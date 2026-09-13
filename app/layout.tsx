@@ -4,6 +4,7 @@ import "./globals.css";
 import "./typography.css";
 import "./desktop-polish.css";
 import "./overview-polish.css";
+import "./overview-finish.css";
 
 const sourceSans = Source_Sans_3({
   subsets: ["latin"],
