@@ -18,9 +18,12 @@ The current implementation contains:
 - representative Work, Handoffs, Records, and Release & Care views;
 - authenticated PostgreSQL-backed create/list/open/resume workspace routes;
 - durable owner-authorized product-scope and business decision records;
-- durable owner-owned proposed work-item records with explicit outcomes, completion conditions, and expected evidence.
+- durable owner-owned proposed work-item records with explicit outcomes, completion conditions, and expected evidence;
+- durable owner-approved product requirements with one linked acceptance criterion and stable identifiers.
 
-The durable decision path does not authorize consequential technical decisions. Those require qualified specialist review and remain later scope. Proposed work items do not imply that execution started, a specialist accepted the work, implementation completed, or verification occurred. Work-state transitions, collaborator/specialist assignment, dependencies, durable requirements, artifact storage/versioning, evidence records, external specialist connectors, automatic CI/CD evidence ingestion, production-changing actions, and production release authorization remain unimplemented.
+The durable decision path does not authorize consequential technical decisions. Those require qualified specialist review and remain later scope. Proposed work items do not imply that execution started, a specialist accepted the work, implementation completed, or verification occurred. The owner requirement path approves only product or business behavior within owner authority; consequential technical implementation choices remain subject to qualified specialist review. Acceptance criteria are conditions, not evidence or verification results.
+
+Work-state transitions, collaborator/specialist assignment, dependencies and links, technical-requirement review, multiple criterion lifecycle, artifact storage/versioning, evidence records, external specialist connectors, automatic CI/CD evidence ingestion, production-changing actions, and production release authorization remain unimplemented.
 
 ## 3. Component boundaries
 
@@ -30,15 +33,15 @@ Next.js App Router and React render the workspace. Interactive components use cl
 
 ### Application logic
 
-Server-side application functions enforce implemented workspace scope, identity, authorization, input validation, decision authority boundaries, and proposed-work semantics. Later slices will add work-state transitions, assignment, requirement linkage, artifact lifecycle, reconciliation, change-impact, evidence, and release rules.
+Server-side application functions enforce implemented workspace scope, identity, authorization, input validation, decision authority boundaries, proposed-work semantics, and owner-approved product-requirement semantics. Later slices will add work-state transitions, assignment and links, specialist review, artifact lifecycle, reconciliation, change-impact, evidence, and release rules.
 
 ### Persistence
 
-PostgreSQL is authoritative for implemented durable workspace, release/stage, owner-decision, and proposed-work-item state. Artifact storage may use object storage when file size or immutability requirements justify it.
+PostgreSQL is authoritative for implemented durable workspace, release/stage, owner-decision, proposed-work-item, owner-approved requirement, and acceptance-criterion state. Artifact storage may use object storage when file size or immutability requirements justify it.
 
 ### AI guidance
 
-AI guidance is advisory. Generated recommendations and drafts remain distinguishable from accepted project records. AI output must not authorize production actions or silently alter accepted scope.
+AI guidance is advisory. Generated recommendations and drafts remain distinguishable from approved or accepted project records. AI output must not authorize production actions or silently alter approved scope.
 
 ### External tools
 
@@ -52,6 +55,9 @@ For implemented persistent state:
 - a saved owner decision is an accepted product-scope or business choice only after explicit owner-authority confirmation;
 - technical choices that require qualified specialist review are not accepted through the owner-decision action;
 - a newly recorded work item is planned work with status `Proposed` and does not establish execution, completion, review, or verification;
+- a requirement recorded through the owner action is an `Approved` product requirement only after explicit owner-authority confirmation;
+- a consequential technical implementation requirement is not approved through the owner requirement action;
+- an acceptance criterion is a durable observable condition linked to a requirement and does not represent evidence, a test result, or verification state;
 - the authenticated owner actor and current release/stage are resolved from durable state instead of caller-supplied authority data;
 - external tool output is input to reconciliation, not automatic project truth;
 - chat history is not a project data source.
@@ -66,21 +72,24 @@ Owner-decision creation derives actor identity, release, and stage from durable 
 
 Proposed-work-item creation derives the owner actor, release, and stage from the verified session and current workspace membership. The database constrains the implemented work-item status to `Proposed` and records `work_item.proposed` in the audit log. This slice does not allow an owner to claim that another collaborator or specialist accepted assignment.
 
+Owner-requirement creation derives the approving actor, release, and stage from the verified session and current owner membership. It requires explicit owner-authority confirmation, constrains kind to `product`, authority to `owner`, and status to `Approved`, creates one acceptance criterion in the same transaction, and records `requirement.approved` in the audit log. This action does not confer specialist approval on consequential technical choices.
+
 The broader production architecture must also provide qualified specialist-review records, explicit reviewer and collaborator roles, validation at file and external-input boundaries, no committed secrets, and audit records for material acceptance and authorization events.
 
 Security design that changes trust boundaries or introduces consequential dependencies requires an Architecture Decision Record.
 
 ## 6. Failure behavior
 
-Material workflows preserve the last accepted or committed project state when a proposed operation fails.
+Material workflows preserve the last accepted, approved, or committed project state when a proposed operation fails.
 
 Implemented examples:
 
 - durable workspace creation is transactional and leaves no partial record after an injected failure;
 - owner-decision creation is transactional and rolls back the decision, audit event, and request result when audit insertion fails;
 - proposed-work-item creation is transactional and rolls back the work item, audit event, and request result when audit insertion fails;
+- owner-requirement creation is transactional and rolls back the requirement, linked criterion, audit event, and request result when audit insertion fails;
 - database interruption renders a recoverable error and does not substitute fixture data;
-- successful same-route decision and work-item saves explicitly revalidate the workspace before redirect so the rendered state matches committed state.
+- successful same-route decision, work-item, and requirement saves explicitly revalidate the workspace before redirect so the rendered state matches committed state.
 
 Future failed imports must preserve accepted artifacts; failed reconciliation must not partially accept returned work; interrupted release actions must not be reported as successful without outcome evidence; unknown dependency impact remains unresolved rather than becoming “no impact.”
 
@@ -88,7 +97,7 @@ The persistence adapters use a bounded retry only for PostgREST error `PGRST303`
 
 ## 7. Observability
 
-Important failures must be diagnosable without logging secrets or unnecessary sensitive data. Implemented durable mutations record scoped audit events and correlation/request context. Later observability work must extend this baseline to requirements, artifact, evidence, review, work-state transition, and release workflows.
+Important failures must be diagnosable without logging secrets or unnecessary sensitive data. Implemented durable mutations record scoped audit events and correlation/request context. Later observability work must extend this baseline to evidence, specialist review, artifact, work-state transition, change-impact, and release workflows.
 
 ## 8. Deployment and rollback
 
@@ -124,4 +133,6 @@ The owner-authorized decision slice is **Validated** at application commit `548f
 
 The proposed-work-item slice is **Validated** at application commit `1f2a1c99856119c845a4495b61674bea415a4a77` through CI run 113. It records owner-owned bounded planned work with status `Proposed`, explicit completion conditions, and expected evidence, without implying execution or verification. See [validation/increment-2-work-items.md](validation/increment-2-work-items.md).
 
-No hosted project or production deployment exists. Broader Increment 2 remains In progress for specialist review, work-state transitions and assignment, requirements, artifacts, evidence, maintenance, and later durable record workflows.
+The owner-approved product-requirement slice is **Validated** at application commit `9e2af6940ce4d440fed00825620e0b693eff17c2` through CI run 131. It records only owner-authorized product requirements with one durable acceptance criterion and keeps that criterion distinct from verification evidence. See [validation/increment-2-requirements.md](validation/increment-2-requirements.md).
+
+No hosted project or production deployment exists. Broader Increment 2 remains In progress for specialist review, work-state transitions and assignment, durable record links, artifacts, evidence, maintenance, and later lifecycle/change-impact behavior.
