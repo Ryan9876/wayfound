@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArrowRight, CheckCircle2, Circle, Clock3, FileText, PackageOpen, ShieldCheck } from "lucide-react";
 
 export function WorkView() {
@@ -67,6 +68,16 @@ export function RecordsView() {
   </section>;
 }
 function RecordRow({name,stage,status,version}:{name:string;stage:string;status:string;version:string}) {return <div className="table-row record-row" role="row"><span className="record-name"><FileText size={16} /><b>{name}</b></span><span className="record-field"><small>Stage</small>{stage}</span><span className="record-field record-status"><small>Status</small><i className={`record-dot ${status === "Accepted" ? "accepted" : status === "Proposed" ? "proposed" : "neutral"}`} />{status}</span><span className="record-field mono"><small>Version</small>{version}</span></div>}
+
+export function MoreView() {
+  return <section className="standard-page more-page"><PageHeading eyebrow="More" title="The rest of the workspace." text="Open specialist handoffs, durable records, and release care from one mobile destination." />
+    <div className="more-grid">
+      <Link href="/handoffs" className="more-card"><span className="more-card-icon"><PackageOpen size={21} /></span><div><span className="eyebrow">Handoffs</span><h2>Specialist packages</h2><p>Prepare bounded context and reconcile returned work.</p></div><ArrowRight size={17} /></Link>
+      <Link href="/records" className="more-card"><span className="more-card-icon"><FileText size={21} /></span><div><span className="eyebrow">Records</span><h2>Project continuity</h2><p>Review decisions, evidence, status, and versions.</p></div><ArrowRight size={17} /></Link>
+      <Link href="/release-care" className="more-card"><span className="more-card-icon"><ShieldCheck size={21} /></span><div><span className="eyebrow">Release & Care</span><h2>Readiness and ownership</h2><p>Track release evidence, recovery, and operating responsibility.</p></div><ArrowRight size={17} /></Link>
+    </div>
+  </section>;
+}
 
 export function ReleaseCareView() {
   return <section className="standard-page release-care-page"><PageHeading eyebrow="Release & Care" title="Release only what the evidence supports." text="Readiness is separate from implementation. This prototype does not claim release readiness." />
