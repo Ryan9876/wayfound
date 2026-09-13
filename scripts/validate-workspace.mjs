@@ -105,7 +105,9 @@ try {
  await page.getByLabel('What problem do you want to solve?').fill('Track the equipment that volunteers borrow.');
  await page.getByRole('button',{name:'Create workspace',exact:true}).click();
  await page.waitForURL(/\/workspaces\/[0-9a-f-]+$/);
- const resumeUrl=page.url();await inspect(page,'saved-workspace');
+ const resumeUrl=page.url();
+ await page.getByRole('heading',{name:'Community workshop',exact:true}).waitFor({timeout:30000});
+ await inspect(page,'saved-workspace');
  assert(await page.getByText('Stage 1: Clarify',{exact:true}).isVisible());
  await page.getByRole('link',{name:'Your workspaces',exact:true}).click();await inspect(page,'workspace-list');
  await page.getByRole('button',{name:'Sign out',exact:true}).click();await page.waitForURL(base+'/sign-in');
@@ -113,6 +115,7 @@ try {
  await context.close();await stop();await start();
  context=await browser.newContext();page=await context.newPage();
  await login(page,emails[1]);await page.getByRole('link',{name:/Community workshop/}).click();assert.equal(page.url(),resumeUrl);
+ await page.getByRole('heading',{name:'Community workshop',exact:true}).waitFor({timeout:30000});
  assert(await page.getByText('Track the equipment that volunteers borrow.',{exact:true}).isVisible());
  // Different owner cannot retrieve this workspace through its route.
  const other=await browser.newContext();const otherPage=await other.newPage();await login(otherPage,emails[0]);await otherPage.goto(resumeUrl);assert(await otherPage.getByRole('heading',{name:'Workspace not available.'}).isVisible());await other.close();
