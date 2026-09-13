@@ -86,7 +86,7 @@ jobs:
 
   durable-workspace:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -104,6 +104,8 @@ jobs:
         run: npx supabase db advisors --local --type security --fail-on error
       - name: Validate durable workspace
         run: npm run test:workspace
+      - name: Validate durable evidence
+        run: npm run test:evidence
       - name: Upload workspace screenshots
         if: always()
         uses: actions/upload-artifact@v4
