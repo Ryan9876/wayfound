@@ -8,7 +8,7 @@ Wayfound is a software-delivery guidance and coordination workspace for capable 
 
 Increment 1 is **Validated** at application commit `4cbc8fd`; see the [validation record](docs/validation/increment-1.md). Increment 2 is **In progress** under [accepted ADR-0002](docs/adr/0002-durable-workspace-identity.md).
 
-Two Increment 2 slices are now **Validated**:
+Two Increment 2 slices are **Validated**:
 
 - authenticated create/list/open/resume workspace continuity at application commit `603f028`, [validation record](docs/validation/increment-2-durable-workspace.md);
 - owner-authorized durable product/business decisions at application commit `548f1bb`, [validation record](docs/validation/increment-2-decisions.md).
