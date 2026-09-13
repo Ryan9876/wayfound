@@ -1,8 +1,9 @@
 # Increment 2 — Durable proposed work items
 
-**Status:** In progress  
+**Status:** Validated  
 **Parent increment:** Increment 2 — Durable workspace record  
-**Architecture basis:** ADR-0002 and the validated durable-workspace boundary
+**Architecture basis:** ADR-0002 and the validated durable-workspace boundary  
+**Validated application commit:** `1f2a1c99856119c845a4495b61674bea415a4a77` through CI run 113
 
 ## 1. Outcome
 
@@ -85,17 +86,19 @@ The section shows:
 - each work item with title, outcome, owner, current-stage capture, completion condition, expected evidence, revision, and text status;
 - a form for title, outcome, completion condition, and expected evidence.
 
-The interface states that saving creates proposed work only. It must not imply that execution started, that a specialist accepted the work, or that verification occurred.
+The interface states that saving creates proposed work only. It does not imply that execution started, that a specialist accepted the work, or that verification occurred.
 
 ## 8. Failure behavior
 
 If work-item creation fails, the application keeps the existing workspace and work-item list unchanged and shows a recoverable error.
 
-A database interruption must not replace durable work with fixture records or claim that a failed save succeeded.
+A database interruption does not replace durable work with fixture records or claim that a failed save succeeded.
 
 The existing bounded retry for exact PostgREST `PGRST303: JWT issued at future` may apply. Authorization failures remain failures.
 
 ## 9. Acceptance criteria
+
+All acceptance criteria below passed at application commit `1f2a1c99856119c845a4495b61674bea415a4a77` through CI run 113:
 
 1. Owner A creates a workspace and records one proposed work item through the application. The saved record contains the entered title, outcome, completion condition, expected evidence, status `Proposed`, current release, current stage, and Owner A as the owner actor.
 2. The rendered work item shows status with text and does not claim `In progress`, `Implemented`, `Validated`, specialist review, or verification.
@@ -108,6 +111,8 @@ The existing bounded retry for exact PostgREST `PGRST303: JWT issued at future` 
 9. The database security advisor reports no new error.
 10. TypeScript, production build, existing durable-workspace and decision acceptance tests, keyboard checks, responsive checks, and rendered screenshots pass.
 11. Mobile and desktop rendered review confirms that the work-item record and form do not overflow the viewport and that owner, stage, status, completion condition, and expected evidence remain readable.
+
+See [validation/increment-2-work-items.md](validation/increment-2-work-items.md) for executed evidence and limits.
 
 ## 10. Excluded behavior
 
