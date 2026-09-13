@@ -17,6 +17,7 @@ import "./overview-mobile-cta.css";
 import "./journey-polish.css";
 import "./work-polish.css";
 import "./handoffs-records-polish.css";
+import "./release-care-polish.css";
 
 const sourceSans = Source_Sans_3({
   subsets: ["latin"],
