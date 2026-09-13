@@ -268,6 +268,8 @@
   }
 
   .records-page .record-row {
+    /* Override the legacy table minimum so mobile cards fit the viewport. */
+    min-width: 0;
     min-height: 0;
     padding: 14px;
     display: grid;

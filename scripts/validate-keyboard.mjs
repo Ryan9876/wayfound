@@ -22,6 +22,24 @@ try {
     for (const route of routes) {
       await page.goto(`${baseUrl}${route}`, { waitUntil: "networkidle" });
 
+      const dimensions = await page.evaluate(() => ({
+        viewport: document.documentElement.clientWidth,
+        content: document.documentElement.scrollWidth,
+      }));
+      if (dimensions.content > dimensions.viewport) {
+        fail(`${viewport.name} ${route}: horizontal overflow (${dimensions.content}px content in ${dimensions.viewport}px viewport).`);
+      }
+
+      if (viewport.name === "mobile" && route === "/records") {
+        const fieldsFit = await page.locator(".record-row .record-field").evaluateAll((fields) =>
+          fields.length === 12 && fields.every((field) => {
+            const rect = field.getBoundingClientRect();
+            return rect.width > 0 && rect.height > 0 && rect.left >= 0 && rect.right <= window.innerWidth;
+          }),
+        );
+        if (!fieldsFit) fail("mobile /records: Stage, Status, and Version must remain visible within the viewport on all four cards.");
+      }
+
       const expected = await page.evaluate(() => {
         const selector = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
         const elements = [...document.querySelectorAll(selector)].filter((element) => {
