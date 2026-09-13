@@ -1,7 +1,9 @@
 /* Cross-workspace accessibility refinements.
    Keeps small supporting text readable and makes keyboard focus visible. */
 
-:where(a, button, input):focus-visible {
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
   outline: 2px solid var(--pine);
   outline-offset: 3px;
 }
