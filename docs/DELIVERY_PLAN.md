@@ -76,9 +76,21 @@ Validated scope includes transactional evidence creation, requirement-to-criteri
 
 Recording evidence does not mark the acceptance criterion satisfied, passed, verified, or validated and does not change the linked requirement from `Approved`.
 
+### Slice 6 — Durable proposed artifacts
+
+**Status:** Validated
+
+An authenticated workspace owner can record a durable artifact identity with one stable initial version and an external reference. Version 1 is constrained to lifecycle `Proposed`; the current flow has no accepted-version pointer and does not make the artifact accepted project direction.
+
+The slice passed all existing durable regression suites and a focused artifact-specific acceptance suite at application commit `8d36adede6c4b5c5570b7a3e37a519588124500b` through CI run 157. See the [artifact slice](INCREMENT_2_ARTIFACTS.md) and [validation record](validation/increment-2-artifacts.md).
+
+Validated scope includes transactional artifact-plus-version creation, stable artifact/version identifiers, derived owner/release/stage context, idempotent retries, HTTP/HTTPS reference validation, direct-table denial, tenant/session/revocation isolation, injected-failure rollback, restart/resume, database interruption/recovery, keyboard focus, mobile/desktop rendered review, and explicit proof that Wayfound stores the external reference without fetching it.
+
+This slice does not implement artifact acceptance, later versions, file import, failed-import history, import retry history, or change summaries. Those remain later lifecycle/import work.
+
 ### Remaining Increment 2 scope
 
-Specialist-review decision and technical-requirement flow; work-state transitions, collaborator/specialist assignment, work dependencies and broader durable links; multiple acceptance-criterion lifecycle; artifact records and versioning; evidence freshness/outdated-state handling, evidence acceptance or specialist review, and explicit verification decisions; maintenance records; later lifecycle behavior; change-impact handling; and supporting audit/seed behavior remain In progress or unimplemented. No hosted project has been provisioned.
+Specialist-review decision and technical-requirement flow; work-state transitions, collaborator/specialist assignment, work dependencies and broader durable links; multiple acceptance-criterion lifecycle; artifact acceptance and later-version lifecycle; evidence freshness/outdated-state handling, evidence acceptance or specialist review, and explicit verification decisions; maintenance records; later lifecycle behavior; change-impact handling; and supporting audit/seed behavior remain In progress or unimplemented. No hosted project has been provisioned.
 
 ## 4. Increment 3 — Versioned artifact import
 
@@ -86,7 +98,7 @@ Specialist-review decision and technical-requirement flow; work-state transition
 
 **Outcome:** An owner can import revised specifications without losing or silently replacing the accepted version.
 
-**Expected scope:** proposed artifact versions, accepted-version preservation, failed-import records, retry history, and a plain-English change summary or documented alternative comparison.
+**Expected scope:** proposed artifact versions beyond the initial durable record, accepted-version preservation and selection, file/import boundaries, failed-import records, retry history, and a plain-English change summary or documented alternative comparison.
 
 ## 5. Increment 4 — Manual specialist handoff and reconciliation
 
