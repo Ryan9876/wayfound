@@ -1,121 +1,228 @@
 # Wayfound Product Requirements
 
-**Status:** Draft
+**Status:** Approved first-version baseline for prototype implementation
 
-## Purpose
+## 1. Requirement rules
 
-This file is the authoritative record of approved Wayfound product behavior. It defines what the system must do and how acceptance is determined.
+- Each requirement has one stable identifier.
+- `MUST` defines required behavior.
+- `SHOULD` defines a strong default that can be changed only with a recorded reason and consequences.
+- `MAY` defines optional behavior.
+- Acceptance criteria define observable behavior. They do not claim that a test has executed.
+- Test evidence and review evidence remain separate from acceptance criteria.
 
-Do not use this file to justify implementation details unless the detail is itself a product constraint.
+## 2. Orientation and guidance
 
-## 1. Requirement format
+### WF-ORI-001 — Current release orientation
 
-Each material requirement should use this structure:
+**Priority:** P0  
+**Status:** Approved
 
-### WF-XXX — Short requirement name
-
-**Status:** Proposed | Approved | Implemented | Validated | Released | Deprecated | Retired
-
-**User or system:** TBD
-
-**Requirement:**
-
-> When **[condition]**, **[actor/system] MUST [behavior]** so that **[observable result]**.
-
-**Rationale:**
-
-TBD
+**Requirement:** While a user is in a project workspace, the Wayfound system MUST show the current release, current stage, unresolved items that materially affect progress, and the next recommended action.
 
 **Acceptance criteria:**
 
-- Given **[precondition]**, when **[action/event]**, then **[observable result]**.
-- Given **[failure condition]**, when **[action/event]**, then **[required failure behavior]**.
+- Given a project has an active release, when the owner opens the workspace, then the release and current stage are visible without opening another view.
+- Given an unresolved assumption affects the current recommendation, when the owner views the recommendation, then that assumption is visible or directly accessible.
 
-**Constraints:**
+### WF-GDE-001 — Recommended next action
 
-- TBD
+**Priority:** P0  
+**Status:** Approved
 
-**Dependencies:**
+**Requirement:** When Wayfound recommends a next action, the Wayfound system MUST show the action before its supporting detail and MUST explain why the action matters.
 
-- TBD
+**Acceptance criteria:**
 
-**Evidence / validation:**
+- Given Stage 2 is active for the Borrow Desk scenario, when the overview renders, then “Observe one equipment checkout next” appears as the primary recommendation.
+- Given the recommendation is visible, when the owner reads its rationale, then the interface presents the governing outcome before supporting reasons.
 
-- TBD
+### WF-GDE-002 — Visible assumptions
 
-## 2. Requirement rules
+**Priority:** P0  
+**Status:** Approved
 
-- Every approved requirement must be testable or objectively reviewable.
-- Use one requirement identifier for one stable behavior.
-- Do not reuse retired identifiers.
-- Do not combine unrelated behaviors into one requirement.
-- State failure behavior when failure can affect users, data, security, or operations.
-- State permissions and authorization behavior for protected actions.
-- State data retention, deletion, or audit behavior when relevant.
-- Link architecture decisions when a requirement depends on an ADR.
-- Mark unknown behavior `TBD`; do not convert assumptions into requirements without approval.
+**Requirement:** The Wayfound system MUST record unanswered material questions as assumptions or open questions instead of presenting them as facts or accepted requirements.
 
-## 3. Priority model
+## 3. Journey and ownership
 
-Use these priorities:
+### WF-JNY-001 — Fifteen-stage journey
 
-- **P0 — Release critical:** the target release cannot succeed without it.
-- **P1 — High:** important to the target outcome; defer only with an explicit tradeoff.
-- **P2 — Normal:** valuable but not necessary for the target outcome.
-- **P3 — Later:** recorded for future consideration; not committed to the active delivery plan.
+**Priority:** P0  
+**Status:** Approved
 
-Priority does not replace status. A P0 requirement can still be Proposed.
+**Requirement:** The Wayfound system MUST represent the complete 15-stage product journey and MUST show which stages are complete, active, upcoming, or reopened.
 
-## 4. Functional requirements
+The canonical stages are:
 
-No product-specific functional requirements are approved yet.
+1. Clarify
+2. Validate and compare
+3. Establish feasibility
+4. Research workflows and UX
+5. Develop brand and visual direction
+6. Prototype and test
+7. Define requirements
+8. Choose implementation approach
+9. Plan delivery
+10. Build
+11. Verify
+12. Refine quality
+13. Prepare pilot and release
+14. Launch and establish ownership
+15. Monitor and improve
 
-Add new requirements below this line using the standard format.
+### WF-OWN-001 — Decision and review ownership
 
----
+**Priority:** P0  
+**Status:** Approved
 
-## 5. Non-functional requirements
+**Requirement:** The Wayfound system MUST distinguish product-owner decisions from work that requires qualified specialist review.
 
-Do not invent numeric targets. Establish targets only when the product context supports them.
+## 4. Durable records and status
 
-### 5.1 Security
+### WF-REC-001 — Durable project record
 
-**TBD** — define authentication, authorization, sensitive-data handling, trust boundaries, audit needs, and security constraints.
+**Priority:** P0  
+**Status:** Approved
 
-### 5.2 Reliability
+**Requirement:** The Wayfound system MUST keep project scope, decisions, requirements, work, evidence, release records, and maintenance records in the project workspace so the user can resume without relying on chat history.
 
-**TBD** — define availability, recovery, retry, idempotency, data-integrity, and degraded-mode expectations where relevant.
+### WF-REC-002 — Honest status
 
-### 5.3 Performance
+**Priority:** P0  
+**Status:** Approved
 
-**TBD** — define user-visible latency, throughput, scale, or resource limits when measured targets are justified.
+**Requirement:** The Wayfound system MUST NOT present implemented or reviewed work as verified unless the required verification evidence exists and is current.
 
-### 5.4 Accessibility
+### WF-REC-003 — Change impact
 
-**TBD** — define required accessibility standard and supported interaction modes for user-facing interfaces.
+**Priority:** P1  
+**Status:** Approved
 
-### 5.5 Privacy and data governance
+**Requirement:** When an accepted decision or artifact changes, the Wayfound system MUST identify known dependent work that needs review and MUST preserve unaffected accepted work.
 
-**TBD** — define data classes, retention, deletion, user control, logging limits, and external processing requirements.
+If the impact is unknown, the system MUST show the impact as unknown until a responsible reviewer confirms it.
 
-### 5.6 Observability
+## 5. Artifact versioning and import
 
-**TBD** — define required logs, metrics, traces, health checks, alerts, and diagnostic context.
+### WF-IMP-001 — Proposed import version
 
-### 5.7 Compatibility
+**Priority:** P0  
+**Status:** Approved
 
-**TBD** — define supported browsers, devices, operating systems, API versions, file formats, or integrations.
+**Requirement:** When an owner imports a specification file, the Wayfound system MUST create a proposed artifact version without replacing the accepted version.
 
-### 5.8 Maintainability
+**Acceptance criteria:**
 
-At minimum, consequential behavior must be represented in repository documentation and must have a practical validation path.
+- Given an accepted specification exists, when the owner imports a valid revision, then the accepted version remains accessible and the imported revision appears as proposed.
 
-## 6. Requirement index
+### WF-IMP-002 — Failed import preservation
 
-| ID | Name | Priority | Status | Validation |
-| --- | --- | --- | --- | --- |
-| TBD | TBD | TBD | TBD | TBD |
+**Priority:** P0  
+**Status:** Approved
 
-## 7. Change rule
+**Requirement:** If an artifact import fails, then the Wayfound system MUST preserve the accepted artifact and identify the failed import.
 
-When implementation changes observable product behavior, update the applicable requirement before or with the code change. When a requirement is intentionally changed, update its acceptance criteria and identify affected implementation and tests.
+**Acceptance criteria:**
+
+- Given an accepted version exists, when an import fails, then the accepted version remains unchanged and the failed attempt shows a recoverable error.
+
+### WF-IMP-003 — Retry history
+
+**Priority:** P0  
+**Status:** Approved
+
+**Requirement:** When an owner successfully retries a failed import, the Wayfound system MUST create one proposed version for the successful retry and retain the earlier failure record.
+
+### WF-IMP-004 — Change summary
+
+**Priority:** P1  
+**Status:** Approved
+
+**Requirement:** Before the owner accepts an imported revision, the Wayfound system SHOULD show a plain-English summary of material changes.
+
+If this summary is omitted, the project record must contain a reason and an alternative comparison method.
+
+## 6. Specialist handoff and reconciliation
+
+### WF-HND-001 — Manual handoff package
+
+**Priority:** P0  
+**Status:** Approved
+
+**Requirement:** When the owner prepares a specialist handoff, the Wayfound system MUST produce a bounded package that identifies relevant context, accepted scope, exclusions, decisions, assumptions, constraints, requested outputs, and return instructions.
+
+### WF-HND-002 — Returned work remains proposed
+
+**Priority:** P0  
+**Status:** Approved
+
+**Requirement:** When specialist work returns to Wayfound, the Wayfound system MUST preserve the original return and MUST keep returned changes proposed until they are reconciled with accepted scope and decisions.
+
+## 7. Release and care
+
+### WF-REL-001 — Concrete release packet
+
+**Priority:** P1  
+**Status:** Approved
+
+**Requirement:** Before a release action is authorized, the Wayfound system MUST identify the exact release version, target, material data effects, known interruption, recovery method, responsible executor, and applicable unresolved findings.
+
+### WF-REL-002 — Scoped authorization
+
+**Priority:** P1  
+**Status:** Approved
+
+**Requirement:** A release authorization MUST apply only to the reviewed release packet. A material change to the version, target, data operation, or consequences MUST require renewed review.
+
+### WF-CAR-001 — Operating ownership
+
+**Priority:** P1  
+**Status:** Approved
+
+**Requirement:** A released project MUST identify an operations owner and MUST retain maintenance, incident, recovery, and improvement records in the project workspace.
+
+## 8. First-version interface requirements
+
+### WF-UI-001 — Responsive workspace
+
+**Priority:** P0  
+**Status:** Approved
+
+**Requirement:** The Wayfound first version MUST provide a usable web workspace on phone and desktop layouts.
+
+### WF-UI-002 — Primary navigation
+
+**Priority:** P0  
+**Status:** Approved
+
+**Requirement:** The desktop workspace MUST provide direct navigation to Overview, Journey, Work, Handoffs, Records, and Release & Care.
+
+The compact mobile workspace MUST provide direct access to Overview, Journey, Work, and a More destination for the remaining workspace areas.
+
+### WF-UI-003 — Status is not color-only
+
+**Priority:** P0  
+**Status:** Approved
+
+**Requirement:** The interface MUST identify important status with text and MUST NOT rely on color alone.
+
+## 9. Deferred capabilities
+
+The following capabilities are outside the active first-version commitment unless a later approved change moves them into scope:
+
+- verified direct specialist-tool connectors;
+- automatic CI/CD evidence ingestion;
+- automatic repository change analysis;
+- scheduling integrations;
+- portfolio reporting;
+- automatic production-changing actions;
+- rich side-by-side document comparison.
+
+A future requirement retains its normative strength only after its feature enters an approved release scope.
+
+## 10. Validation state
+
+The requirements above define expected behavior. They do not claim that the behavior is implemented, reviewed, verified, or released.
+
+The current prototype slice covers only the orientation, navigation, journey presentation, and representative record/readiness states needed for product-learning work.

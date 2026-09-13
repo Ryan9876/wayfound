@@ -1,135 +1,71 @@
 # Wayfound Delivery Plan
 
-**Status:** Draft
+**Status:** In progress
 
-## Purpose
+## 1. Delivery objective
 
-This file is the current execution plan for Wayfound. It translates approved scope and requirements into sequenced work.
+Deliver Wayfound as validated vertical slices. Each slice must improve a complete user outcome and leave the repository coherent.
 
-Do not use this file to redefine product scope or architecture. Update the authoritative source first.
+Do not build deferred automation before the core orientation, continuity, and evidence model is understandable to intended users.
 
-## 1. Current objective
-
-**TBD — define the first bounded delivery outcome.**
-
-A good objective identifies:
-
-- user or system outcome
-- included requirements
-- excluded work
-- validation method
-- completion condition
-
-## 2. Delivery rules
-
-- Prefer small vertical slices that produce testable behavior.
-- Sequence work by dependency and risk, not by convenience alone.
-- Resolve high-impact unknowns before building large dependent areas.
-- Keep speculative future work out of the active milestone.
-- Do not mark work complete until required validation passes.
-- Record blockers with a named dependency or decision.
-
-## 3. Milestones
-
-### M0 — Product definition
-
-**Goal:** Establish enough approved product context to select an architecture and define the first build slice.
-
-**Exit criteria:**
-
-- Product statement approved.
-- Primary users and core problem approved.
-- In-scope and out-of-scope boundaries approved.
-- Initial delivery target approved.
-- Initial functional requirements approved.
-- Key non-functional constraints identified or explicitly deferred.
+## 2. Increment 1 — Foundation and orientation
 
 **Status:** In progress
 
-### M1 — Architecture baseline
+**Outcome:** A user can open the Borrow Desk prototype, understand the current release and stage, see one recommended next action with its reason, and move across the primary workspace areas.
 
-**Goal:** Select the minimum architecture required for the first delivery target.
+**Included:**
 
-**Entry criteria:** M0 exit criteria met.
+- responsive desktop and mobile shell;
+- Wayfound design tokens and logo direction;
+- Overview dashboard;
+- canonical 15-stage Journey view;
+- Work, Handoffs, Records, and Release & Care representative views;
+- fixture data only.
 
-**Exit criteria:**
+**Validation:**
 
-- System context defined.
-- Major component boundaries defined.
-- Data authority defined.
-- Security boundaries defined.
-- Deployment and rollback approach defined.
-- Foundational decisions recorded as ADRs.
-- Validation approach defined.
+- source/type checks when dependencies are available;
+- desktop and mobile visual review;
+- keyboard and contrast review;
+- task test: identify current stage, next action, open assumption, and evidence state.
 
-**Status:** Proposed
-
-### M2 — First working vertical slice
-
-**Goal:** Deliver one end-to-end user or system outcome with production-quality engineering practices appropriate to the target environment.
-
-**Entry criteria:** Required M1 decisions approved.
-
-**Exit criteria:**
-
-- Selected requirements implemented.
-- Acceptance criteria pass.
-- Required automated checks pass.
-- Important failure behavior is verified.
-- Required observability is present.
-- Documentation matches implementation.
-- Release decision is explicit.
+## 3. Increment 2 — Durable workspace record
 
 **Status:** Proposed
 
-## 4. Active work
+**Outcome:** An authenticated owner can create and resume a workspace without relying on chat history.
 
-| Work item | Source | Owner | Status | Dependency | Validation |
-| --- | --- | --- | --- | --- | --- |
-| Define Wayfound product statement | Project charter | Project owner | Proposed | None | Charter review |
-| Define primary users and core problem | Project charter | Project owner | Proposed | None | Charter review |
-| Define first delivery outcome | Project charter / requirements | Project owner | Proposed | Product statement | Scope review |
-| Create initial approved requirements | Product requirements | TBD | Blocked | Product definition | Acceptance criteria review |
-| Select architecture baseline | Architecture / ADRs | TBD | Blocked | Approved initial requirements | Architecture review |
+**Expected scope:** authentication and workspace membership, PostgreSQL persistence, release/stage/decision/work/artifact/evidence/maintenance records, explicit lifecycle status, audit baseline, and seed/demo tooling.
 
-## 5. Work item standard
+## 4. Increment 3 — Versioned artifact import
 
-A work item is ready for implementation when it has:
+**Status:** Proposed
 
-- a clear outcome
-- authoritative source reference
-- defined scope
-- acceptance criteria
-- known dependencies
-- material assumptions identified
-- required design decision resolved or explicitly bounded
+**Outcome:** An owner can import revised specifications without losing or silently replacing the accepted version.
 
-A work item is complete when:
+**Expected scope:** proposed artifact versions, accepted-version preservation, failed-import records, retry history, and a plain-English change summary or documented alternative comparison.
 
-- implementation is complete
-- applicable tests pass
-- acceptance criteria pass
-- relevant failure modes are reviewed
-- documentation is reconciled
-- remaining risk is recorded
+## 5. Increment 4 — Manual specialist handoff and reconciliation
 
-## 6. Blocker standard
+**Status:** Proposed
 
-A blocker entry must state:
+**Outcome:** The owner can prepare a bounded specialist package, return with specialist output, and reconcile it against accepted scope and decisions.
 
-1. what cannot proceed
-2. the exact dependency or decision
-3. the owner of that dependency or decision
-4. the next action
+**Expected scope:** handoff package generation, return intake, contradiction/open-question capture, acceptance by artifact or bounded change, and named reviewer records.
 
-Do not use `blocked` for ordinary uncertainty that can be handled by a reversible assumption.
+## 6. Increment 5 — Impact, readiness, release, and care
 
-## 7. Future work
+**Status:** Proposed
 
-**TBD**
+**Outcome:** Changes expose affected evidence, and a release can be reviewed against a concrete packet with named operating ownership.
 
-Record future ideas here only after they are sufficiently clear to preserve. Future work is not committed scope.
+**Expected scope:** dependency and impact records, outdated-evidence handling, requirement-to-criterion-to-evidence traceability, readiness view, release packet and scoped authorization, deployment outcome record, and maintenance due items.
 
-## 8. Change rule
+## 7. Deferred roadmap
 
-Update this plan when approved scope, requirement priority, dependency order, or delivery status changes. Do not use the plan as a substitute for requirements or architecture records.
+Do not include these items without an approved scope change: verified direct specialist connectors, automatic CI/CD evidence ingestion, automatic repository change analysis, scheduling integrations, portfolio reporting, or automatic production actions.
+
+## 8. Completion rule
+
+An increment is not `Validated` until its acceptance criteria and required checks have executed against an identified build. A preview deployment alone does not establish validation.

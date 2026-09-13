@@ -1,167 +1,100 @@
 # Wayfound Architecture
 
-**Status:** Draft
+**Status:** Approved foundation; implementation is incremental
 
-## Purpose
+## 1. Architecture decision
 
-This file describes the approved technical structure of Wayfound. It records system boundaries, major components, interfaces, data authority, operational behavior, and technical constraints.
+Wayfound uses a web application architecture based on Next.js App Router, React, TypeScript, and a relational PostgreSQL data model.
 
-Use an Architecture Decision Record (ADR) for consequential decisions that explain why the architecture has a specific form.
+The first prototype slice deliberately uses local fixture data. This keeps product-learning work reversible while the interface and record model are validated.
 
-## 1. Architecture summary
+Persistent data, authentication, artifact versioning, and dependency-aware evidence handling enter later vertical slices. The prototype fixture layer must not become an accidental production data source.
 
-**TBD — define after the product charter and initial requirements are approved.**
+## 2. Current prototype boundary
 
-Preferred format:
+The current implementation contains:
 
-> Wayfound uses **[architecture style]** with **[major components]**. **[component]** owns **[data or behavior]**. Components communicate through **[interfaces]**. The system is deployed to **[environment]** and relies on **[external dependencies]**.
+- a responsive application shell;
+- the approved Wayfound visual tokens;
+- desktop and mobile primary navigation;
+- a Borrow Desk overview scenario;
+- the canonical 15-stage journey;
+- representative Work, Handoffs, Records, and Release & Care views;
+- fixture data with no production writes.
 
-## 2. System context
+The current implementation does not contain authentication, a database connection, durable artifact storage, external specialist connectors, automatic CI/CD evidence ingestion, production-changing actions, or a production authorization mechanism.
 
-### Users and external actors
+## 3. Target component boundaries
 
-**TBD**
+### Presentation
 
-### External systems
+Next.js App Router and React render the workspace. Interactive components should use client-side JavaScript only where interaction requires it.
 
-**TBD**
+### Application logic
 
-### Trust boundaries
+Server-side application functions will enforce workspace scope, artifact lifecycle, authorization, versioning, reconciliation, impact review, and release rules.
 
-**TBD**
+### Persistence
 
-## 3. Major components
+PostgreSQL will become the authoritative application data store for structured workspace records. Artifact storage may use object storage when file size or immutability requirements justify it.
 
-| Component | Responsibility | Owns | Depends on | Failure effect |
-| --- | --- | --- | --- | --- |
-| TBD | TBD | TBD | TBD | TBD |
+### AI guidance
 
-A component must have one clear primary responsibility. Do not create a component only to mirror an implementation framework.
+AI guidance is advisory. Generated recommendations and drafts remain distinguishable from accepted project records. AI output must not authorize production actions or silently alter accepted scope.
 
-## 4. Data model and authority
+### External tools
 
-**TBD**
+The first version uses explicit manual handoff packages and returned-file reconciliation. Verified direct connectors are later scope.
 
-For each important data domain, define:
+## 4. Data authority
 
-- authoritative owner
-- storage location
-- creation and update path
-- lifecycle and retention
-- access rules
-- integrity constraints
-- replication or caching behavior
+When persistence is implemented:
 
-Do not create two authorities for the same data without an explicit reconciliation rule.
+- the Wayfound database owns structured workspace state;
+- an accepted artifact version remains authoritative until an authorized acceptance action selects a later version;
+- failed imports remain failure records and do not replace accepted artifacts;
+- external tool output is input to reconciliation, not automatic project truth;
+- chat history is not a project data source.
 
-## 5. Interfaces and contracts
+## 5. Security and authorization
 
-**TBD**
+The production architecture must provide authenticated users, workspace-scoped authorization, explicit ownership and reviewer roles, validation at file and external-input boundaries, no committed secrets, audit records for material acceptance and authorization events, and clear separation between recommendations and authorized actions.
 
-For each interface, define:
+Security design that changes trust boundaries or introduces consequential dependencies requires an Architecture Decision Record.
 
-- caller and provider
-- protocol or mechanism
-- request and response contract
-- authentication and authorization
-- timeout and retry behavior
-- idempotency behavior where relevant
-- versioning and compatibility expectations
-- failure behavior
+## 6. Failure behavior
 
-## 6. Security architecture
+Material workflows must preserve the last accepted project state when a proposed operation fails.
 
-**TBD**
+Examples:
 
-At minimum, define:
+- failed imports preserve accepted artifacts;
+- failed reconciliation does not partially accept returned work;
+- an interrupted release action must not be reported as successful without outcome evidence;
+- unknown dependency impact remains unresolved rather than becoming “no impact.”
 
-- identities and principals
-- authentication boundaries
-- authorization model
-- secret storage
-- sensitive-data classification
-- encryption requirements
-- audit requirements
-- untrusted-input boundaries
-- external-service trust assumptions
+## 7. Observability
 
-## 7. Reliability and failure model
+Important failures must be diagnosable. Production implementation must identify the workspace, operation, actor or external source, record version, outcome, and correlation context without logging secrets or unnecessary sensitive data.
 
-**TBD**
+## 8. Deployment and rollback
 
-For each critical dependency or component, define:
+The prototype can use preview deployment without persistent operational data.
 
-- expected failure modes
-- detection method
-- degraded behavior
-- retry policy
-- data-integrity protection
-- recovery procedure
-- user-visible effect
+Before production data exists, Wayfound must define repeatable deployment and rollback behavior for the chosen hosting and persistence services. Recovery claims require executed restore evidence.
 
-## 8. Observability
+## 9. Technology baseline
 
-**TBD**
+The prototype source currently targets:
 
-Define required:
+- Next.js 16.3.x App Router;
+- React 19.3.x;
+- TypeScript 7.0.x;
+- Tailwind CSS 4.3.x;
+- Lucide React for interface icons.
 
-- health checks
-- structured logs
-- metrics
-- traces where justified
-- correlation identifiers
-- alerts
-- operational dashboards
-- diagnostic data retained for support
+These versions remain implementation details within the approved Next.js 14+ architecture family. Dependency versions should be reviewed during each release rather than treated as permanent product requirements.
 
-Important failures must be visible without reproducing them manually.
+## 10. Reconsideration triggers
 
-## 9. Deployment and environments
-
-**TBD**
-
-Define:
-
-- environments
-- deployment mechanism
-- configuration sources
-- secret injection
-- schema or data migrations
-- rollout strategy
-- rollback strategy
-- release verification
-
-## 10. Performance and capacity
-
-**TBD**
-
-Document only justified targets and known constraints. Do not invent scale requirements.
-
-## 11. Technology choices
-
-No foundational technology choices are approved in this baseline.
-
-Record consequential choices in ADRs before treating them as project constraints.
-
-## 12. Architecture decision triggers
-
-Create an ADR when a change:
-
-- changes a system or ownership boundary
-- selects or replaces a foundational framework, database, hosting platform, or major external service
-- changes the authentication or authorization model
-- changes the authoritative data source
-- introduces a difficult migration
-- materially changes deployment or rollback behavior
-- accepts a significant security, reliability, cost, or maintainability tradeoff
-- is expensive to reverse
-
-## 13. Known risks and technical debt
-
-| Item | Type | Impact | Mitigation | Owner | Status |
-| --- | --- | --- | --- | --- | --- |
-| Architecture not yet selected | Open decision | Implementation should not begin from assumed platform choices | Complete product definition, then evaluate architecture options | Project owner | Open |
-
-## 14. Change rule
-
-Architecture documentation and implementation must describe the same system. Update this file and any affected ADR when a change modifies a documented boundary, contract, dependency, data authority, deployment model, or failure behavior.
+Revisit the architecture when validated product behavior cannot be represented cleanly by the current record model, persistence or file-volume needs materially exceed the planned model, direct integrations enter approved scope, AI or external actions gain authority beyond drafting and recommendations, or security/privacy/availability/regulatory requirements materially change.
