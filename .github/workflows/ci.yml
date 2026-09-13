@@ -28,6 +28,9 @@ jobs:
       - name: Check prototype structure
         run: npm run test:prototype
 
+      - name: Check accessibility baseline
+        run: npm run test:accessibility
+
       - name: Check TypeScript
         run: npm run lint
 
