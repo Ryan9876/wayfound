@@ -6,6 +6,7 @@ import { identityClient } from "@/lib/auth/server";
 import { workspaceService } from "@/lib/application/workspaces";
 import { decisionService } from "@/lib/application/decisions";
 import { workItemService } from "@/lib/application/work-items";
+import { requirementService } from "@/lib/application/requirements";
 export type FormState = { error: string };
 async function checkOrigin() {
   const origin = (await headers()).get("origin");
@@ -106,4 +107,35 @@ export async function createWorkItem(_: FormState, form: FormData): Promise<Form
   revalidatePath(`/workspaces/${workspaceId}`);
   revalidatePath("/workspaces");
   redirect(`/workspaces/${workspaceId}#work-items`);
+}
+export async function createRequirement(_: FormState, form: FormData): Promise<FormState> {
+  await checkOrigin();
+  const workspaceId = String(form.get("workspaceId") ?? "");
+  const service = await requirementService();
+  try {
+    await service.create({
+      workspaceId,
+      title: String(form.get("title") ?? ""),
+      obligation: String(form.get("obligation") ?? "") as "MUST" | "SHOULD" | "MAY",
+      requirement: String(form.get("requirement") ?? ""),
+      acceptanceCriterion: String(form.get("acceptanceCriterion") ?? ""),
+      confirmAuthority: form.get("confirmAuthority") === "on",
+      requestId: String(form.get("requestId") ?? ""),
+    });
+  } catch (error) {
+    const code = error instanceof Error ? error.message : "UNKNOWN";
+    console.error(JSON.stringify({ operation: "record_owner_requirement", workspace_id: workspaceId, outcome: "failed", code }));
+    return {
+      error: code === "INVALID_INPUT"
+        ? "Complete the requirement and acceptance criterion, then confirm product-owner authority."
+        : code === "REQUEST_CONFLICT"
+          ? "This requirement request was already used with different details. Reload the workspace before starting again."
+          : code === "ACCESS_DENIED"
+            ? "This workspace is not available for requirement changes."
+            : "We could not confirm the requirement save. Existing records are unchanged. Retry with the same details to avoid a duplicate.",
+    };
+  }
+  revalidatePath(`/workspaces/${workspaceId}`);
+  revalidatePath("/workspaces");
+  redirect(`/workspaces/${workspaceId}#requirements`);
 }
