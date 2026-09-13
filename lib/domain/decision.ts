@@ -6,7 +6,8 @@ export type DecisionRecord = {
   title: string;
   decision: string;
   rationale: string;
-  status: "Proposed" | "Accepted";
+  authority: "owner";
+  status: "Accepted";
   revision: number;
   created_at: string;
   updated_at: string;
@@ -17,6 +18,7 @@ export type CreateDecisionInput = {
   title: string;
   decision: string;
   rationale: string;
+  confirmAuthority: boolean;
   requestId: string;
 };
 
@@ -34,7 +36,8 @@ export function validateCreateDecision(input: CreateDecisionInput): CreateDecisi
     !UUID.test(result.requestId) ||
     !result.title || result.title.length > 160 ||
     !result.decision || result.decision.length > 4000 ||
-    !result.rationale || result.rationale.length > 4000
+    !result.rationale || result.rationale.length > 4000 ||
+    !result.confirmAuthority
   ) {
     throw new Error("INVALID_INPUT");
   }
