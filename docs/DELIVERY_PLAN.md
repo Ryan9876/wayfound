@@ -64,9 +64,21 @@ Validated scope includes transactional requirement-and-criterion creation, expli
 
 Consequential technical implementation requirements remain outside this action and still require qualified specialist review.
 
+### Slice 5 — Durable criterion evidence
+
+**Status:** Validated
+
+An authenticated workspace owner can record a durable evidence result against an existing acceptance criterion. Each evidence record captures result, source/provenance, effect (`Supports`, `Challenges`, or `Inconclusive`), stable identifier, recorder, release/stage, and the linked requirement and criterion revisions.
+
+The slice passed the existing durable regression suite and a focused evidence-specific acceptance suite at application commit `4f67d99078600735f086ae894017481234a5a109` through CI run 151. See the [evidence slice](INCREMENT_2_EVIDENCE.md) and [validation record](validation/increment-2-evidence.md).
+
+Validated scope includes transactional evidence creation, requirement-to-criterion-to-evidence traceability, revision snapshots, idempotent retries, criterion/workspace integrity, direct-table denial, tenant/session/revocation isolation, injected-failure rollback, restart/resume, database interruption/recovery, keyboard focus, and mobile/desktop rendered review.
+
+Recording evidence does not mark the acceptance criterion satisfied, passed, verified, or validated and does not change the linked requirement from `Approved`.
+
 ### Remaining Increment 2 scope
 
-Specialist-review decision and technical-requirement flow; work-state transitions, collaborator/specialist assignment, work dependencies and durable links; multiple acceptance-criterion lifecycle; artifact records; evidence records and criterion-to-evidence links; maintenance records; later lifecycle behavior; change-impact handling; and supporting audit/seed behavior remain In progress or unimplemented. No hosted project has been provisioned.
+Specialist-review decision and technical-requirement flow; work-state transitions, collaborator/specialist assignment, work dependencies and broader durable links; multiple acceptance-criterion lifecycle; artifact records and versioning; evidence freshness/outdated-state handling, evidence acceptance or specialist review, and explicit verification decisions; maintenance records; later lifecycle behavior; change-impact handling; and supporting audit/seed behavior remain In progress or unimplemented. No hosted project has been provisioned.
 
 ## 4. Increment 3 — Versioned artifact import
 
