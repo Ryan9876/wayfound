@@ -12,6 +12,7 @@
     "test:workspace": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-workspace.mjs",
     "test:evidence": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-evidence.mjs",
     "test:artifacts": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-artifacts.mjs",
+    "test:artifact-acceptance": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-artifact-acceptance.mjs",
     "seed:local": "WAYFOUND_LOCAL_TEST=1 node scripts/seed-local.mjs"
   },
   "dependencies": {
