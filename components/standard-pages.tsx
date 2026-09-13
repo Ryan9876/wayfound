@@ -36,16 +36,27 @@ function WorkRow({ status, title, meta, action }: { status: string; title: strin
 }
 
 export function HandoffsView() {
-  return <section className="standard-page"><PageHeading eyebrow="Handoffs" title="Give specialists the context they need." text="The first version uses explicit manual packages. Returned work stays proposed until it is reconciled." />
-    <div className="feature-grid two">
-      <article className="feature-card prominent"><span className="round-icon"><PackageOpen size={22} /></span><span className="eyebrow">Planned handoff</span><h2>Requirements package</h2><p>Prepare accepted scope, decisions, assumptions, constraints, and relevant files for a requirements specialist or DSpec.</p><div className="feature-meta"><span><small>Stage</small><strong>7 • Define requirements</strong></span><span><small>Mode</small><strong>Manual exchange</strong></span></div><button className="button secondary" disabled>Available in a later slice</button></article>
-      <article className="feature-card"><span className="eyebrow">Return rule</span><h2>Imported work does not replace accepted work.</h2><p>A returned specification becomes a proposed revision. The accepted version remains available until review is complete.</p><ul className="clean-list check-list compact"><li><CheckCircle2 size={15} /> Preserve accepted version</li><li><CheckCircle2 size={15} /> Record failed imports</li><li><CheckCircle2 size={15} /> Show a plain-English change summary</li></ul></article>
+  return <section className="standard-page handoffs-page"><PageHeading eyebrow="Handoffs" title="Give specialists the context they need." text="The first version uses explicit manual packages. Returned work stays proposed until it is reconciled." />
+    <div className="handoff-state-bar">
+      <div><span className="eyebrow">Current state</span><strong>No specialist handoff is active in Stage 2.</strong></div>
+      <span className="row-status queued"><Circle size={8} fill="currentColor" />Stage 7 planned</span>
     </div>
+    <div className="feature-grid two handoff-feature-grid">
+      <article className="feature-card prominent handoff-package-card"><span className="round-icon"><PackageOpen size={22} /></span><span className="eyebrow">Planned handoff</span><h2>Requirements package</h2><p>Prepare accepted scope, decisions, assumptions, constraints, and relevant files for a requirements specialist or DSpec.</p><div className="feature-meta"><span><small>Stage</small><strong>7 • Define requirements</strong></span><span><small>Mode</small><strong>Manual exchange</strong></span></div><button className="button secondary" disabled>Available when Stage 7 work starts</button></article>
+      <article className="feature-card handoff-return-card"><span className="eyebrow">Return rule</span><h2>Imported work does not replace accepted work.</h2><p>A returned specification becomes a proposed revision. The accepted version remains available until review is complete.</p><ul className="clean-list check-list compact"><li><CheckCircle2 size={15} /> Preserve accepted version</li><li><CheckCircle2 size={15} /> Record failed imports</li><li><CheckCircle2 size={15} /> Show a plain-English change summary</li></ul></article>
+    </div>
+    <div className="handoff-boundary-note"><strong>First-version boundary</strong><span>Handoffs use files, links, and copy-ready instructions. No direct specialist-tool connection is assumed.</span></div>
   </section>;
 }
 
 export function RecordsView() {
-  return <section className="standard-page"><PageHeading eyebrow="Records" title="Keep decisions and evidence traceable." text="This prototype shows the record model with fixture data. Persistent version history is the next data-layer increment." />
+  return <section className="standard-page records-page"><PageHeading eyebrow="Records" title="Keep decisions and evidence traceable." text="This prototype shows the record model with fixture data. Persistent version history is the next data-layer increment." />
+    <div className="records-summary" aria-label="Record status summary">
+      <span><strong>4</strong><small>Total records</small></span>
+      <span><strong>1</strong><small>Accepted</small></span>
+      <span><strong>1</strong><small>Proposed</small></span>
+      <span><strong>2</strong><small>Not started</small></span>
+    </div>
     <div className="records-table" role="table" aria-label="Project records">
       <div className="table-row table-head" role="row"><span>Record</span><span>Stage</span><span>Status</span><span>Version</span></div>
       <RecordRow name="Problem brief" stage="1 • Clarify" status="Accepted" version="v1" />
@@ -55,7 +66,7 @@ export function RecordsView() {
     </div>
   </section>;
 }
-function RecordRow({name,stage,status,version}:{name:string;stage:string;status:string;version:string}) {return <div className="table-row" role="row"><span><FileText size={16} />{name}</span><span>{stage}</span><span><i className={`record-dot ${status === "Accepted" ? "accepted" : status === "Proposed" ? "proposed" : "neutral"}`} />{status}</span><span className="mono">{version}</span></div>}
+function RecordRow({name,stage,status,version}:{name:string;stage:string;status:string;version:string}) {return <div className="table-row record-row" role="row"><span className="record-name"><FileText size={16} /><b>{name}</b></span><span className="record-field"><small>Stage</small>{stage}</span><span className="record-field record-status"><small>Status</small><i className={`record-dot ${status === "Accepted" ? "accepted" : status === "Proposed" ? "proposed" : "neutral"}`} />{status}</span><span className="record-field mono"><small>Version</small>{version}</span></div>}
 
 export function ReleaseCareView() {
   return <section className="standard-page"><PageHeading eyebrow="Release & Care" title="Release only what the evidence supports." text="Readiness is separate from implementation. This prototype does not claim release readiness." />
