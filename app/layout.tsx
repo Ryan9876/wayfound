@@ -1,7 +1,22 @@
 import type { Metadata } from "next";
+import { IBM_Plex_Mono, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
+import "./typography.css";
 import "./desktop-polish.css";
 import "./overview-polish.css";
+
+const sourceSans = Source_Sans_3({
+  subsets: ["latin"],
+  variable: "--font-source-sans",
+  display: "swap",
+});
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-plex-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Wayfound",
@@ -10,7 +25,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${sourceSans.variable} ${plexMono.variable}`}>
       <body>{children}</body>
     </html>
   );
