@@ -19,6 +19,7 @@ import "./work-polish.css";
 import "./handoffs-records-polish.css";
 import "./release-care-polish.css";
 import "./more-polish.css";
+import "./accessibility-polish.css";
 
 const sourceSans = Source_Sans_3({
   subsets: ["latin"],
