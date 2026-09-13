@@ -6,38 +6,34 @@
 
 Wayfound uses a web application architecture based on Next.js App Router, React, TypeScript, and a relational PostgreSQL data model.
 
-The foundation prototype deliberately uses local fixture data for the illustrative Borrow Desk routes. This keeps product-learning work reversible while the interface and record model are validated.
+The foundation prototype deliberately uses local fixture data for the illustrative Borrow Desk routes. Increment 2 adds authenticated PostgreSQL-backed workspace state through validated vertical slices. The prototype fixture layer must not become an accidental persistent data source.
 
-Increment 2 introduces authenticated PostgreSQL-backed workspace identity and continuity through a bounded create/open/resume slice. Durable artifact storage, artifact versioning, dependency-aware evidence handling, and other later record types remain future vertical slices. The prototype fixture layer must not become an accidental persistent data source.
-
-## 2. Current prototype boundary
+## 2. Current implementation boundary
 
 The current implementation contains:
 
-- a responsive application shell;
-- the approved Wayfound visual tokens;
+- a responsive application shell and approved Wayfound visual tokens;
 - desktop and mobile primary navigation;
-- a Borrow Desk overview scenario;
-- the canonical 15-stage journey;
+- the fixture-backed Borrow Desk scenario and canonical 15-stage journey;
 - representative Work, Handoffs, Records, and Release & Care views;
-- fixture-backed foundation routes with no persistent writes;
-- authenticated create/list/open/resume workspace routes backed by PostgreSQL for the first Increment 2 slice.
+- authenticated PostgreSQL-backed create/list/open/resume workspace routes;
+- durable owner-authorized product-scope and business decision records.
 
-The foundation routes retain fixtures. The Increment 2 routes add server-side authentication and PostgreSQL create/open/resume through scoped RPCs. Durable artifact storage, external specialist connectors, automatic CI/CD evidence ingestion, production-changing actions, and production release authorization remain unimplemented.
+The durable decision path does not authorize consequential technical decisions. Those require qualified specialist review and remain later scope. Durable artifact storage, artifact versioning, external specialist connectors, automatic CI/CD evidence ingestion, production-changing actions, and production release authorization remain unimplemented.
 
-## 3. Target component boundaries
+## 3. Component boundaries
 
 ### Presentation
 
-Next.js App Router and React render the workspace. Interactive components should use client-side JavaScript only where interaction requires it.
+Next.js App Router and React render the workspace. Interactive components use client-side JavaScript only where interaction requires it.
 
 ### Application logic
 
-Server-side application functions enforce implemented workspace scope and authorization. Later slices will add artifact lifecycle, versioning, reconciliation, impact review, and release rules as those behaviors enter approved scope.
+Server-side application functions enforce implemented workspace scope, identity, authorization, input validation, and decision authority boundaries. Later slices will add artifact lifecycle, reconciliation, change-impact, evidence, and release rules.
 
 ### Persistence
 
-PostgreSQL is the authoritative application data store for the implemented durable workspace state. Artifact storage may use object storage when file size or immutability requirements justify it.
+PostgreSQL is authoritative for implemented durable workspace, release/stage, and owner-decision state. Artifact storage may use object storage when file size or immutability requirements justify it.
 
 ### AI guidance
 
@@ -45,52 +41,52 @@ AI guidance is advisory. Generated recommendations and drafts remain distinguish
 
 ### External tools
 
-The first version uses explicit manual handoff packages and returned-file reconciliation. Verified direct connectors are later scope.
+The first version uses explicit manual handoff packages and returned-file reconciliation when those workflows enter implementation. Verified direct connectors are later scope.
 
 ## 4. Data authority
 
 For implemented persistent state:
 
 - the Wayfound database owns structured durable workspace state;
-- an accepted artifact version will remain authoritative until an authorized acceptance action selects a later version when artifact versioning is implemented;
-- failed imports must remain failure records and must not replace accepted artifacts when import behavior is implemented;
+- a saved owner decision is an accepted product-scope or business choice only after explicit owner-authority confirmation;
+- technical choices that require qualified specialist review are not accepted through the owner-decision action;
 - external tool output is input to reconciliation, not automatic project truth;
 - chat history is not a project data source.
 
+Future artifact behavior must preserve the accepted artifact version until an authorized action selects a later version. Failed imports must not replace accepted artifacts.
+
 ## 5. Security and authorization
 
-The implemented durable-workspace slice uses authenticated users, workspace-scoped membership checks, row-level access policies, scoped RPCs, server-side session verification, and no application service key. Direct exposed-table writes are denied for the bounded slice.
+The implemented durable slices use authenticated users, workspace-scoped membership checks, row-level access policies, scoped RPCs, server-side session verification, and no application service key. Direct exposed-table writes are denied.
 
-The broader production architecture must also provide explicit ownership and reviewer roles, validation at file and external-input boundaries, no committed secrets, audit records for material acceptance and authorization events, and clear separation between recommendations and authorized actions.
+Owner-decision creation derives actor identity, release, and stage from durable state. It requires explicit product-owner authority confirmation and records `decision.accepted` in the audit log. The database constrains the implemented decision authority to `owner` and status to `Accepted`.
+
+The broader production architecture must also provide qualified specialist-review records, explicit reviewer roles, validation at file and external-input boundaries, no committed secrets, and audit records for material acceptance and authorization events.
 
 Security design that changes trust boundaries or introduces consequential dependencies requires an Architecture Decision Record.
 
 ## 6. Failure behavior
 
-Material workflows must preserve the last accepted or committed project state when a proposed operation fails.
+Material workflows preserve the last accepted or committed project state when a proposed operation fails.
 
-Examples:
+Implemented examples:
 
 - durable workspace creation is transactional and leaves no partial record after an injected failure;
-- database interruption renders a recoverable error and does not substitute fixture data for a durable workspace;
-- failed imports preserve accepted artifacts;
-- failed reconciliation does not partially accept returned work;
-- an interrupted release action must not be reported as successful without outcome evidence;
-- unknown dependency impact remains unresolved rather than becoming “no impact.”
+- owner-decision creation is transactional and rolls back the decision, audit event, and request result when audit insertion fails;
+- database interruption renders a recoverable error and does not substitute fixture data;
+- a successful same-route decision save explicitly revalidates the workspace before redirect so the rendered state matches committed state.
 
-The current persistence adapter uses a bounded retry only for PostgREST error `PGRST303` with the exact message `JWT issued at future`. Other persistence and authorization failures are not converted to success. Acceptance tests require the intended denial result for protected-data checks.
+Future failed imports must preserve accepted artifacts; failed reconciliation must not partially accept returned work; interrupted release actions must not be reported as successful without outcome evidence; unknown dependency impact remains unresolved rather than becoming “no impact.”
+
+The persistence adapters use a bounded retry only for PostgREST error `PGRST303` with the exact message `JWT issued at future`. Other persistence and authorization failures are not converted to success.
 
 ## 7. Observability
 
-Important failures must be diagnosable. Production implementation must identify the workspace, operation, actor or external source, record version, outcome, and correlation context without logging secrets or unnecessary sensitive data.
-
-The first durable-workspace transaction records a scoped audit event and correlation context. Later observability work must extend this baseline without exposing authentication material.
+Important failures must be diagnosable without logging secrets or unnecessary sensitive data. Implemented durable operations record scoped audit events and correlation/request context. Later observability work must extend this baseline to artifact, evidence, review, and release workflows.
 
 ## 8. Deployment and rollback
 
-The foundation prototype can use preview deployment without persistent operational data.
-
-The durable-workspace slice has been validated against isolated local Supabase in CI. No hosted persistence project or production data deployment is established by that validation.
+The durable slices have been validated against isolated local Supabase in CI. No hosted persistence project or production data deployment is established by that validation.
 
 Before production data exists, Wayfound must define repeatable deployment and rollback behavior for the chosen hosting and persistence services. Recovery claims require executed restore evidence.
 
@@ -112,8 +108,12 @@ Revisit the architecture when validated product behavior cannot be represented c
 
 ## 11. Increment 2 implementation
 
-[ADR-0002](adr/0002-durable-workspace-identity.md) was accepted following Ryan Smith's development-slice approval on 2026-09-13. Presentation uses `app/sign-in` and `app/workspaces`. `lib/application` validates input and authenticates the actor. `lib/auth` owns Supabase identity access. `lib/persistence` owns bounded database calls. `lib/domain` contains the shared journey catalog and input contract, with no provider or fixture dependency.
+[ADR-0002](adr/0002-durable-workspace-identity.md) defines the accepted identity and persistence boundary. `lib/application` owns use-case validation and actor checks, `lib/auth` owns Supabase identity access, `lib/persistence` owns bounded database calls, and `lib/domain` owns provider-independent contracts and the canonical journey catalog.
 
-The private `wayfound` schema owns workspace state. Privileged creation is a single scoped transaction behind invoker RPC wrappers; no direct client table writes or application service keys are permitted. Reads verify current provider session and membership. New workspaces have Stage 1 active and a Proposed release, with no evidence or completion claims. AI is not connected.
+The private `wayfound` schema owns durable state. Privileged mutations are scoped transactions behind invoker RPC wrappers; no direct client table writes or application service keys are permitted. Reads verify the current provider session and workspace membership. AI is not connected to persisted authority.
 
-The bounded create/open/resume slice is **Validated** at application commit `603f02862ae4090bd1853157e449a01508186f4c` through CI run 70. The [validation record](validation/increment-2-durable-workspace.md) covers authentication, atomic creation, retry behavior, tenant isolation, revocation, rollback, restart/resume, database interruption/recovery, keyboard focus, responsive rendering, and the Supabase database security advisor. No hosted project or production deployment exists. Broader Increment 2 remains In progress for later approved entities and workflows.
+The create/list/open/resume slice is **Validated** at application commit `603f02862ae4090bd1853157e449a01508186f4c` through CI run 70. See [validation/increment-2-durable-workspace.md](validation/increment-2-durable-workspace.md).
+
+The owner-authorized decision slice is **Validated** at application commit `548f1bbb4264ca412bc808a94a60593bca2c3602` through CI run 92. It records only product-scope and business decisions after explicit owner-authority confirmation. See [validation/increment-2-decisions.md](validation/increment-2-decisions.md).
+
+No hosted project or production deployment exists. Broader Increment 2 remains In progress for specialist review and later durable record workflows.
