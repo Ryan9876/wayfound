@@ -15,6 +15,7 @@ import "./overview-mobile-first-screen.css";
 import "./overview-mobile-action-hierarchy.css";
 import "./overview-mobile-cta.css";
 import "./journey-polish.css";
+import "./work-polish.css";
 
 const sourceSans = Source_Sans_3({
   subsets: ["latin"],
