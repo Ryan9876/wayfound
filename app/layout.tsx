@@ -13,6 +13,7 @@ import "./overview-mobile-spacing.css";
 import "./overview-mobile-density.css";
 import "./overview-mobile-first-screen.css";
 import "./overview-mobile-action-hierarchy.css";
+import "./overview-mobile-cta.css";
 
 const sourceSans = Source_Sans_3({
   subsets: ["latin"],
