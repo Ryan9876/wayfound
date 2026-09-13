@@ -25,6 +25,9 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
+      - name: Check prototype structure
+        run: npm run test:prototype
+
       - name: Check TypeScript
         run: npm run lint
 
