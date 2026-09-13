@@ -1,0 +1,114 @@
+/* Mobile More destination.
+   Provides direct access to workspace areas intentionally omitted from the compact bottom navigation. */
+
+.more-page {
+  max-width: 760px;
+}
+
+.more-grid {
+  display: grid;
+  gap: 11px;
+}
+
+.more-card {
+  min-height: 118px;
+  padding: 17px;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 1px 2px rgba(23, 43, 42, 0.025);
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.more-card:hover {
+  border-color: #bfd2cc;
+  background: #fff;
+  transform: translateY(-1px);
+}
+
+.more-card-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--pine-soft);
+  color: var(--pine);
+}
+
+.more-card h2 {
+  margin: 4px 0 4px;
+  font-size: 15px;
+  line-height: 1.2;
+  letter-spacing: -0.018em;
+}
+
+.more-card p {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: #63726e;
+}
+
+.more-card > svg {
+  color: var(--pine);
+}
+
+@media (min-width: 821px) {
+  .more-page .page-title-row {
+    margin-bottom: 22px;
+  }
+
+  .more-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .more-card {
+    min-height: 210px;
+    grid-template-columns: 1fr;
+    align-content: start;
+    gap: 16px;
+  }
+
+  .more-card > svg {
+    margin-top: auto;
+  }
+}
+
+@media (max-width: 820px) {
+  .more-page .page-title-row {
+    margin-bottom: 18px;
+  }
+
+  .more-page .page-title-row h1 {
+    font-size: 31px;
+    line-height: 1.04;
+  }
+
+  .more-page .page-title-row p {
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+}
+
+@media (max-width: 520px) {
+  .more-card {
+    min-height: 106px;
+    padding: 15px;
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+    gap: 12px;
+  }
+
+  .more-card-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .more-card h2 {
+    font-size: 14px;
+  }
+}
