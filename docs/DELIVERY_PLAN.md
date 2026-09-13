@@ -100,7 +100,9 @@ Artifact acceptance records product-owner project direction only. It does not es
 
 ### Remaining Increment 2 scope
 
-Specialist-review decision and technical-requirement flow; work-state transitions, collaborator/specialist assignment, work dependencies and broader durable links; multiple acceptance-criterion lifecycle; later artifact-version and supersession lifecycle; evidence freshness/outdated-state handling, evidence acceptance or specialist review, and explicit verification decisions; maintenance records; later lifecycle behavior; change-impact handling; and supporting audit/seed behavior remain In progress or unimplemented. No hosted project has been provisioned.
+Specialist-review decision and technical-requirement flow; work-state transitions, collaborator/specialist assignment, work dependencies and broader durable links; multiple acceptance-criterion lifecycle; evidence freshness/outdated-state handling, evidence acceptance or specialist review, and explicit verification decisions; maintenance records; later lifecycle behavior; change-impact handling; and supporting audit/seed behavior remain In progress or unimplemented. No hosted project has been provisioned.
+
+Later artifact-version, accepted-version replacement/supersession, and file-import behavior are assigned to Increment 3 rather than duplicated in the remaining Increment 2 scope.
 
 ## 4. Increment 3 — Versioned artifact import
 
