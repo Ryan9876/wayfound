@@ -466,7 +466,7 @@ try {
   await inspect(page, 'saved-work-item');
 
   await page.getByLabel('Requirement title', { exact: true }).fill('Identify the active borrower');
-  await page.getByLabel('Obligation', { exact: true }).selectOption('MUST');
+  await page.locator('#requirement-obligation').selectOption('MUST');
   await page.getByLabel('Requirement statement', { exact: true }).fill('The product records the person responsible for each active equipment checkout.');
   await page.getByLabel('Acceptance criterion', { exact: true }).fill('Given an equipment checkout is active, when the checkout record is viewed, then the responsible borrower is visible.');
   await page.getByLabel(/I confirm this requirement states product or business behavior/).check();
