@@ -206,3 +206,38 @@ export async function createArtifact(_: FormState, form: FormData): Promise<Form
   revalidatePath("/workspaces");
   redirect(`/workspaces/${workspaceId}#artifacts`);
 }
+export async function acceptArtifactVersion(_: FormState, form: FormData): Promise<FormState> {
+  await checkOrigin();
+  const workspaceId = String(form.get("workspaceId") ?? "");
+  const artifactId = String(form.get("artifactId") ?? "");
+  const versionId = String(form.get("versionId") ?? "");
+  const service = await artifactService();
+  try {
+    await service.accept({
+      workspaceId,
+      artifactId,
+      versionId,
+      confirmAuthority: form.get("confirmAuthority") === "on",
+      requestId: String(form.get("requestId") ?? ""),
+    });
+  } catch (error) {
+    const code = error instanceof Error ? error.message : "UNKNOWN";
+    console.error(JSON.stringify({ operation: "accept_artifact_version", workspace_id: workspaceId, artifact_id: artifactId, version_id: versionId, outcome: "failed", code }));
+    return {
+      error: code === "INVALID_INPUT"
+        ? "Confirm product-owner authority before accepting this artifact version."
+        : code === "REQUEST_CONFLICT"
+          ? "This acceptance request was already used with different details. Reload the workspace before starting again."
+          : code === "INVALID_TARGET"
+            ? "This artifact version is not available in this workspace."
+            : code === "INVALID_STATE"
+              ? "This artifact version is no longer Proposed. Reload the workspace to review its current state."
+              : code === "ACCESS_DENIED"
+                ? "This workspace is not available for artifact acceptance."
+                : "We could not confirm artifact acceptance. Existing project direction is unchanged. Retry with the same details to avoid duplicate history.",
+    };
+  }
+  revalidatePath(`/workspaces/${workspaceId}`);
+  revalidatePath("/workspaces");
+  redirect(`/workspaces/${workspaceId}#artifact-${artifactId}`);
+}
