@@ -307,7 +307,9 @@
     color: #7d8986;
   }
 
-  .records-page .record-field:nth-child(2) {
+  /* Base mobile table rules hide the second column. Records cards need Stage visible. */
+  .records-page .record-row > .record-field:nth-child(2) {
+    display: grid !important;
     grid-column: 1 / -1;
   }
 
