@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { identityClient } from "@/lib/auth/server";
 import { workspaceService } from "@/lib/application/workspaces";
 import { decisionService } from "@/lib/application/decisions";
+import { workItemService } from "@/lib/application/work-items";
 export type FormState = { error: string };
 async function checkOrigin() {
   const origin = (await headers()).get("origin");
@@ -75,4 +76,34 @@ export async function createDecision(_: FormState, form: FormData): Promise<Form
   revalidatePath(`/workspaces/${workspaceId}`);
   revalidatePath("/workspaces");
   redirect(`/workspaces/${workspaceId}#decisions`);
+}
+export async function createWorkItem(_: FormState, form: FormData): Promise<FormState> {
+  await checkOrigin();
+  const workspaceId = String(form.get("workspaceId") ?? "");
+  const service = await workItemService();
+  try {
+    await service.create({
+      workspaceId,
+      title: String(form.get("title") ?? ""),
+      outcome: String(form.get("outcome") ?? ""),
+      completionCondition: String(form.get("completionCondition") ?? ""),
+      evidenceExpectation: String(form.get("evidenceExpectation") ?? ""),
+      requestId: String(form.get("requestId") ?? ""),
+    });
+  } catch (error) {
+    const code = error instanceof Error ? error.message : "UNKNOWN";
+    console.error(JSON.stringify({ operation: "create_proposed_work_item", workspace_id: workspaceId, outcome: "failed", code }));
+    return {
+      error: code === "INVALID_INPUT"
+        ? "Complete all work-item fields and try again."
+        : code === "REQUEST_CONFLICT"
+          ? "This work-item request was already used with different details. Reload the workspace before starting again."
+          : code === "ACCESS_DENIED"
+            ? "This workspace is not available for work-item changes."
+            : "We could not confirm the work-item save. Existing records are unchanged. Retry with the same details to avoid a duplicate.",
+    };
+  }
+  revalidatePath(`/workspaces/${workspaceId}`);
+  revalidatePath("/workspaces");
+  redirect(`/workspaces/${workspaceId}#work-items`);
 }
