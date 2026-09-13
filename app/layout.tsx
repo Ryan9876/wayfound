@@ -7,6 +7,7 @@ import "./overview-polish.css";
 import "./overview-finish.css";
 import "./overview-type-spacing.css";
 import "./overview-card-spacing.css";
+import "./overview-mobile.css";
 
 const sourceSans = Source_Sans_3({
   subsets: ["latin"],
