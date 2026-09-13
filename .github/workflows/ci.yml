@@ -86,7 +86,7 @@ jobs:
 
   durable-workspace:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -112,6 +112,10 @@ jobs:
         run: |
           WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
           npm run test:artifacts
+      - name: Validate artifact acceptance
+        run: |
+          WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
+          npm run test:artifact-acceptance
       - name: Upload workspace screenshots
         if: always()
         uses: actions/upload-artifact@v4
