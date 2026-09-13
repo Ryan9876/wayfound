@@ -3,8 +3,6 @@ import {
   ArrowRight,
   Binoculars,
   Check,
-  ChevronLeft,
-  ChevronRight,
   Circle,
   FileText,
   Lightbulb,
@@ -25,8 +23,8 @@ export function OverviewDashboard() {
   return (
     <section className="overview" aria-labelledby="release-title">
       <div className="release-heading">
-        <div>
-          <span className="eyebrow">Release</span>
+        <div className="release-title-block">
+          <span className="eyebrow">Current release</span>
           <h1 id="release-title">{demoRelease.project} <span>•</span> {demoRelease.release}</h1>
           <p>{demoRelease.subtitle}</p>
         </div>
@@ -43,15 +41,16 @@ export function OverviewDashboard() {
         </div>
       </div>
 
-      <div className="dashboard-grid">
+      <div className="dashboard-grid overview-primary-grid">
         <article className="next-action-card">
           <div className="card-topline">
             <span className="eyebrow">Next action</span>
-            <span className="pager"><b>1 of 5</b><button aria-label="Previous action"><ChevronLeft size={16} /></button><button aria-label="Next action"><ChevronRight size={16} /></button></span>
+            <span className="action-position"><i />Stage {demoRelease.stage} priority</span>
           </div>
           <div className="action-intro">
             <span className="round-icon"><Binoculars size={22} strokeWidth={1.7} /></span>
-            <div>
+            <div className="action-copy">
+              <span className="action-kicker">Recommended now</span>
               <h2>{demoRelease.nextAction.title}</h2>
               <p>{demoRelease.nextAction.description}</p>
             </div>
@@ -68,12 +67,15 @@ export function OverviewDashboard() {
           </div>
         </article>
 
-        <aside className="context-card">
-          <div className="card-heading"><span className="eyebrow">Context</span><Link href="/records">View records</Link></div>
+        <aside className="context-card overview-context-card">
+          <div className="card-heading"><span className="eyebrow">Current context</span><Link href="/records">View records</Link></div>
+          <div className="context-evidence">
+            <span className="context-evidence-label"><ShieldCheck size={16} /> Evidence state</span>
+            <span className="status-chip pending"><Circle size={8} fill="currentColor" /> Direct observation pending</span>
+          </div>
           <dl className="context-list">
             <div><dt><Users size={17} /> Who experiences this?</dt><dd>Workshop volunteers handling equipment loans.</dd></div>
             <div><dt><Lightbulb size={17} /> Working assumption</dt><dd>Staff enter each checkout; borrowers do not need accounts in this release.</dd></div>
-            <div><dt><ShieldCheck size={17} /> Evidence state</dt><dd><span className="status-chip pending"><Circle size={8} fill="currentColor" /> Direct observation pending</span></dd></div>
           </dl>
           <div className="context-footer">
             <span><small>Owner</small><strong>Jordan Singh</strong></span>
@@ -82,8 +84,15 @@ export function OverviewDashboard() {
         </aside>
       </div>
 
-      <div className="summary-grid">
-        <article className="summary-card">
+      <div className="overview-section-heading">
+        <div>
+          <span className="eyebrow">Release snapshot</span>
+          <h2>What is known, assumed, and complete.</h2>
+        </div>
+      </div>
+
+      <div className="summary-grid overview-summary-grid">
+        <article className="summary-card overview-summary-card">
           <div className="card-heading"><span className="eyebrow">What we know</span><span className="count-badge">3</span></div>
           <ul className="clean-list check-list">
             <li><Check size={15} /> Loan records are incomplete today.</li>
@@ -91,14 +100,14 @@ export function OverviewDashboard() {
             <li><Check size={15} /> Clear availability is the first problem to solve.</li>
           </ul>
         </article>
-        <article className="summary-card">
+        <article className="summary-card overview-summary-card">
           <div className="card-heading"><span className="eyebrow">Open assumptions</span><span className="count-badge amber">2</span></div>
           <ul className="clean-list dot-list">
             <li><i /> A configured existing tool may still meet the essential workflow.</li>
             <li><i /> Borrowers do not need self-service in Release 1.0.</li>
           </ul>
         </article>
-        <article className="summary-card release-card">
+        <article className="summary-card release-card overview-summary-card">
           <div className="card-heading"><span className="eyebrow">This release</span><Link href="/journey">Open journey</Link></div>
           <div className="release-stat"><strong>1</strong><span>stage complete</span></div>
           <div className="mini-progress"><span /></div>
@@ -106,7 +115,7 @@ export function OverviewDashboard() {
         </article>
       </div>
 
-      <article className="records-strip">
+      <article className="records-strip overview-records-strip">
         <div><span className="eyebrow">Recent records</span><h3>Project continuity, in one place.</h3></div>
         <div className="record-items">
           <span><i className="record-dot accepted" /><b>Problem brief</b><small>Accepted • v1</small></span>
