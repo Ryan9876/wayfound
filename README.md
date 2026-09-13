@@ -6,32 +6,26 @@ Wayfound is a software-delivery guidance and coordination workspace for capable 
 
 ## Current state
 
-Increment 1 is **Validated** at application commit `4cbc8fd`; see the [validation record](docs/validation/increment-1.md). Increment 2 is **In progress** under [accepted ADR-0002](docs/adr/0002-durable-workspace-identity.md). Its first authenticated create/list/open/resume slice is **Validated** at application commit `603f028`; see the [durable-workspace validation record](docs/validation/increment-2-durable-workspace.md).
+Increment 1 is **Validated** at application commit `4cbc8fd`; see the [validation record](docs/validation/increment-1.md). Increment 2 is **In progress** under [accepted ADR-0002](docs/adr/0002-durable-workspace-identity.md).
 
-The repository contains the validated fixture-backed foundation prototype and the first validated durable-workspace slice. This state does not claim production readiness or release.
+Two Increment 2 slices are now **Validated**:
 
-Implemented and validated foundation behavior:
+- authenticated create/list/open/resume workspace continuity at application commit `603f028`, [validation record](docs/validation/increment-2-durable-workspace.md);
+- owner-authorized durable product/business decisions at application commit `548f1bb`, [validation record](docs/validation/increment-2-decisions.md).
 
-- responsive application shell;
-- desktop and mobile navigation;
-- Overview dashboard with next-action guidance;
-- 15-stage Journey view;
-- representative Work, Handoffs, Records, and Release & Care views;
-- Wayfound visual tokens and prototype logo mark.
+The repository does not claim production readiness or release.
 
-Implemented and validated durable-workspace behavior:
+Implemented and validated foundation behavior includes the responsive shell, desktop/mobile navigation, Overview guidance, the 15-stage Journey, representative Work/Handoffs/Records/Release & Care views, and Wayfound visual tokens.
 
-- Supabase authentication for the bounded local/CI slice;
-- PostgreSQL-backed create, list, open, and resume workspace flow;
-- workspace membership isolation;
-- Proposed release with Stage 1 active and all 15 stage records;
-- transactional creation, retry protection, and initial audit event;
-- recoverable loading, empty, authorization, and database-failure states.
+Implemented and validated durable behavior includes Supabase authentication in isolated local/CI environments; PostgreSQL-backed workspace create/list/open/resume; membership isolation; Proposed release and 15-stage state; transactional/idempotent workspace creation; and accepted owner decisions with rationale, captured stage, audit event, authority confirmation, transactional rollback, tenant isolation, and restart/resume behavior.
+
+The owner-decision action is limited to product-scope and business decisions. Consequential technical decisions require qualified specialist review and are not accepted through this action.
 
 Not yet implemented or validated as broader product behavior:
 
 - hosted authentication/database provisioning;
-- decision, work, artifact, evidence, and maintenance record workflows;
+- specialist-review decision workflow;
+- work, artifact, evidence, and maintenance record workflows;
 - artifact import or versioning;
 - specialist connector integrations;
 - automated verification ingestion;
