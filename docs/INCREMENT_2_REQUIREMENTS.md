@@ -1,8 +1,9 @@
 # Increment 2 — Durable owner-approved product requirements
 
-**Status:** In progress  
+**Status:** Validated  
 **Parent increment:** Increment 2 — Durable workspace record  
-**Architecture basis:** ADR-0002 and the validated durable-workspace boundary
+**Architecture basis:** ADR-0002 and the validated durable-workspace boundary  
+**Validated application commit:** `9e2af6940ce4d440fed00825620e0b693eff17c2` through CI run 131
 
 ## 1. Outcome
 
@@ -114,17 +115,19 @@ The section shows:
 - a form for title, obligation, requirement statement, and one acceptance criterion;
 - a required owner-authority confirmation.
 
-The form states that it is for product or business behavior. It must not imply that a technical implementation choice has received specialist review.
+The form states that it is for product or business behavior. It does not imply that a technical implementation choice has received specialist review.
 
 ## 9. Failure behavior
 
 If requirement creation fails, the application keeps the existing workspace and requirement list unchanged and shows a recoverable error.
 
-A database interruption must not replace durable requirements with fixture records or claim that a failed save succeeded.
+A database interruption does not replace durable requirements with fixture records or claim that a failed save succeeded.
 
 The existing bounded retry for exact PostgREST `PGRST303: JWT issued at future` may apply. Authorization failures remain failures.
 
 ## 10. Acceptance criteria
+
+All acceptance criteria below passed at application commit `9e2af6940ce4d440fed00825620e0b693eff17c2` through CI run 131:
 
 1. Owner A creates a workspace and records one approved product requirement through the application. The saved record contains the entered title, obligation, statement, status `Approved`, kind `product`, authority `owner`, current release, current stage, and Owner A as approving actor.
 2. Exactly one linked acceptance criterion is created atomically with the requirement and remains identifiable by its own durable identifier.
@@ -139,6 +142,8 @@ The existing bounded retry for exact PostgREST `PGRST303: JWT issued at future` 
 11. The database security advisor reports no new error.
 12. TypeScript, production build, existing durable workspace, decision, and work-item acceptance tests, keyboard checks, responsive checks, and rendered screenshots pass.
 13. Mobile and desktop rendered review confirms that the stable identifier, obligation, requirement statement, status, authority, stage, and acceptance criterion remain readable without horizontal overflow.
+
+See [validation/increment-2-requirements.md](validation/increment-2-requirements.md) for executed evidence, the two corrected browser-harness defects, and limits.
 
 ## 11. Excluded behavior
 
