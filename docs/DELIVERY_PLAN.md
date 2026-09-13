@@ -80,17 +80,27 @@ Recording evidence does not mark the acceptance criterion satisfied, passed, ver
 
 **Status:** Validated
 
-An authenticated workspace owner can record a durable artifact identity with one stable initial version and an external reference. Version 1 is constrained to lifecycle `Proposed`; the current flow has no accepted-version pointer and does not make the artifact accepted project direction.
+An authenticated workspace owner can record a durable artifact identity with one stable initial version and an external reference. Version 1 is constrained to lifecycle `Proposed`; creation by itself does not make the artifact accepted project direction.
 
 The slice passed all existing durable regression suites and a focused artifact-specific acceptance suite at application commit `8d36adede6c4b5c5570b7a3e37a519588124500b` through CI run 157. See the [artifact slice](INCREMENT_2_ARTIFACTS.md) and [validation record](validation/increment-2-artifacts.md).
 
 Validated scope includes transactional artifact-plus-version creation, stable artifact/version identifiers, derived owner/release/stage context, idempotent retries, HTTP/HTTPS reference validation, direct-table denial, tenant/session/revocation isolation, injected-failure rollback, restart/resume, database interruption/recovery, keyboard focus, mobile/desktop rendered review, and explicit proof that Wayfound stores the external reference without fetching it.
 
-This slice does not implement artifact acceptance, later versions, file import, failed-import history, import retry history, or change summaries. Those remain later lifecycle/import work.
+### Slice 7 — Owner artifact acceptance
+
+**Status:** Validated
+
+An authenticated current workspace owner can explicitly accept one existing proposed artifact version as the version currently accepted as project direction. The action requires product-owner authority confirmation, changes that exact version from `Proposed` to `Accepted`, stores the artifact accepted-version pointer, accepting actor and acceptance time, increments artifact/version revisions, and records `artifact.accepted` in the audit log.
+
+The slice passed the full prior durable regression chain plus a focused acceptance suite at repository head `3ca0ea4a1fe931e80a9466250915efe623827847` through CI run 164. See the [artifact-acceptance slice](INCREMENT_2_ARTIFACT_ACCEPTANCE.md) and [validation record](validation/increment-2-artifact-acceptance.md).
+
+Validated scope includes exact artifact/version target integrity, explicit owner authority, idempotent retry, invalid-state rejection, direct-table denial, tenant/session/revocation isolation, injected-failure rollback, restart/resume, database interruption/recovery, zero external-reference fetches, keyboard focus, and mobile/desktop rendered review.
+
+Artifact acceptance records product-owner project direction only. It does not establish qualified specialist review, technical correctness, verification, validation, release readiness, or production authorization.
 
 ### Remaining Increment 2 scope
 
-Specialist-review decision and technical-requirement flow; work-state transitions, collaborator/specialist assignment, work dependencies and broader durable links; multiple acceptance-criterion lifecycle; artifact acceptance and later-version lifecycle; evidence freshness/outdated-state handling, evidence acceptance or specialist review, and explicit verification decisions; maintenance records; later lifecycle behavior; change-impact handling; and supporting audit/seed behavior remain In progress or unimplemented. No hosted project has been provisioned.
+Specialist-review decision and technical-requirement flow; work-state transitions, collaborator/specialist assignment, work dependencies and broader durable links; multiple acceptance-criterion lifecycle; later artifact-version and supersession lifecycle; evidence freshness/outdated-state handling, evidence acceptance or specialist review, and explicit verification decisions; maintenance records; later lifecycle behavior; change-impact handling; and supporting audit/seed behavior remain In progress or unimplemented. No hosted project has been provisioned.
 
 ## 4. Increment 3 — Versioned artifact import
 
@@ -98,7 +108,7 @@ Specialist-review decision and technical-requirement flow; work-state transition
 
 **Outcome:** An owner can import revised specifications without losing or silently replacing the accepted version.
 
-**Expected scope:** proposed artifact versions beyond the initial durable record, accepted-version preservation and selection, file/import boundaries, failed-import records, retry history, and a plain-English change summary or documented alternative comparison.
+**Expected scope:** proposed artifact versions beyond the initial durable record, preservation of the currently accepted version while a later version is proposed, explicit later-version acceptance/replacement behavior, file/import boundaries, failed-import records, retry history, and a plain-English change summary or documented alternative comparison before accepting an imported revision.
 
 ## 5. Increment 4 — Manual specialist handoff and reconciliation
 
