@@ -32,11 +32,12 @@ export class DecisionStore {
   }
 
   async create(input: CreateDecisionInput): Promise<string> {
-    const { data, error } = await this.rpc("create_decision", {
+    const { data, error } = await this.rpc("record_owner_decision", {
       p_workspace: input.workspaceId,
       p_title: input.title,
       p_decision: input.decision,
       p_rationale: input.rationale,
+      p_authority_confirm: input.confirmAuthority,
       p_request: input.requestId,
     });
     if (error) {
