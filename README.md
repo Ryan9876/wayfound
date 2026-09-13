@@ -15,9 +15,7 @@ Two Increment 2 slices are **Validated**:
 
 The repository does not claim production readiness or release.
 
-Implemented and validated foundation behavior includes the responsive shell, desktop/mobile navigation, Overview guidance, the 15-stage Journey, representative Work/Handoffs/Records/Release & Care views, and Wayfound visual tokens.
-
-Implemented and validated durable behavior includes Supabase authentication in isolated local/CI environments; PostgreSQL-backed workspace create/list/open/resume; membership isolation; Proposed release and 15-stage state; transactional/idempotent workspace creation; and accepted owner decisions with rationale, captured stage, audit event, authority confirmation, transactional rollback, tenant isolation, and restart/resume behavior.
+Implemented and validated durable behavior includes isolated Supabase authentication; PostgreSQL-backed workspace create/list/open/resume; membership isolation; Proposed release and 15-stage state; transactional/idempotent creation; and accepted owner decisions with rationale, captured stage, audit event, authority confirmation, rollback, tenant isolation, and restart/resume behavior.
 
 The owner-decision action is limited to product-scope and business decisions. Consequential technical decisions require qualified specialist review and are not accepted through this action.
 
