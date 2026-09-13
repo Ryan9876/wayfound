@@ -6,6 +6,7 @@ import "./desktop-polish.css";
 import "./overview-polish.css";
 import "./overview-finish.css";
 import "./overview-type-spacing.css";
+import "./overview-card-spacing.css";
 
 const sourceSans = Source_Sans_3({
   subsets: ["latin"],
