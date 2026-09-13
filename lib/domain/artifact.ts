@@ -1,4 +1,4 @@
-export type ArtifactLifecycle = "Proposed";
+export type ArtifactLifecycle = "Proposed" | "Accepted";
 export type ArtifactSourceKind = "ExternalReference";
 
 export type ArtifactVersionRecord = {
@@ -27,6 +27,9 @@ export type ArtifactRecord = {
   title: string;
   kind: string;
   created_by_actor_id: string;
+  accepted_version_id: string | null;
+  accepted_by_actor_id: string | null;
+  accepted_at: string | null;
   revision: number;
   created_at: string;
   updated_at: string;
@@ -40,6 +43,14 @@ export type CreateArtifactInput = {
   summary: string;
   referenceLabel: string;
   referenceUrl: string;
+  requestId: string;
+};
+
+export type AcceptArtifactVersionInput = {
+  workspaceId: string;
+  artifactId: string;
+  versionId: string;
+  confirmAuthority: boolean;
   requestId: string;
 };
 
@@ -78,4 +89,18 @@ export function validateCreateArtifact(input: CreateArtifactInput): CreateArtifa
   }
 
   return result;
+}
+
+export function validateAcceptArtifactVersion(input: AcceptArtifactVersionInput): AcceptArtifactVersionInput {
+  if (
+    !UUID.test(input.workspaceId) ||
+    !UUID.test(input.artifactId) ||
+    !UUID.test(input.versionId) ||
+    !UUID.test(input.requestId) ||
+    input.confirmAuthority !== true
+  ) {
+    throw new Error("INVALID_INPUT");
+  }
+
+  return input;
 }
