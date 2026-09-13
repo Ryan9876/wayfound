@@ -1,6 +1,6 @@
 # ADR-0004 — Technical decision review and acceptance authority
 
-**Status:** Proposed  
+**Status:** Accepted  
 **Date:** 2026-09-13  
 **Decision owner:** Ryan Smith
 
@@ -12,23 +12,19 @@ A current workspace owner may record a **technical choice proposal**. An assigne
 
 `No blocking finding` is therefore a required review result, not an approval action. `Changes required` blocks acceptance of that exact proposal revision. `Advisory` does not satisfy the acceptance gate.
 
-This ADR is **Proposed**. No authority change is approved until the decision owner accepts this ADR.
-
 ## Context
 
 The approved charter separates product-owner authority from qualified specialist review. It states that a qualified specialist reviews consequential technical decisions within that specialist's competence. Existing durable owner-decision and owner-requirement actions deliberately reject consequential technical choices.
 
 ADR-0003 proves assignment-scoped specialist review without granting general workspace membership. That review model currently targets an exact accepted artifact version and explicitly states that specialist conclusions do not establish product-owner acceptance, verification, validation, release readiness, or production authorization.
 
-The repository does not yet define the acceptance boundary for consequential technical choices. Specifically, it does not define:
+The repository did not define the acceptance boundary for consequential technical choices. Specifically, it did not define:
 
 - who may create a technical choice before it is accepted;
 - which specialist result is sufficient to make that choice eligible for acceptance;
 - who converts reviewed technical guidance into project direction;
 - whether a blocking specialist finding can be overridden through the owner action;
 - what happens when the proposal changes after review.
-
-This missing authority rule blocks safe implementation of the next Increment 2 technical-decision slice.
 
 The glossary defines a `decision` as an approved choice. Therefore, an unapproved technical choice must not be stored or presented as an accepted decision.
 
@@ -47,7 +43,7 @@ The authority model must:
 
 ## Options considered
 
-### Option A — Specialist gate, owner acceptance — recommended
+### Option A — Specialist gate, owner acceptance — selected
 
 **Summary:** The owner records a technical choice proposal. An assigned qualified specialist reviews the exact proposal revision. `No blocking finding` makes that revision eligible. The owner must then explicitly accept it as project direction.
 
@@ -237,11 +233,11 @@ The existing bounded retry remains limited to exact PostgREST `PGRST303` with me
 
 ## Reversibility
 
-The authority policy is reversible by a later approved ADR, but changing it after technical decisions exist would require migration and reinterpretation of historical authority records. Therefore, approve the boundary before implementing durable technical-decision state.
+The authority policy is reversible by a later approved ADR, but changing it after technical decisions exist would require migration and reinterpretation of historical authority records. Therefore, the boundary was approved before durable technical-decision state was implemented.
 
 ## Validation
 
-If accepted and implemented, validation must prove at minimum:
+Implementation validation must prove at minimum:
 
 - only a current owner can create a technical choice proposal;
 - proposal creation does not create an accepted decision;
@@ -282,4 +278,5 @@ Revisit this decision if:
 
 | Date | Status | Reason |
 | --- | --- | --- |
-| 2026-09-13 | Proposed | The repository requires qualified specialist review for consequential technical choices but does not yet define the acceptance authority or blocking-result gate. Owner approval is required before implementation. |
+| 2026-09-13 | Proposed | The repository required qualified specialist review for consequential technical choices but did not yet define the acceptance authority or blocking-result gate. |
+| 2026-09-13 | Accepted | Ryan Smith approved Option A: exact-revision `No blocking finding` specialist review is required, followed by separate explicit owner acceptance as project direction. |
