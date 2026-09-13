@@ -42,9 +42,19 @@ The slice passed real-backend and rendered acceptance tests at application commi
 
 Validated scope includes transactional decision acceptance, audit record, idempotent retries, direct-table denial, tenant/session/revocation isolation, injected-failure rollback, restart/resume, database interruption/recovery, and mobile/desktop rendered review.
 
+### Slice 3 — Owner-owned proposed work items
+
+**Status:** Validated
+
+An authenticated workspace owner can record bounded planned work with an outcome, completion condition, expected evidence, current stage, and explicit owner. New work items remain `Proposed`; recording them does not start execution, assign a specialist, or claim implementation, review, or verification.
+
+The slice passed real-backend and rendered acceptance tests at application commit `1f2a1c99856119c845a4495b61674bea415a4a77` through CI run 113. See the [work-item slice](INCREMENT_2_WORK_ITEMS.md) and [validation record](validation/increment-2-work-items.md).
+
+Validated scope includes transactional work-item creation, audit record, idempotent retries, direct-table denial, tenant/session/revocation isolation, injected-failure rollback, restart/resume, database interruption/recovery, explicit text status, and mobile/desktop rendered review.
+
 ### Remaining Increment 2 scope
 
-Specialist-review decision flow, work records, artifact records, evidence records, maintenance records, later lifecycle behavior, change-impact handling, and supporting audit/seed behavior remain In progress or unimplemented. No hosted project has been provisioned.
+Specialist-review decision flow; work-state transitions, collaborator/specialist assignment, work dependencies and links; durable requirement records; artifact records; evidence records; maintenance records; later lifecycle behavior; change-impact handling; and supporting audit/seed behavior remain In progress or unimplemented. No hosted project has been provisioned.
 
 ## 4. Increment 3 — Versioned artifact import
 
