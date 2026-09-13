@@ -1,9 +1,30 @@
 import { ArrowRight, CheckCircle2, Circle, Clock3, FileText, PackageOpen, ShieldCheck } from "lucide-react";
 
 export function WorkView() {
-  return <section className="standard-page"><PageHeading eyebrow="Work" title="Keep work bounded and owned." text="Work items connect the current stage to a clear output, owner, and completion condition." />
-    <div className="list-panel">
-      <WorkRow status="Next" title="Observe one equipment checkout" meta="Owner: Jordan Singh • Stage 2" action="Open action" />
+  return <section className="standard-page work-page"><PageHeading eyebrow="Work" title="Keep work bounded and owned." text="Work items connect the current stage to a clear output, owner, and completion condition." />
+    <article className="work-focus-card">
+      <div className="work-focus-topline">
+        <span className="eyebrow">Current focus</span>
+        <span className="row-status next"><Circle size={8} fill="currentColor" />Next</span>
+      </div>
+      <div className="work-focus-copy">
+        <h2>Observe one equipment checkout</h2>
+        <p>Watch a real checkout to see how the process works in practice, what confuses people, and where it slows down.</p>
+      </div>
+      <div className="work-focus-meta">
+        <span><small>Owner</small><strong>Jordan Singh</strong></span>
+        <span><small>Stage</small><strong>2 • Validate and compare</strong></span>
+        <span><small>Complete when</small><strong>One real checkout is observed and findings are recorded.</strong></span>
+        <span><small>Evidence expected</small><strong>Observation notes linked to the Stage 2 record.</strong></span>
+      </div>
+      <button className="button primary work-primary-action" type="button">Start action <ArrowRight size={16} /></button>
+    </article>
+
+    <div className="work-queue-heading">
+      <div><span className="eyebrow">Queued next</span><h2>Dependent work</h2></div>
+      <span>2 actions</span>
+    </div>
+    <div className="list-panel work-queue">
       <WorkRow status="Queued" title="Compare three viable approaches" meta="Depends on: checkout observation" action="View dependency" />
       <WorkRow status="Queued" title="Record the route decision" meta="Depends on: alternatives comparison" action="View dependency" />
     </div>
