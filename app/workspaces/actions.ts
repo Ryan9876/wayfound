@@ -27,7 +27,6 @@ export async function signOut() {
   try {
     await client.auth.signOut({ scope: "local" });
   } finally {
-    // Remove this browser's session even if the provider call throws.
     const { cookies } = await import("next/headers");
     const jar = await cookies();
     jar.getAll().filter(c => c.name.startsWith("sb-")).forEach(c => jar.delete(c.name));
@@ -56,14 +55,15 @@ export async function createDecision(_: FormState, form: FormData): Promise<Form
       title: String(form.get("title") ?? ""),
       decision: String(form.get("decision") ?? ""),
       rationale: String(form.get("rationale") ?? ""),
+      confirmAuthority: form.get("confirmAuthority") === "on",
       requestId: String(form.get("requestId") ?? ""),
     });
   } catch (error) {
     const code = error instanceof Error ? error.message : "UNKNOWN";
-    console.error(JSON.stringify({ operation: "create_decision", workspace_id: workspaceId, outcome: "failed", code }));
+    console.error(JSON.stringify({ operation: "record_owner_decision", workspace_id: workspaceId, outcome: "failed", code }));
     return {
       error: code === "INVALID_INPUT"
-        ? "Check the decision fields and try again."
+        ? "Complete the decision fields and confirm that this choice is within product-owner authority."
         : code === "REQUEST_CONFLICT"
           ? "This decision request was already used with different details. Reload the workspace before starting again."
           : code === "ACCESS_DENIED"
