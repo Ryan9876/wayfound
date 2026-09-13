@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 import { WorkspaceFrame } from "@/components/workspace-frame";
-import { CreateDecisionForm, CreateWorkItemForm, CreateRequirementForm, CreateEvidenceForm, CreateArtifactForm } from "@/components/workspace-forms";
+import { CreateDecisionForm, CreateWorkItemForm, CreateRequirementForm, CreateEvidenceForm, CreateArtifactForm, AcceptArtifactVersionForm } from "@/components/workspace-forms";
 import { workspaceService } from "@/lib/application/workspaces";
 import { decisionService } from "@/lib/application/decisions";
 import { workItemService } from "@/lib/application/work-items";
@@ -22,6 +22,8 @@ export default async function WorkspacePage({ params }: { params: Promise<{ id: 
   const requirements = await (await requirementService()).list(id);
   const evidence = await (await evidenceService()).list(id);
   const artifacts = await (await artifactService()).list(id);
+  const acceptedArtifactCount = artifacts.filter(artifact => artifact.accepted_version_id !== null).length;
+  const proposedArtifactCount = artifacts.length - acceptedArtifactCount;
   const current = stageCatalog.find(stage => stage.number === workspace.release.current_stage)!;
 
   return <WorkspaceFrame signedIn>
@@ -90,20 +92,25 @@ export default async function WorkspacePage({ params }: { params: Promise<{ id: 
         </section>
 
         <section id="artifacts" className="artifact-section" aria-labelledby="artifacts-title" aria-label="Artifacts">
-          <div className="artifact-section-header"><div><span className="eyebrow">Project record</span><h2 id="artifacts-title">Artifacts</h2><p>Versioned project outputs remain proposed until an explicit later acceptance workflow changes project direction.</p></div><span className="status-chip">{artifacts.length} proposed</span></div>
+          <div className="artifact-section-header"><div><span className="eyebrow">Project record</span><h2 id="artifacts-title">Artifacts</h2><p>Versioned project outputs remain proposed until an explicit owner action accepts a specific version as current project direction.</p></div><span className="status-chip">{acceptedArtifactCount} accepted · {proposedArtifactCount} proposed</span></div>
           {artifacts.length ? <div className="artifact-list">{artifacts.map(artifact => {
             const version = artifact.versions[0];
-            return <article className="durable-card artifact-card" key={artifact.id}>
-              <span className="eyebrow">Proposed artifact · Version {version.version_number}</span>
+            const accepted = artifact.accepted_version_id === version.id && version.lifecycle === "Accepted";
+            return <article className="durable-card artifact-card" id={`artifact-${artifact.id}`} key={artifact.id}>
+              <span className="eyebrow">{accepted ? "Accepted artifact" : "Proposed artifact"} · Version {version.version_number}</span>
               <h3>{artifact.title}</h3>
               <p className="artifact-kind"><strong>Kind:</strong> {artifact.kind}</p>
               <div className="artifact-detail"><strong>Summary</strong><p>{version.summary}</p></div>
               <div className="artifact-reference"><strong>External reference</strong><p>{version.reference_label}</p><a href={version.reference_url} target="_blank" rel="noreferrer">{version.reference_url}</a><small>Wayfound stores this reference. It does not fetch the referenced content in this slice.</small></div>
-              <div className="artifact-meta"><span><strong>Status:</strong> {version.lifecycle}</span><span><strong>Version:</strong> {version.version_number}</span><span><strong>Stage:</strong> {version.stage_number} · {stageCatalog[version.stage_number - 1].name}</span><span><strong>Recorder:</strong> Product owner</span></div>
+              <div className="artifact-meta"><span><strong>Status:</strong> {version.lifecycle}</span><span><strong>Version:</strong> {version.version_number}</span><span><strong>Stage:</strong> {version.stage_number} · {stageCatalog[version.stage_number - 1].name}</span><span><strong>Recorder:</strong> Product owner</span><span><strong>Artifact revision:</strong> {artifact.revision}</span><span><strong>Version revision:</strong> {version.revision}</span></div>
+              {accepted && artifact.accepted_at ? <div className="artifact-acceptance-meta"><strong>Accepted project direction</strong><span><strong>Authority:</strong> Product owner</span><span><strong>Accepted:</strong> <time dateTime={artifact.accepted_at}>{new Date(artifact.accepted_at).toISOString()}</time></span></div> : null}
               <code>Artifact ID: {artifact.id}</code><code>Version ID: {version.id}</code>
-              <p className="artifact-warning"><strong>Not accepted project direction.</strong> This version remains Proposed until a later authorized acceptance workflow changes its lifecycle.</p>
+              {accepted ? <p className="artifact-warning artifact-accepted-warning"><strong>Accepted project direction.</strong> This records product-owner direction only. It does not establish qualified specialist review, technical correctness, verification, validation, release readiness, or production authorization.</p> : <>
+                <p className="artifact-warning"><strong>Not accepted project direction.</strong> This version remains Proposed until an authorized owner accepts this exact version.</p>
+                <div className="artifact-acceptance-action"><span className="eyebrow">Product-owner authority</span><h4>Accept this version</h4><p>Use this action only when this exact version should become current project direction.</p><AcceptArtifactVersionForm workspaceId={workspace.id} artifactId={artifact.id} versionId={version.id} versionNumber={version.version_number} requestId={randomUUID()} /></div>
+              </>}
             </article>;
-          })}</div> : <article className="durable-card"><h3>No proposed artifacts yet.</h3><p>Record a versioned project output when you have an external reference that should remain part of project continuity.</p></article>}
+          })}</div> : <article className="durable-card"><h3>No artifacts yet.</h3><p>Record a versioned project output when you have an external reference that should remain part of project continuity.</p></article>}
           <article className="durable-card artifact-form-card"><span className="eyebrow">Versioned project output</span><h3>Record a proposed artifact</h3><p>This creates a stable artifact identity and version 1 as Proposed. It does not accept the artifact or fetch its external content.</p><CreateArtifactForm workspaceId={workspace.id} requestId={randomUUID()} /></article>
         </section>
       </section>
