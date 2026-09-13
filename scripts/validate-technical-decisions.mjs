@@ -350,8 +350,9 @@ try {
   await specialistContext.close(); await ownerContext.close(); await stop(); await start();
   ownerContext=await browser.newContext(); ownerPage=await ownerContext.newPage();
   await login(ownerPage,emails[0]); await ownerPage.goto(workspaceUrl);
-  await ownerPage.getByRole('heading',{name:'UI authorization boundary',exact:true,level:3}).first().waitFor({timeout:30000});
-  await ownerPage.getByText('Accepted project direction after qualified review.',{exact:false}).waitFor();
+  const restartedCard=ownerPage.locator('#technical-decisions article').filter({has:ownerPage.getByRole('heading',{name:'UI authorization boundary',exact:true,level:3})}).first();
+  await restartedCard.waitFor({state:'visible',timeout:30000});
+  await restartedCard.getByText('Accepted project direction after qualified review.',{exact:false}).waitFor();
   const afterRestart=(await list(clients[0],workspace)).find(x=>x.id===uiPersisted.id);
   assert.equal(afterRestart.decision.id,uiPersisted.decision.id,'restart changed accepted technical decision');
   const otherContext=await browser.newContext(); const otherPage=await otherContext.newPage();
@@ -367,7 +368,8 @@ try {
   } finally { execFileSync('docker',['unpause','supabase_db_wayfound'],{stdio:'ignore'}); dbPaused=false; }
   await new Promise(resolve=>setTimeout(resolve,5000));
   await ownerPage.reload();
-  await ownerPage.getByRole('heading',{name:'UI authorization boundary',exact:true}).waitFor({timeout:30000});
+  await restartedCard.waitFor({state:'visible',timeout:30000});
+  await restartedCard.getByText('Accepted project direction after qualified review.',{exact:false}).waitFor();
   assert.equal(((await list(clients[0],workspace)).find(x=>x.id===uiPersisted.id)).decision.id,uiPersisted.decision.id,'database recovery changed accepted technical decision');
 
   console.log('PASS: consequential technical choices preserve split authority; exact-revision specialist review gates separate owner acceptance; blocking/advisory findings, stale revisions, tenant/session/membership violations, direct-table access, duplicate/concurrent requests, injected audit failure, restart/re-login, database interruption/recovery, keyboard access, and desktop/390 px rendering passed.');
