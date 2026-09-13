@@ -1,0 +1,59 @@
+/* Cross-workspace accessibility refinements.
+   Keeps small supporting text readable and makes keyboard focus visible. */
+
+:where(a, button, input):focus-visible {
+  outline: 2px solid var(--pine);
+  outline-offset: 3px;
+}
+
+.search-box:focus-within {
+  border-color: #8fb5aa;
+  box-shadow: 0 0 0 3px rgba(23, 107, 91, 0.10);
+}
+
+/* Small labels must meet normal-text contrast requirements. */
+.eyebrow,
+.project-switcher small,
+.sync-state small,
+.context-footer small,
+.record-items small,
+.group-title span,
+.journey-status-summary small,
+.work-focus-meta small,
+.work-queue-heading > span,
+.records-summary small,
+.release-state-summary small,
+.release-check-heading > span,
+.records-page .record-field small,
+.more-card p {
+  color: #60706c;
+}
+
+.journey-page .phase-step small {
+  color: #667471;
+}
+
+.journey-page .phase-step.done small {
+  color: #60706c;
+}
+
+.journey-page .phase-step.active small {
+  color: #304f48;
+}
+
+.mobile-nav-item:focus-visible,
+.nav-item:focus-visible,
+.more-card:focus-visible {
+  border-radius: 9px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
