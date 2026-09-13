@@ -225,7 +225,50 @@ try {
   expectedError(await clients[0].schema('wayfound').from('decisions').select('*'), 'private decision table read unexpectedly succeeded');
   expectedError(await clients[0].from('decisions').insert({ title: 'bypass' }), 'direct decision table write unexpectedly succeeded');
 
-  const tables = ['actors', 'workspaces', 'memberships', 'releases', 'release_stages', 'audit_events', 'creation_requests', 'decisions', 'decision_requests'];
+  const ownerActorId = (await sql.query('select id from wayfound.actors where provider_subject=$1', [users[0].id])).rows[0].id;
+  const workArgs = {
+    p_workspace: id,
+    p_title: 'Observe one equipment checkout',
+    p_outcome: 'Record how one real equipment checkout works in practice.',
+    p_completion_condition: 'One checkout is observed and the findings are recorded.',
+    p_evidence_expectation: 'Observation notes linked to this work item.',
+    p_request: randomUUID(),
+  };
+  const duplicateWork = await Promise.all([
+    rpc(clients[0], 'create_proposed_work_item', workArgs),
+    rpc(clients[0], 'create_proposed_work_item', workArgs),
+  ]);
+  const workItemId = ok(duplicateWork[0]);
+  duplicateWork.forEach(result => assert.equal(ok(result), workItemId));
+  const savedWorkItems = ok(await rpc(clients[0], 'list_work_items', { p_workspace: id }));
+  assert.equal(savedWorkItems.length, 1);
+  assert.equal(savedWorkItems[0].id, workItemId);
+  assert.equal(savedWorkItems[0].release_id, saved.release.id);
+  assert.equal(savedWorkItems[0].stage_number, 1);
+  assert.equal(savedWorkItems[0].title, workArgs.p_title);
+  assert.equal(savedWorkItems[0].outcome, workArgs.p_outcome);
+  assert.equal(savedWorkItems[0].completion_condition, workArgs.p_completion_condition);
+  assert.equal(savedWorkItems[0].evidence_expectation, workArgs.p_evidence_expectation);
+  assert.equal(savedWorkItems[0].owner_actor_id, ownerActorId);
+  assert.equal(savedWorkItems[0].status, 'Proposed');
+  expectedError(
+    await clients[0].rpc('create_proposed_work_item', { ...workArgs, p_title: 'Changed' }),
+    'changed duplicate work-item request unexpectedly succeeded',
+  );
+  expectedError(
+    await clients[0].rpc('create_proposed_work_item', { ...workArgs, p_request: randomUUID(), p_completion_condition: ' ' }),
+    'invalid proposed work item unexpectedly succeeded',
+  );
+  assert.deepEqual(ok(await rpc(clients[1], 'list_work_items', { p_workspace: id })), []);
+  expectedError(
+    await clients[1].rpc('create_proposed_work_item', { ...workArgs, p_request: randomUUID() }),
+    'non-owner work-item creation unexpectedly succeeded',
+  );
+  expectedError(await backend.client().rpc('list_work_items', { p_workspace: id }), 'anonymous work-item read unexpectedly succeeded');
+  expectedError(await clients[0].schema('wayfound').from('work_items').select('*'), 'private work-item table read unexpectedly succeeded');
+  expectedError(await clients[0].from('work_items').insert({ title: 'bypass' }), 'direct work-item table write unexpectedly succeeded');
+
+  const tables = ['actors', 'workspaces', 'memberships', 'releases', 'release_stages', 'audit_events', 'creation_requests', 'decisions', 'decision_requests', 'work_items', 'work_item_requests'];
   async function counts() {
     return Promise.all(tables.map(async table => (await sql.query(`select count(*)::int n from wayfound.${table}`)).rows[0].n));
   }
@@ -260,19 +303,35 @@ try {
     await sql.query('drop trigger test_decision_failure on wayfound.audit_events; drop function wayfound.test_decision_failure()');
   }
 
+  const beforeWorkFailure = await counts();
+  await sql.query(`create function wayfound.test_work_failure() returns trigger language plpgsql as $$begin if new.operation='work_item.proposed' then raise exception 'Injected work-item audit failure'; end if; return new; end$$; create trigger test_work_failure before insert on wayfound.audit_events for each row execute function wayfound.test_work_failure()`);
+  try {
+    expectedError(
+      await clients[0].rpc('create_proposed_work_item', { ...workArgs, p_request: randomUUID(), p_title: 'Rollback work item' }),
+      'injected work-item creation failure unexpectedly succeeded',
+    );
+    assert.deepEqual(await counts(), beforeWorkFailure);
+  } finally {
+    await sql.query('drop trigger test_work_failure on wayfound.audit_events; drop function wayfound.test_work_failure()');
+  }
+
   const membership = (await sql.query('delete from wayfound.memberships where workspace_id=$1 returning *', [id])).rows[0];
   assert.equal(ok(await rpc(clients[0], 'open_workspace', { p_id: id })), null);
   assert.deepEqual(ok(await rpc(clients[0], 'list_decisions', { p_workspace: id })), []);
+  assert.deepEqual(ok(await rpc(clients[0], 'list_work_items', { p_workspace: id })), []);
   expectedError(await clients[0].rpc('record_owner_decision', decisionArgs), 'membership-revoked decision retry unexpectedly succeeded');
+  expectedError(await clients[0].rpc('create_proposed_work_item', workArgs), 'membership-revoked work-item retry unexpectedly succeeded');
   expectedError(await clients[0].rpc('create_workspace', args), 'membership-revoked workspace retry unexpectedly succeeded');
   await sql.query('insert into wayfound.memberships(workspace_id,actor_id,role) values($1,$2,$3)', [id, membership.actor_id, membership.role]);
 
   await sql.query("update auth.sessions set not_after=now()-interval '1 minute' where user_id=$1", [users[0].id]);
   expectedError(await clients[0].rpc('list_decisions', { p_workspace: id }), 'expired session decision read succeeded');
+  expectedError(await clients[0].rpc('list_work_items', { p_workspace: id }), 'expired session work-item read succeeded');
   await sql.query('update auth.sessions set not_after=null where user_id=$1', [users[0].id]);
-  const decisionAccess = ok(await clients[0].auth.getSession()).session.access_token;
+  const protectedAccess = ok(await clients[0].auth.getSession()).session.access_token;
   await sql.query('delete from auth.sessions where user_id=$1', [users[0].id]);
-  await revokedRpc(decisionAccess, 'list_decisions', { p_workspace: id });
+  await revokedRpc(protectedAccess, 'list_decisions', { p_workspace: id });
+  await revokedRpc(protectedAccess, 'list_work_items', { p_workspace: id });
   ok(await clients[0].auth.signInWithPassword({ email: emails[0], password }));
 
   await sql.query("update auth.sessions set not_after=now()-interval '1 minute' where user_id=$1", [users[1].id]);
@@ -307,6 +366,7 @@ try {
   await inspect(page, 'saved-workspace');
   assert(await page.getByText('Stage 1: Clarify', { exact: true }).isVisible());
   assert(await page.getByRole('heading', { name: 'No accepted decisions yet.', exact: true }).isVisible());
+  assert(await page.getByRole('heading', { name: 'No proposed work yet.', exact: true }).isVisible());
 
   await page.getByLabel('Decision title', { exact: true }).fill('Keep checkout staff-assisted');
   await page.getByLabel('Decision statement', { exact: true }).fill('Keep equipment checkout staff-assisted for Release 1.0.');
@@ -318,6 +378,20 @@ try {
   assert(await page.getByText('Status: Accepted', { exact: true }).isVisible());
   assert(await page.getByText('Authority: Product owner', { exact: true }).isVisible());
   await inspect(page, 'saved-decision');
+
+  await page.getByLabel('Work-item title', { exact: true }).fill('Observe one equipment checkout');
+  await page.getByLabel('Outcome', { exact: true }).fill('Record how one real equipment checkout works in practice.');
+  await page.getByLabel('Complete when', { exact: true }).fill('One checkout is observed and the findings are recorded.');
+  await page.getByLabel('Evidence expected', { exact: true }).fill('Observation notes linked to this work item.');
+  await page.getByRole('button', { name: 'Add proposed work item', exact: true }).click();
+  await page.waitForURL(url => url.pathname === new URL(resumeUrl).pathname && url.hash === '#work-items');
+  await page.getByRole('heading', { name: 'Observe one equipment checkout', exact: true }).waitFor({ timeout: 30000 });
+  assert(await page.getByText('Status: Proposed', { exact: true }).isVisible());
+  assert(await page.getByText('Owner: Product owner', { exact: true }).isVisible());
+  assert.equal(await page.getByText('Status: In progress', { exact: true }).count(), 0);
+  assert.equal(await page.getByText('Status: Implemented', { exact: true }).count(), 0);
+  assert.equal(await page.getByText('Status: Validated', { exact: true }).count(), 0);
+  await inspect(page, 'saved-work-item');
 
   await page.getByRole('link', { name: 'Your workspaces', exact: true }).click();
   await waitForWorkspaceList(page);
@@ -339,6 +413,9 @@ try {
   assert(await page.getByText('Track the equipment that volunteers borrow.', { exact: true }).isVisible());
   assert(await page.getByRole('heading', { name: 'Keep checkout staff-assisted', exact: true }).isVisible());
   assert(await page.getByText('Keep equipment checkout staff-assisted for Release 1.0.', { exact: true }).isVisible());
+  assert(await page.getByRole('heading', { name: 'Observe one equipment checkout', exact: true }).isVisible());
+  assert(await page.getByText('One checkout is observed and the findings are recorded.', { exact: true }).isVisible());
+  assert(await page.getByText('Observation notes linked to this work item.', { exact: true }).isVisible());
 
   const other = await browser.newContext();
   const otherPage = await other.newPage();
@@ -358,11 +435,13 @@ try {
   await page.reload();
   await page.getByRole('heading', { name: 'Community workshop', exact: true }).waitFor({ timeout: 30000 });
   assert(await page.getByRole('heading', { name: 'Keep checkout staff-assisted', exact: true }).isVisible());
+  assert(await page.getByRole('heading', { name: 'Observe one equipment checkout', exact: true }).isVisible());
   assert.deepEqual(ok(await rpc(clients[0], 'open_workspace', { p_id: id })), saved);
   assert.deepEqual(ok(await rpc(clients[0], 'list_decisions', { p_workspace: id })), savedDecisions);
+  assert.deepEqual(ok(await rpc(clients[0], 'list_work_items', { p_workspace: id })), savedWorkItems);
   await context.close();
 
-  console.log('PASS: real Supabase authentication, atomic workspace and owner-decision creation, idempotent retries, tenant isolation, authority confirmation, revocation, failure rollback, restart/resume, sign-out, database interruption/recovery, keyboard focus and responsive screenshots.');
+  console.log('PASS: real Supabase authentication, atomic workspace, owner-decision, and proposed work-item creation, idempotent retries, tenant isolation, authority boundaries, revocation, failure rollback, restart/resume, sign-out, database interruption/recovery, keyboard focus and responsive screenshots.');
 } finally {
   if (browser) await browser.close();
   await stop();
