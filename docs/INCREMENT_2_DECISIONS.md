@@ -1,8 +1,9 @@
 # Increment 2 — Durable decision records
 
-**Status:** In progress  
+**Status:** Validated  
 **Parent increment:** Increment 2 — Durable workspace record  
-**Architecture basis:** ADR-0002 and the validated durable-workspace boundary
+**Architecture basis:** ADR-0002 and the validated durable-workspace boundary  
+**Validated application commit:** `548f1bbb4264ca412bc808a94a60593bca2c3602` through CI run 92
 
 ## 1. Outcome
 
@@ -91,19 +92,23 @@ The section shows:
 - each accepted decision with title, decision statement, rationale, captured stage, authority, and text status;
 - a form for title, decision statement, rationale, and explicit authority confirmation.
 
-The form must state that technical decisions requiring qualified specialist review must not be accepted through this action.
+The form states that technical decisions requiring qualified specialist review must not be accepted through this action.
 
-The interface must not imply specialist review, verification, or release authorization.
+The interface does not imply specialist review, verification, or release authorization.
 
 ## 8. Failure behavior
 
 If decision creation fails, the application keeps the existing workspace and decision list unchanged and shows a recoverable error.
 
-A database interruption must not replace durable decisions with fixture records or claim that a failed save succeeded.
+A database interruption does not replace durable decisions with fixture records or claim that a failed save succeeded.
 
-The existing bounded retry for exact PostgREST `PGRST303: JWT issued at future` may apply. Authorization failures must remain failures.
+The existing bounded retry for exact PostgREST `PGRST303: JWT issued at future` may apply. Authorization failures remain failures.
+
+A same-route save defect found in CI run 91 was corrected by revalidating the workspace before redirect. CI run 92 confirmed that a successful save appears immediately and remains durable after restart.
 
 ## 9. Acceptance criteria
+
+All acceptance criteria below passed at application commit `548f1bbb4264ca412bc808a94a60593bca2c3602` through CI run 92:
 
 1. Owner A creates a workspace and records one owner-authorized decision through the application. The saved record contains the entered title, decision statement, rationale, authority `owner`, status `Accepted`, current release, and current stage.
 2. The action requires explicit confirmation that the choice is a product-scope or business decision within owner authority.
@@ -116,6 +121,8 @@ The existing bounded retry for exact PostgREST `PGRST303: JWT issued at future` 
 9. The database security advisor reports no new error.
 10. TypeScript, production build, existing durable-workspace acceptance tests, keyboard checks, responsive checks, and rendered screenshots pass.
 11. Mobile and desktop rendered review confirms that status and authority are text-visible and the decision form/list do not overflow the viewport.
+
+See [validation/increment-2-decisions.md](validation/increment-2-decisions.md) for executed evidence and limits.
 
 ## 10. Excluded behavior
 
