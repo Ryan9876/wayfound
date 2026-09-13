@@ -16,7 +16,19 @@ let server, browser;
 const base='http://127.0.0.1:3100';
 const output='artifacts/workspace';mkdirSync(output,{recursive:true});
 const args={p_name:'Workshop continuity',p_problem:'Volunteers need a reliable equipment record.',p_release:'Release 1.0',p_request:randomUUID()};
+const retryDelays=[150,350,750];
 function ok(result){if(result.error) throw new Error(`${result.error.code}: ${result.error.message}`);return result.data;}
+function jwtFuture(error){return error?.code==='PGRST303'&&error.message==='JWT issued at future';}
+function expectedError(result,message){assert(result.error,message);assert(!jwtFuture(result.error),`${message}: transient PostgREST JWT clock failure`);return result.error;}
+async function rpc(client,name,rpcArgs){
+ let result=await client.rpc(name,rpcArgs);
+ for(const delay of retryDelays){
+  if(!jwtFuture(result.error)) return result;
+  await new Promise(r=>setTimeout(r,delay));
+  result=await client.rpc(name,rpcArgs);
+ }
+ return result;
+}
 async function start(){
  server=spawn(process.execPath,['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port','3100'],{env:{...process.env,SUPABASE_URL:backend.url,SUPABASE_PUBLISHABLE_KEY:backend.key,APP_ORIGIN:base},stdio:'ignore'});
  for(let i=0;i<100;i++){try{if((await fetch(base+'/sign-in')).ok)return;}catch{} await new Promise(r=>setTimeout(r,200));}
@@ -46,37 +58,44 @@ try {
   users.push(ok(await backend.admin.auth.admin.createUser({email:emails[i],password,email_confirm:true})).user);
   ok(await clients[i].auth.signInWithPassword({email:emails[i],password}));
  }
- const duplicate=await Promise.all([clients[0].rpc('create_workspace',args),clients[0].rpc('create_workspace',args)]);
+ const duplicate=await Promise.all([rpc(clients[0],'create_workspace',args),rpc(clients[0],'create_workspace',args)]);
  const id=ok(duplicate[0]);
- assert((await backend.client().auth.signUp({email:`uninvited-${randomUUID()}@example.test`,password})).error,'public signup must stay disabled');
+ expectedError(await backend.client().auth.signUp({email:`uninvited-${randomUUID()}@example.test`,password}),'public signup unexpectedly succeeded');
  duplicate.forEach(r=>assert.equal(ok(r),id));
- assert((await clients[0].rpc('create_workspace',{...args,p_name:'Changed'})).error);
- const saved=ok(await clients[0].rpc('open_workspace',{p_id:id}));
+ expectedError(await clients[0].rpc('create_workspace',{...args,p_name:'Changed'}),'changed duplicate request unexpectedly succeeded');
+ const saved=ok(await rpc(clients[0],'open_workspace',{p_id:id}));
  assert.equal(saved.release.lifecycle,'Proposed');assert.equal(saved.release.current_stage,1);
  assert.equal(saved.stages.length,15);assert.deepEqual(saved.stages.map(s=>s.state),['active',...Array(14).fill('upcoming')]);
- assert.equal(ok(await clients[1].rpc('open_workspace',{p_id:id})),null);
- assert.deepEqual(ok(await clients[1].rpc('list_workspaces')),[]);
- assert((await backend.client().rpc('open_workspace',{p_id:id})).error);
- assert((await clients[0].schema('wayfound').from('workspaces').select('*')).error);
- assert((await clients[0].from('workspaces').insert({name:'bypass'})).error);
+ assert.equal(ok(await rpc(clients[1],'open_workspace',{p_id:id})),null);
+ assert.deepEqual(ok(await rpc(clients[1],'list_workspaces')),[]);
+ expectedError(await backend.client().rpc('open_workspace',{p_id:id}),'anonymous workspace read unexpectedly succeeded');
+ expectedError(await clients[0].schema('wayfound').from('workspaces').select('*'),'private schema read unexpectedly succeeded');
+ expectedError(await clients[0].from('workspaces').insert({name:'bypass'}),'direct table write unexpectedly succeeded');
  const tables=['actors','workspaces','memberships','releases','release_stages','audit_events','creation_requests'];
  async function counts(){return Promise.all(tables.map(async t=>(await sql.query(`select count(*)::int n from wayfound.${t}`)).rows[0].n));}
- for (const invalid of [{p_name:''},{p_problem:' '},{p_release:'x'.repeat(81)},{p_request:null}]) assert((await clients[0].rpc('create_workspace',{...args,...invalid})).error);
+ for (const invalid of [{p_name:''},{p_problem:' '},{p_release:'x'.repeat(81)},{p_request:null}]) expectedError(await clients[0].rpc('create_workspace',{...args,...invalid}),'invalid workspace input unexpectedly succeeded');
  const before=await counts();
  await sql.query(`create function wayfound.test_failure() returns trigger language plpgsql as $$begin raise exception 'Injected audit failure'; end$$; create trigger test_failure before insert on wayfound.audit_events for each row execute function wayfound.test_failure()`);
- try{assert((await clients[0].rpc('create_workspace',{...args,p_request:randomUUID()})).error);assert.deepEqual(await counts(),before);}finally{await sql.query('drop trigger test_failure on wayfound.audit_events; drop function wayfound.test_failure()');}
+ try{expectedError(await clients[0].rpc('create_workspace',{...args,p_request:randomUUID()}),'injected creation failure unexpectedly succeeded');assert.deepEqual(await counts(),before);}finally{await sql.query('drop trigger test_failure on wayfound.audit_events; drop function wayfound.test_failure()');}
  const membership=(await sql.query('delete from wayfound.memberships where workspace_id=$1 returning *',[id])).rows[0];
- assert.equal(ok(await clients[0].rpc('open_workspace',{p_id:id})),null);
- assert((await clients[0].rpc('create_workspace',args)).error);
+ assert.equal(ok(await rpc(clients[0],'open_workspace',{p_id:id})),null);
+ expectedError(await clients[0].rpc('create_workspace',args),'membership-revoked retry unexpectedly succeeded');
  await sql.query('insert into wayfound.memberships(workspace_id,actor_id,role) values($1,$2,$3)',[id,membership.actor_id,membership.role]);
  await sql.query("update auth.sessions set not_after=now()-interval '1 minute' where user_id=$1",[users[1].id]);
- assert((await clients[1].rpc('list_workspaces')).error,'expired session read succeeded');
+ expectedError(await clients[1].rpc('list_workspaces'),'expired session read succeeded');
  await sql.query('update auth.sessions set not_after=null where user_id=$1',[users[1].id]);
  // Revoked sessions cannot reuse a still-signed access token for data access.
  const access=ok(await clients[1].auth.getSession()).session.access_token;
  await sql.query('delete from auth.sessions where user_id=$1',[users[1].id]);
- const revoked=await fetch(backend.url+'/rest/v1/rpc/list_workspaces',{method:'POST',headers:{apikey:backend.key,Authorization:`Bearer ${access}`,'Content-Type':'application/json'},body:'{}'});
+ let revoked,revokedBody;
+ for(let attempt=0;attempt<=retryDelays.length;attempt++){
+  revoked=await fetch(backend.url+'/rest/v1/rpc/list_workspaces',{method:'POST',headers:{apikey:backend.key,Authorization:`Bearer ${access}`,'Content-Type':'application/json'},body:'{}'});
+  revokedBody=await revoked.clone().json().catch(()=>null);
+  if(!jwtFuture(revokedBody)||attempt===retryDelays.length) break;
+  await new Promise(r=>setTimeout(r,retryDelays[attempt]));
+ }
  assert(!revoked.ok,'revoked session read succeeded');
+ assert(!jwtFuture(revokedBody),'revoked session test only observed transient PostgREST JWT clock failure');
  await start();browser=await chromium.launch();
  let context=await browser.newContext();let page=await context.newPage();
  await page.goto(base+'/sign-in');await inspect(page,'sign-in');
@@ -102,7 +121,7 @@ try {
  try{await page.goto(resumeUrl,{timeout:90000});await page.getByRole('heading',{name:'We could not load your workspace.'}).waitFor({timeout:60000});await page.screenshot({path:`${output}/database-unavailable.png`,fullPage:true});}
  finally{execFileSync('docker',['unpause','supabase_db_wayfound'],{stdio:'ignore'});}
  await page.reload();await page.getByRole('heading',{name:'Community workshop',exact:true}).waitFor({timeout:30000});
- assert.deepEqual(ok(await clients[0].rpc('open_workspace',{p_id:id})),saved);
+ assert.deepEqual(ok(await rpc(clients[0],'open_workspace',{p_id:id})),saved);
  await context.close();
  console.log('PASS: real Supabase authentication, atomic PostgreSQL creation, duplicate retries, tenant isolation, revocation, failure rollback, restart/resume, sign-out, database interruption/recovery, keyboard focus and responsive screenshots.');
 } finally {if(browser)await browser.close();await stop();await sql.end();}
