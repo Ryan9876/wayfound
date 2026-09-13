@@ -12,7 +12,7 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -33,3 +33,38 @@ jobs:
 
       - name: Build application
         run: npm run build
+
+      - name: Install visual test browser
+        run: npx --yes playwright@1.55.0 install --with-deps chromium
+
+      - name: Start built application
+        run: |
+          npm run start > /tmp/wayfound-next.log 2>&1 &
+          echo $! > /tmp/wayfound-next.pid
+          npx --yes wait-on@8.0.1 http://127.0.0.1:3000
+
+      - name: Capture UI screenshots
+        run: |
+          mkdir -p artifacts/ui-screenshots
+          npx --yes playwright@1.55.0 screenshot --device="iPhone 14" --wait-for-timeout=1200 http://127.0.0.1:3000 artifacts/ui-screenshots/overview-mobile-first.png
+          npx --yes playwright@1.55.0 screenshot --device="iPhone 14" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000 artifacts/ui-screenshots/overview-mobile-full.png
+          npx --yes playwright@1.55.0 screenshot --device="iPhone 14" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/journey artifacts/ui-screenshots/journey-mobile-full.png
+          npx --yes playwright@1.55.0 screenshot --device="iPhone 14" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/work artifacts/ui-screenshots/work-mobile-full.png
+          npx --yes playwright@1.55.0 screenshot --viewport-size="1440,1200" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000 artifacts/ui-screenshots/overview-desktop-full.png
+          npx --yes playwright@1.55.0 screenshot --viewport-size="1440,1200" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/journey artifacts/ui-screenshots/journey-desktop-full.png
+          npx --yes playwright@1.55.0 screenshot --viewport-size="1440,1200" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/work artifacts/ui-screenshots/work-desktop-full.png
+
+      - name: Upload UI screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-screenshots
+          path: artifacts/ui-screenshots
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Stop built application
+        if: always()
+        run: |
+          if [ -f /tmp/wayfound-next.pid ]; then
+            kill "$(cat /tmp/wayfound-next.pid)" || true
+          fi
