@@ -38,9 +38,11 @@ Do not build deferred automation before the core orientation, continuity, and ev
 
 **Outcome:** An authenticated owner can create and resume a workspace without relying on chat history.
 
-**Preparation:** Ryan Smith approved [ADR-0002](adr/0002-durable-workspace-identity.md) for the development slice on 2026-09-13. The first create/open/resume slice is Implemented; real-backend and rendered validation are In progress. See [slice plan](INCREMENT_2_SLICE.md). No hosted project has been provisioned.
+**First slice:** **Validated.** Ryan Smith approved [ADR-0002](adr/0002-durable-workspace-identity.md) for the development slice on 2026-09-13. The authenticated create/list/open/resume path passed real-backend and rendered acceptance tests at application commit `603f02862ae4090bd1853157e449a01508186f4c` through CI run 70. See the [slice plan](INCREMENT_2_SLICE.md) and [validation record](validation/increment-2-durable-workspace.md). No hosted project has been provisioned.
 
-**Expected scope:** authentication and workspace membership, PostgreSQL persistence, release/stage/decision/work/artifact/evidence/maintenance records, explicit lifecycle status, audit baseline, and seed/demo tooling.
+**Validated first-slice scope:** Supabase authentication, workspace membership, PostgreSQL workspace/release/stage persistence, initial audit event, idempotent creation request, loading/empty/error states, tenant isolation, restart/resume behavior, and failure recovery for the bounded create/open/resume workflow.
+
+**Remaining expected scope:** decision, work, artifact, evidence, and maintenance records; explicit lifecycle behavior for those records; later audit coverage; and seed/demo tooling required by those later workflows. These items remain In progress or unimplemented and are not covered by the first-slice validation.
 
 ## 4. Increment 3 — Versioned artifact import
 
@@ -72,4 +74,4 @@ Do not include these items without an approved scope change: verified direct spe
 
 ## 8. Completion rule
 
-An increment is not `Validated` until its acceptance criteria and required checks have executed against an identified build. A preview deployment alone does not establish validation.
+An increment is not `Validated` until its acceptance criteria and required checks have executed against an identified build. A validated bounded slice does not make its parent increment Validated when material approved scope remains unfinished. A preview deployment alone does not establish validation.
