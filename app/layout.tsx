@@ -9,6 +9,7 @@ import "./overview-type-spacing.css";
 import "./overview-card-spacing.css";
 import "./overview-mobile.css";
 import "./overview-mobile-typography.css";
+import "./overview-mobile-spacing.css";
 
 const sourceSans = Source_Sans_3({
   subsets: ["latin"],
