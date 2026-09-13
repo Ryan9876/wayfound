@@ -13,6 +13,7 @@
     "test:evidence": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-evidence.mjs",
     "test:artifacts": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-artifacts.mjs",
     "test:artifact-acceptance": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-artifact-acceptance.mjs",
+    "test:specialist-review": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-specialist-review.mjs",
     "seed:local": "WAYFOUND_LOCAL_TEST=1 node scripts/seed-local.mjs"
   },
   "dependencies": {
