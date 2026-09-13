@@ -2,12 +2,14 @@ import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 import { WorkspaceFrame } from "@/components/workspace-frame";
 import { CreateDecisionForm, CreateWorkItemForm, CreateRequirementForm, CreateEvidenceForm, CreateArtifactForm, AcceptArtifactVersionForm } from "@/components/workspace-forms";
+import { SpecialistReviewOwnerPanel } from "@/components/specialist-review-owner-panel";
 import { workspaceService } from "@/lib/application/workspaces";
 import { decisionService } from "@/lib/application/decisions";
 import { workItemService } from "@/lib/application/work-items";
 import { requirementService } from "@/lib/application/requirements";
 import { evidenceService } from "@/lib/application/evidence";
 import { artifactService } from "@/lib/application/artifacts";
+import { specialistReviewService } from "@/lib/application/specialist-reviews";
 import { stageCatalog } from "@/lib/domain/journey";
 
 export const dynamic = "force-dynamic";
@@ -22,6 +24,7 @@ export default async function WorkspacePage({ params }: { params: Promise<{ id: 
   const requirements = await (await requirementService()).list(id);
   const evidence = await (await evidenceService()).list(id);
   const artifacts = await (await artifactService()).list(id);
+  const specialistReviews = await (await specialistReviewService()).listForOwner(id);
   const acceptedArtifactCount = artifacts.filter(artifact => artifact.accepted_version_id !== null).length;
   const proposedArtifactCount = artifacts.length - acceptedArtifactCount;
   const current = stageCatalog.find(stage => stage.number === workspace.release.current_stage)!;
@@ -39,7 +42,7 @@ export default async function WorkspacePage({ params }: { params: Promise<{ id: 
           <span className="eyebrow">Next action · Guidance</span>
           <h2>Clarify who experiences this problem.</h2>
           <p>Describe one situation in which the problem occurs and the outcome that would improve it.</p>
-          <div className="entry-note"><strong>Why this matters</strong><p>A clear problem gives the project a useful starting point. Requirements, acceptance criteria, evidence, and artifacts remain distinct project records.</p></div>
+          <div className="entry-note"><strong>Why this matters</strong><p>A clear problem gives the project a useful starting point. Requirements, acceptance criteria, evidence, artifacts, and specialist reviews remain distinct project records.</p></div>
         </article>
         <article className="durable-card problem-record">
           <span className="eyebrow">Your problem statement</span>
@@ -105,7 +108,10 @@ export default async function WorkspacePage({ params }: { params: Promise<{ id: 
               <div className="artifact-meta"><span><strong>Status:</strong> {version.lifecycle}</span><span><strong>Version:</strong> {version.version_number}</span><span><strong>Stage:</strong> {version.stage_number} · {stageCatalog[version.stage_number - 1].name}</span><span><strong>Recorder:</strong> Product owner</span><span><strong>Artifact revision:</strong> {artifact.revision}</span><span><strong>Version revision:</strong> {version.revision}</span></div>
               {accepted && artifact.accepted_at ? <div className="artifact-acceptance-meta"><strong>Accepted project direction</strong><span><strong>Authority:</strong> Product owner</span><span><strong>Accepted:</strong> <time dateTime={artifact.accepted_at}>{new Date(artifact.accepted_at).toISOString()}</time></span></div> : null}
               <code>Artifact ID: {artifact.id}</code><code>Version ID: {version.id}</code>
-              {accepted ? <p className="artifact-warning artifact-accepted-warning"><strong>Accepted project direction.</strong> This records product-owner direction only. It does not establish qualified specialist review, technical correctness, verification, validation, release readiness, or production authorization.</p> : <>
+              {accepted ? <>
+                <p className="artifact-warning artifact-accepted-warning"><strong>Accepted project direction.</strong> This records product-owner direction only. It does not establish qualified specialist review, technical correctness, verification, validation, release readiness, or production authorization.</p>
+                <SpecialistReviewOwnerPanel workspaceId={workspace.id} artifactId={artifact.id} versionId={version.id} assignments={specialistReviews} />
+              </> : <>
                 <p className="artifact-warning"><strong>Not accepted project direction.</strong> This version remains Proposed until an authorized owner accepts this exact version.</p>
                 <div className="artifact-acceptance-action"><span className="eyebrow">Product-owner authority</span><h4>Accept this version</h4><p>Use this action only when this exact version should become current project direction.</p><AcceptArtifactVersionForm workspaceId={workspace.id} artifactId={artifact.id} versionId={version.id} versionNumber={version.version_number} requestId={randomUUID()} /></div>
               </>}
