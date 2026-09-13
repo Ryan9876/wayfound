@@ -92,7 +92,11 @@ async function inspect(page, name) {
     await page.screenshot({ path: `${output}/${name}-${label}.png`, fullPage: true });
     await page.evaluate(() => document.activeElement?.blur());
     const targets = await page.locator('a[href],button:not([disabled]),input:not([type=hidden]),textarea,select,summary').evaluateAll(elements =>
-      elements.filter(element => element.getBoundingClientRect().width > 0).map((element,index) => { element.dataset.technicalDecisionFocusId=String(index); return String(index); }));
+      elements.filter(element => {
+        if (element.getBoundingClientRect().width <= 0) return false;
+        if (element.matches('summary')) return true;
+        return element.closest('details:not([open])') === null;
+      }).map((element,index) => { element.dataset.technicalDecisionFocusId=String(index); return String(index); }));
     const seen = new Set();
     for (let index=0; index<targets.length+8; index++) {
       await page.keyboard.press('Tab');
