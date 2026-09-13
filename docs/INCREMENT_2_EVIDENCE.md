@@ -1,8 +1,10 @@
 # Increment 2 — Durable criterion evidence
 
-**Status:** In progress  
+**Status:** Validated  
 **Parent increment:** Increment 2 — Durable workspace record  
-**Architecture basis:** ADR-0002 and the validated durable workspace, requirement, and acceptance-criterion boundaries
+**Architecture basis:** ADR-0002 and the validated durable workspace, requirement, and acceptance-criterion boundaries  
+**Validated application commit:** `4f67d99078600735f086ae894017481234a5a109`  
+**Validation:** CI run 151 — `34778920418`; see [validation/increment-2-evidence.md](validation/increment-2-evidence.md)
 
 ## 1. Outcome
 
@@ -138,6 +140,8 @@ The existing bounded retry for exact PostgREST `PGRST303: JWT issued at future` 
 13. The database security advisor reports no new error.
 14. TypeScript, production build, existing durable workspace, decision, work-item, and requirement acceptance tests, keyboard checks, responsive checks, and rendered screenshots pass.
 15. Mobile and desktop rendered review confirms that evidence effect, result, provenance, stable identifier, linked criterion context, and no-verification warning remain readable without horizontal overflow.
+
+All 15 criteria passed in CI run 151 against application commit `4f67d99078600735f086ae894017481234a5a109`.
 
 ## 10. Excluded behavior
 
