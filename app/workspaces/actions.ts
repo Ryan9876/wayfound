@@ -1,4 +1,5 @@
 "use server";
+import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { identityClient } from "@/lib/auth/server";
@@ -71,5 +72,7 @@ export async function createDecision(_: FormState, form: FormData): Promise<Form
             : "We could not confirm the decision save. Existing records are unchanged. Retry with the same details to avoid a duplicate.",
     };
   }
+  revalidatePath(`/workspaces/${workspaceId}`);
+  revalidatePath("/workspaces");
   redirect(`/workspaces/${workspaceId}#decisions`);
 }
