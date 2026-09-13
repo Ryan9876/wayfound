@@ -194,7 +194,9 @@ try {
   assert.equal(version.release_id, workspace.release.id);
   assert.equal(version.stage_number, workspace.release.current_stage);
   assert.equal(version.created_by_actor_id, ownerActorId);
-  assert.equal(Object.prototype.hasOwnProperty.call(artifact, 'accepted_version_id'), false);
+  assert.equal(artifact.accepted_version_id, null);
+  assert.equal(artifact.accepted_by_actor_id, null);
+  assert.equal(artifact.accepted_at, null);
   assert.equal(referenceHits, 0, 'artifact RPC unexpectedly fetched external reference');
 
   expectedError(await clients[0].rpc('create_proposed_artifact', { ...artifactArgs, p_title: 'Changed duplicate' }), 'changed duplicate artifact request unexpectedly succeeded');
@@ -269,7 +271,7 @@ try {
   await artifactSection.getByRole('button', { name: 'Record proposed artifact', exact: true }).click();
   await page.waitForURL(url => url.pathname === new URL(workspaceUrl).pathname && url.hash === '#artifacts');
   await artifactSection.getByRole('heading', { name: 'Observation plan', exact: true }).waitFor({ timeout: 30000 });
-  assert(await artifactSection.getByText('2 proposed', { exact: true }).isVisible());
+  assert(await artifactSection.getByText('0 accepted · 2 proposed', { exact: true }).isVisible());
   await inspect(page, 'saved-artifact');
   assert.equal(referenceHits, 0, 'artifact UI save unexpectedly fetched external reference');
 
