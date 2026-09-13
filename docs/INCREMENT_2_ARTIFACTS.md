@@ -1,7 +1,9 @@
 # Increment 2 — Durable proposed artifacts
 
-**Status:** In progress  
+**Status:** Validated  
 **Parent increment:** Increment 2 — Durable workspace record  
+**Validated application commit:** `8d36adede6c4b5c5570b7a3e37a519588124500b`  
+**Validation:** CI run 157 — https://github.com/Ryan9876/wayfound/actions/runs/34780475855  
 **Architecture basis:** ADR-0002 and the validated durable workspace-record boundary
 
 ## 1. Outcome
@@ -141,6 +143,8 @@ The existing bounded retry for exact PostgREST `PGRST303: JWT issued at future` 
 13. The database security advisor reports no new error.
 14. TypeScript, production build, all previously validated durable suites, keyboard checks, responsive checks, and rendered screenshots pass.
 15. Mobile and desktop rendered review confirms that artifact lifecycle, summary, reference, stable identifiers, stage, and non-acceptance warning remain readable without horizontal overflow.
+
+All 15 criteria passed in CI run 157. See [validation/increment-2-artifacts.md](validation/increment-2-artifacts.md) for executed evidence and limits.
 
 ## 10. Excluded behavior
 
