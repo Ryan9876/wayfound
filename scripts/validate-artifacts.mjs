@@ -194,7 +194,9 @@ try {
   assert.equal(version.release_id, workspace.release.id);
   assert.equal(version.stage_number, workspace.release.current_stage);
   assert.equal(version.created_by_actor_id, ownerActorId);
-  assert.equal(Object.prototype.hasOwnProperty.call(artifact, 'accepted_version_id'), false);
+  assert.equal(artifact.accepted_version_id, null);
+  assert.equal(artifact.accepted_by_actor_id, null);
+  assert.equal(artifact.accepted_at, null);
   assert.equal(referenceHits, 0, 'artifact RPC unexpectedly fetched external reference');
 
   expectedError(await clients[0].rpc('create_proposed_artifact', { ...artifactArgs, p_title: 'Changed duplicate' }), 'changed duplicate artifact request unexpectedly succeeded');
@@ -279,6 +281,9 @@ try {
     assert.equal(item.versions.length, 1);
     assert.equal(item.versions[0].version_number, 1);
     assert.equal(item.versions[0].lifecycle, 'Proposed');
+    assert.equal(item.accepted_version_id, null);
+    assert.equal(item.accepted_by_actor_id, null);
+    assert.equal(item.accepted_at, null);
   });
 
   await context.close();
