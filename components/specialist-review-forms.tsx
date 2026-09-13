@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { assignSpecialistReview } from "@/app/workspaces/actions";
+import { assignSpecialistReview } from "@/app/workspaces/specialist-review-actions";
 import { submitSpecialistReview } from "@/app/specialist-reviews/actions";
 
 export function AssignSpecialistReviewForm({
