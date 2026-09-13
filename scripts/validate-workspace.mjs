@@ -473,12 +473,13 @@ try {
   await page.getByRole('button', { name: 'Record approved requirement', exact: true }).click();
   await page.waitForURL(url => url.pathname === new URL(resumeUrl).pathname && url.hash === '#requirements');
   await page.getByRole('heading', { name: 'Identify the active borrower', exact: true }).waitFor({ timeout: 30000 });
-  assert(await page.getByText('Status: Approved', { exact: true }).isVisible());
-  assert(await page.getByText('Authority: Product owner', { exact: true }).isVisible());
-  assert(await page.getByText('Acceptance criterion · Not verification evidence', { exact: true }).isVisible());
-  assert(await page.getByText('Given an equipment checkout is active, when the checkout record is viewed, then the responsible borrower is visible.', { exact: true }).isVisible());
-  assert(await page.getByText(/^Requirement ID: [0-9a-f-]{36}$/i).isVisible());
-  assert(await page.getByText(/^Criterion ID: [0-9a-f-]{36}$/i).isVisible());
+  const requirementSection = page.getByLabel('Requirements');
+  assert(await requirementSection.getByText('Status: Approved', { exact: true }).isVisible());
+  assert(await requirementSection.getByText('Authority: Product owner', { exact: true }).isVisible());
+  assert(await requirementSection.getByText('Acceptance criterion · Not verification evidence', { exact: true }).isVisible());
+  assert(await requirementSection.getByText('Given an equipment checkout is active, when the checkout record is viewed, then the responsible borrower is visible.', { exact: true }).isVisible());
+  assert(await requirementSection.getByText(/^Requirement ID: [0-9a-f-]{36}$/i).isVisible());
+  assert(await requirementSection.getByText(/^Criterion ID: [0-9a-f-]{36}$/i).isVisible());
   await inspect(page, 'saved-requirement');
 
   await page.getByRole('link', { name: 'Your workspaces', exact: true }).click();
