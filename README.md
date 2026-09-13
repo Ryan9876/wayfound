@@ -6,9 +6,9 @@ Wayfound is a software-delivery guidance and coordination workspace for capable 
 
 ## Current state
 
-Increment 1 is **Validated** at application commit `4cbc8fd`; see the [validation record](docs/validation/increment-1.md). Increment 2 is **In progress** under [accepted ADR-0002](docs/adr/0002-durable-workspace-identity.md).
+Increment 1 is **Validated** at application commit `4cbc8fd`; see the [validation record](docs/validation/increment-1.md). Increment 2 is **In progress** under [accepted ADR-0002](docs/adr/0002-durable-workspace-identity.md) and [accepted ADR-0003](docs/adr/0003-assignment-scoped-specialist-review.md).
 
-Seven Increment 2 slices are **Validated**:
+Eight Increment 2 slices are **Validated**:
 
 - authenticated create/list/open/resume workspace continuity at application commit `603f028`, [validation record](docs/validation/increment-2-durable-workspace.md);
 - owner-authorized durable product/business decisions at application commit `548f1bb`, [validation record](docs/validation/increment-2-decisions.md);
@@ -16,28 +16,29 @@ Seven Increment 2 slices are **Validated**:
 - owner-approved durable product requirements with one acceptance criterion at application commit `9e2af69`, [validation record](docs/validation/increment-2-requirements.md);
 - owner-recorded durable criterion evidence at application commit `4f67d99`, [validation record](docs/validation/increment-2-evidence.md);
 - durable proposed artifacts with stable artifact/version identities and external references at application commit `8d36ade`, [validation record](docs/validation/increment-2-artifacts.md);
-- explicit owner acceptance of one proposed artifact version as current project direction at repository head `3ca0ea4`, [validation record](docs/validation/increment-2-artifact-acceptance.md).
+- explicit owner acceptance of one proposed artifact version as current project direction at repository head `3ca0ea4`, [validation record](docs/validation/increment-2-artifact-acceptance.md);
+- assignment-scoped specialist artifact review at application head `fc91a43`, [validation record](docs/validation/increment-2-specialist-review.md).
 
 The repository does not claim production readiness or release.
 
-Implemented and validated durable behavior includes isolated Supabase authentication; PostgreSQL-backed workspace create/list/open/resume; membership isolation; Proposed release and 15-stage state; transactional/idempotent workspace creation; accepted owner decisions with explicit authority; proposed work items with owner, stage, outcome, completion condition, and expected evidence; approved product requirements with `MUST`/`SHOULD`/`MAY` obligations and stable requirement/criterion identifiers; criterion evidence records with result, source/provenance, `Supports`/`Challenges`/`Inconclusive` effect and revision snapshots; proposed artifact records with stable artifact/version identifiers, version 1, current release/stage, and stored HTTP/HTTPS external references; and explicit owner acceptance that changes that exact proposed version to `Accepted` and records the accepted-version pointer, accepting actor, acceptance time, revisions, and audit event.
+Implemented and validated durable behavior includes isolated Supabase authentication; PostgreSQL-backed workspace create/list/open/resume; owner membership isolation; Proposed release and 15-stage state; transactional/idempotent workspace creation; accepted owner decisions with explicit authority; proposed work items with owner, stage, outcome, completion condition, and expected evidence; approved product requirements with `MUST`/`SHOULD`/`MAY` obligations and stable requirement/criterion identifiers; criterion evidence records with result, source/provenance, `Supports`/`Challenges`/`Inconclusive` effect and revision snapshots; proposed artifact records with stable artifact/version identifiers, version 1, current release/stage, and stored HTTP/HTTPS external references; explicit owner acceptance that changes that exact proposed version to `Accepted` and records the accepted-version pointer, accepting actor, acceptance time, revisions, and audit event; and assignment-scoped specialist artifact review with a stable reviewer code, bounded competence/question, authenticated specialist identity, named findings, and artifact/version revision snapshots without granting general workspace membership.
 
-The owner-decision action is limited to product-scope and business decisions. Consequential technical decisions require qualified specialist review and are not accepted through that action. Work-item creation records planned work only and does not start execution or claim implementation, review, completion, or verification. The owner-requirement action records product or business behavior only; consequential technical implementation requirements remain subject to qualified specialist review. An acceptance criterion is stored as a condition and does not count as verification evidence. Recording evidence does not by itself mark the criterion satisfied, passed, verified, or validated and does not change the linked requirement from `Approved`. Recording an artifact creates only version 1 with lifecycle `Proposed`; it does not accept project direction, and Wayfound stores the external reference without fetching the referenced content. Artifact acceptance is a separate explicit product-owner action and does not establish qualified specialist review, technical correctness, verification, validation, release readiness, or production authorization.
+The owner-decision action is limited to product-scope and business decisions. Consequential technical decisions require qualified specialist review and are not accepted through that action. Work-item creation records planned work only and does not start execution or claim implementation, review, completion, or verification. The owner-requirement action records product or business behavior only; consequential technical implementation requirements remain subject to qualified specialist review. An acceptance criterion is stored as a condition and does not count as verification evidence. Recording evidence does not by itself mark the criterion satisfied, passed, verified, or validated and does not change the linked requirement from `Approved`. Recording an artifact creates only version 1 with lifecycle `Proposed`; it does not accept project direction, and Wayfound stores the external reference without fetching the referenced content. Artifact acceptance is a separate explicit product-owner action. Specialist artifact review is a separate authenticated specialist action scoped to one exact accepted artifact version. Neither action establishes verification, validation, release readiness, or production authorization.
 
 Not yet implemented or validated as broader product behavior:
 
 - hosted authentication/database provisioning;
-- specialist-review decision and technical-requirement workflow;
-- work-state transitions, collaborator/specialist assignment, dependencies, and broader durable record links;
+- specialist review for consequential technical decisions and technical requirements;
+- broad collaborator/specialist membership administration, work-state transitions, work assignment, dependencies, and broader durable record links;
 - multiple acceptance-criterion lifecycle;
 - second or later artifact versions, accepted-version replacement/supersession, file import, failed-import history, retry history, and change summaries;
 - maintenance record workflow;
-- evidence freshness/outdated-state handling, evidence acceptance or specialist review, and explicit verification decisions;
+- evidence freshness/outdated-state handling, specialist evidence review, and explicit verification decisions;
 - specialist connector integrations;
 - automated evidence or verification ingestion;
 - production deployment actions.
 
-The persisted workspace is at `/workspaces`; sign-in is at `/sign-in`. Borrow Desk remains illustrative at `/demo` and the existing prototype routes. See [local development](docs/LOCAL_DEVELOPMENT.md) for an isolated Supabase setup.
+The persisted owner workspace is at `/workspaces`; the bounded specialist review workspace is at `/specialist-reviews`; sign-in is at `/sign-in`. Borrow Desk remains illustrative at `/demo` and the existing prototype routes. See [local development](docs/LOCAL_DEVELOPMENT.md) for an isolated Supabase setup.
 
 ## Run locally
 
