@@ -52,9 +52,21 @@ The slice passed real-backend and rendered acceptance tests at application commi
 
 Validated scope includes transactional work-item creation, audit record, idempotent retries, direct-table denial, tenant/session/revocation isolation, injected-failure rollback, restart/resume, database interruption/recovery, explicit text status, and mobile/desktop rendered review.
 
+### Slice 4 — Owner-approved product requirements
+
+**Status:** Validated
+
+An authenticated workspace owner can record an approved product requirement with a `MUST`, `SHOULD`, or `MAY` obligation and exactly one durable acceptance criterion. The requirement records current release/stage, owner authority, and stable identifiers. The criterion remains an observable condition and is explicitly not verification evidence.
+
+The slice passed real-backend and rendered acceptance tests at application commit `9e2af6940ce4d440fed00825620e0b693eff17c2` through CI run 131. See the [requirement slice](INCREMENT_2_REQUIREMENTS.md) and [validation record](validation/increment-2-requirements.md).
+
+Validated scope includes transactional requirement-and-criterion creation, explicit owner-authority confirmation, obligation validation, audit record, idempotent retries, direct-table denial, tenant/session/revocation isolation, injected-failure rollback, restart/resume, database interruption/recovery, stable identifiers, honest evidence language, and mobile/desktop rendered review.
+
+Consequential technical implementation requirements remain outside this action and still require qualified specialist review.
+
 ### Remaining Increment 2 scope
 
-Specialist-review decision flow; work-state transitions, collaborator/specialist assignment, work dependencies and links; durable requirement records; artifact records; evidence records; maintenance records; later lifecycle behavior; change-impact handling; and supporting audit/seed behavior remain In progress or unimplemented. No hosted project has been provisioned.
+Specialist-review decision and technical-requirement flow; work-state transitions, collaborator/specialist assignment, work dependencies and durable links; multiple acceptance-criterion lifecycle; artifact records; evidence records and criterion-to-evidence links; maintenance records; later lifecycle behavior; change-impact handling; and supporting audit/seed behavior remain In progress or unimplemented. No hosted project has been provisioned.
 
 ## 4. Increment 3 — Versioned artifact import
 
