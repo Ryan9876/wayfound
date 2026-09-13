@@ -10,6 +10,7 @@
     "test:prototype": "node scripts/validate-prototype.mjs",
     "test:accessibility": "node scripts/validate-accessibility.mjs",
     "test:workspace": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-workspace.mjs",
+    "test:evidence": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-evidence.mjs",
     "seed:local": "WAYFOUND_LOCAL_TEST=1 node scripts/seed-local.mjs"
   },
   "dependencies": {
