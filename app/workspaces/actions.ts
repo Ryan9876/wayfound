@@ -241,3 +241,35 @@ export async function acceptArtifactVersion(_: FormState, form: FormData): Promi
   revalidatePath("/workspaces");
   redirect(`/workspaces/${workspaceId}#artifact-${artifactId}`);
 }
+
+export async function transitionWorkItem(_: FormState, form: FormData): Promise<FormState> {
+  await checkOrigin();
+  const workspaceId = String(form.get("workspaceId") ?? "");
+  const workItemId = String(form.get("workItemId") ?? "");
+  const service = await workItemService();
+  try {
+    await service.transition({
+      workspaceId, workItemId,
+      expectedRevision: Number(form.get("expectedRevision")),
+      targetStatus: String(form.get("targetStatus") ?? ""),
+      reason: String(form.get("reason") ?? ""),
+      confirm: form.get("confirm") === "on",
+      requestId: String(form.get("requestId") ?? ""),
+    });
+  } catch (error) {
+    const code = error instanceof Error ? error.message : "UNKNOWN";
+    console.error(JSON.stringify({ operation: "transition_work_item", workspace_id: workspaceId, work_item_id: workItemId, outcome: "failed", code }));
+    return { error: code === "INVALID_INPUT"
+      ? "Enter a reason and confirm this work-state change."
+      : code === "REQUEST_CONFLICT"
+        ? "This request was already used with different details. Reload the workspace and review the current work."
+        : code === "INVALID_STATE"
+          ? "This work changed or the transition is not allowed. Reload the workspace and review its current state."
+          : code === "INVALID_TARGET" || code === "ACCESS_DENIED"
+            ? "This work item is not available for changes by your account."
+            : "We could not confirm the work-state change. Retry with the same details to avoid duplicate history, or reload to check the saved state." };
+  }
+  revalidatePath(`/workspaces/${workspaceId}`);
+  revalidatePath("/workspaces");
+  redirect(`/workspaces/${workspaceId}#work-item-${workItemId}`);
+}

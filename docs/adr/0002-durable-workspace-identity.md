@@ -76,3 +76,10 @@ Recheck current provider APIs and security guidance before implementation. No pr
 The first slice uses private `wayfound` tables with RLS and no direct client table grants. Public invoker RPC wrappers call private, narrowly scoped definer functions. The privilege elevation is deliberate: it permits one atomic creation while denying partial client writes. Each entry point validates the provider session, derives the subject from that session, and checks current membership. Functions fix their search path and revoke default PUBLIC execution. Auth sessions are checked in PostgreSQL so a revoked session cannot use an unexpired signed access token to read a workspace.
 
 This is an implementation of the approved boundary, not an unrestricted service-key path. No service key is used by the application. Local seed/test tooling alone uses local admin credentials and rejects non-loopback endpoints. The provider adapter calls these commands; direct calls enforce the same invariants.
+
+
+## Implementation detail — owner work transitions
+
+The owner work lifecycle extension uses the same approved identity and transaction boundary. It does not add a role or broaden membership. It requires explicit current owner membership and ownership of the exact work item. A row lock and expected revision serialize state changes; a membership row lock orders concurrent owner revocation against a mutation. Immutable transition rows preserve old/new states and revisions, reason, authenticated actor, and time. The transition, audit event, and idempotent request result commit together.
+
+See [INCREMENT_2_WORK_LIFECYCLE.md](../INCREMENT_2_WORK_LIFECYCLE.md) for the bounded state machine and recovery limits. ADR-0003 remains unchanged. Work approval does not approve technical choices, and work status does not establish specialist review or verification.

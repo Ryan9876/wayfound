@@ -27,7 +27,7 @@ The current implementation contains:
 
 The durable decision path does not authorize consequential technical decisions. Those require qualified specialist review and remain later scope. Proposed work items do not imply that execution started, a specialist accepted the work, implementation completed, or verification occurred. The owner requirement path approves only product or business behavior within owner authority; consequential technical implementation choices remain subject to qualified specialist review. Acceptance criteria are conditions, not evidence or verification results. Evidence effects describe a recorded result as `Supports`, `Challenges`, or `Inconclusive`; recording evidence is not a verification decision and does not change the linked requirement from `Approved`. A newly recorded artifact version remains `Proposed` until the owner explicitly accepts that exact version. Artifact acceptance records project direction only. A specialist review records qualified judgment within its declared scope only. Neither artifact acceptance nor specialist review establishes verification, validation, release readiness, or production authorization.
 
-Work-state transitions, collaborator membership/administration, dependencies and broader links, technical-decision and technical-requirement specialist review, multiple criterion lifecycle, later artifact versions/import and supersession behavior, evidence freshness/outdated-state handling, specialist evidence review, external specialist connectors, automatic CI/CD evidence ingestion, production-changing actions, and production release authorization remain unimplemented.
+Work completion transitions, collaborator membership/administration, dependencies and broader links, technical-decision and technical-requirement specialist review, multiple criterion lifecycle, later artifact versions/import and supersession behavior, evidence freshness/outdated-state handling, specialist evidence review, external specialist connectors, automatic CI/CD evidence ingestion, production-changing actions, and production release authorization remain unimplemented.
 
 ## 3. Component boundaries
 
@@ -39,7 +39,7 @@ The owner sees specialist assignments and completed reviews directly under the e
 
 ### Application logic
 
-Server-side application functions enforce implemented workspace scope, identity, authorization, input validation, decision authority boundaries, proposed-work semantics, owner-approved product-requirement semantics, criterion-evidence semantics, proposed-artifact semantics, explicit owner artifact acceptance, and assignment-scoped specialist artifact review. Later slices will add work-state transitions, collaborator membership and broader links, specialist technical-decision/requirement review, later artifact versions/import lifecycle, reconciliation, change-impact, evidence freshness, verification decisions, and release rules.
+Server-side application functions enforce implemented workspace scope, identity, authorization, input validation, decision authority boundaries, proposed-work semantics, owner-approved product-requirement semantics, criterion-evidence semantics, proposed-artifact semantics, explicit owner artifact acceptance, and assignment-scoped specialist artifact review. Later slices will add work completion transitions, collaborator membership and broader links, specialist technical-decision/requirement review, later artifact versions/import lifecycle, reconciliation, change-impact, evidence freshness, verification decisions, and release rules.
 
 ### Persistence
 
@@ -174,3 +174,14 @@ The owner artifact-acceptance slice is **Validated** at repository head `3ca0ea4
 The assignment-scoped specialist artifact-review slice is **Validated** at application head `fc91a4377e887cada269fb35b2192f5c3efad15b` through CI run 172. It gives authenticated specialists a stable reviewer code without workspace membership, lets the owner assign one specialist to one exact accepted artifact version, records named qualified judgment with revision snapshots, proves that the specialist cannot execute owner mutations, and preserves the boundary between specialist review and verification. See [validation/increment-2-specialist-review.md](validation/increment-2-specialist-review.md).
 
 No hosted project or production deployment exists. Broader Increment 2 remains In progress for work-state transitions and assignment, collaborator administration and broader durable record links, technical-decision/requirement specialist review, multiple criterion lifecycle, evidence freshness and verification lifecycle, maintenance, and later lifecycle/change-impact behavior. Later artifact-version, accepted-version replacement/supersession, and file-import behavior are assigned to Increment 3.
+
+
+## 12. Owner work lifecycle extension
+
+**Status:** In progress; complete validation pending.
+
+[Owner work lifecycle](INCREMENT_2_WORK_LIFECYCLE.md) extends the durable work record with Proposed → Approved → In progress, In progress → Blocked, and Blocked → In progress. The owner must have current explicit owner membership and must own the target work item. Approval accepts planned work within owner authority only. It does not approve consequential technical choices or establish specialist review, completion, verification, or release authority.
+
+The private transition command locks membership and the work row, checks the expected revision, and atomically records state/revision, immutable transition history, audit event, and request result. Exact duplicate replay returns its original transition ID after live authorization; changed payload or stale distinct requests fail. Owner reads include ordered history. UI controls expose only the allowed next action, require a reason/confirmation, and preserve entered details after an error.
+
+No membership role or specialist authority changes. The migration preserves existing Proposed records. Because the earlier reader described every work item as Proposed, recovery must retain a state-aware reader; do not restore the old status constraint or drop history after transitions exist. Completion, assignment, dependencies, and technical acceptance remain later scope.

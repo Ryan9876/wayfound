@@ -130,3 +130,8 @@ This slice does not implement:
 - production deployment or release authorization.
 
 These exclusions keep the slice inside the current identity and authorization boundary and preserve honest status while the durable record model expands.
+
+
+## Later extension
+
+The creation slice and its executed validation above remain the historical baseline. [Owner work lifecycle](INCREMENT_2_WORK_LIFECYCLE.md) extends existing records with explicit approval, start, block, and resume actions. Creation still returns Proposed. Transition validation is recorded separately; this earlier validation does not validate the extension.

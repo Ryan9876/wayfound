@@ -110,9 +110,17 @@ Validated scope includes reviewer-code identity without workspace membership, ex
 
 A specialist review records qualified judgment within its declared competence and scope. It does not change artifact acceptance, requirement/criterion/evidence state, release state, verification, validation, release readiness, or production authorization.
 
+### Slice 9 — Owner work approval, start, block, and resume
+
+**Status:** In progress
+
+The current owner can record state changes for work they own, with a required reason, explicit confirmation, revision checks, and durable transition history. The slice advances P0 durable-record, honest-status, and ownership requirements without adding membership roles, work assignment, completion, verification, or technical approval.
+
+See the [slice specification](INCREMENT_2_WORK_LIFECYCLE.md). Complete validation is pending. The prior eight slices retain their recorded validation evidence.
+
 ### Remaining Increment 2 scope
 
-Specialist-review flow for consequential technical decisions and technical requirements; work-state transitions, collaborator membership/administration and work assignment, work dependencies and broader durable links; multiple acceptance-criterion lifecycle; evidence freshness/outdated-state handling, specialist evidence review and explicit verification decisions; maintenance records; later lifecycle behavior; change-impact handling; and supporting audit/seed behavior remain In progress or unimplemented. No hosted project has been provisioned.
+Specialist-review flow for consequential technical decisions and technical requirements; work completion transitions, collaborator membership/administration and work assignment, work dependencies and broader durable links; multiple acceptance-criterion lifecycle; evidence freshness/outdated-state handling, specialist evidence review and explicit verification decisions; maintenance records; later lifecycle behavior; change-impact handling; and supporting audit/seed behavior remain In progress or unimplemented. No hosted project has been provisioned.
 
 Later artifact-version, accepted-version replacement/supersession, and file-import behavior are assigned to Increment 3 rather than duplicated in the remaining Increment 2 scope.
 

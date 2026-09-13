@@ -120,6 +120,10 @@ jobs:
         run: |
           WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
           npm run test:specialist-review
+      - name: Validate owner work lifecycle
+        run: |
+          WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
+          npm run test:work-lifecycle
       - name: Upload workspace screenshots
         if: always()
         uses: actions/upload-artifact@v4

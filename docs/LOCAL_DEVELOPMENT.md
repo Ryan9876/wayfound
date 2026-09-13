@@ -29,3 +29,8 @@ Run `npm run build` and `npm run test:workspace` for the full isolated acceptanc
 Database or authentication failures do not fall back to Borrow Desk. The persisted UI shows a recoverable error. Creation uses a request key and one database transaction; retry with the same details to recover an ambiguous response without duplication. Existing committed records remain authoritative.
 
 Application rollback means deploying the previous application version while retaining the database. Do not drop tables to roll back the UI. Before any hosted or production environment exists, define backup, restore validation, hosting ownership, region, and secrets. This slice makes no production restore claim.
+
+
+## Owner work lifecycle regression
+
+After building, run `npm run test:work-lifecycle` on the same isolated disposable stack. CI runs this after the complete prior durable regression chain. It exercises owner approval, start, block, resume, concurrency, separation of duties, transactional rollback, live-session/revocation denial, browser stale-state errors, restart/re-login, and database interruption/recovery. Screenshots include focused Work sections at desktop and 390 px mobile widths.

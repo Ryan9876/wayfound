@@ -19,6 +19,8 @@ Eight Increment 2 slices are **Validated**:
 - explicit owner acceptance of one proposed artifact version as current project direction at repository head `3ca0ea4`, [validation record](docs/validation/increment-2-artifact-acceptance.md);
 - assignment-scoped specialist artifact review at application head `fc91a43`, [validation record](docs/validation/increment-2-specialist-review.md).
 
+The [owner work lifecycle slice](docs/INCREMENT_2_WORK_LIFECYCLE.md) is **In progress**. It adds explicit approval, start, block, and resume with revision checks and durable history. Complete validation remains pending.
+
 The repository does not claim production readiness or release.
 
 Implemented and validated durable behavior includes isolated Supabase authentication; PostgreSQL-backed workspace create/list/open/resume; owner membership isolation; Proposed release and 15-stage state; transactional/idempotent workspace creation; accepted owner decisions with explicit authority; proposed work items with owner, stage, outcome, completion condition, and expected evidence; approved product requirements with `MUST`/`SHOULD`/`MAY` obligations and stable requirement/criterion identifiers; criterion evidence records with result, source/provenance, `Supports`/`Challenges`/`Inconclusive` effect and revision snapshots; proposed artifact records with stable artifact/version identifiers, version 1, current release/stage, and stored HTTP/HTTPS external references; explicit owner acceptance that changes that exact proposed version to `Accepted` and records the accepted-version pointer, accepting actor, acceptance time, revisions, and audit event; and assignment-scoped specialist artifact review with a stable reviewer code, bounded competence/question, authenticated specialist identity, named findings, and artifact/version revision snapshots without granting general workspace membership.
@@ -29,7 +31,7 @@ Not yet implemented or validated as broader product behavior:
 
 - hosted authentication/database provisioning;
 - specialist review for consequential technical decisions and technical requirements;
-- broad collaborator/specialist membership administration, work-state transitions, work assignment, dependencies, and broader durable record links;
+- broad collaborator/specialist membership administration, work completion transitions, work assignment, dependencies, and broader durable record links;
 - multiple acceptance-criterion lifecycle;
 - second or later artifact versions, accepted-version replacement/supersession, file import, failed-import history, retry history, and change summaries;
 - maintenance record workflow;
