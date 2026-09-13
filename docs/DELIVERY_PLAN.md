@@ -98,9 +98,21 @@ Validated scope includes exact artifact/version target integrity, explicit owner
 
 Artifact acceptance records product-owner project direction only. It does not establish qualified specialist review, technical correctness, verification, validation, release readiness, or production authorization.
 
+### Slice 8 — Assignment-scoped specialist artifact review
+
+**Status:** Validated
+
+An authenticated specialist can establish a stable reviewer code without gaining workspace membership. The current workspace owner can assign that specialist to one exact artifact version that is currently accepted as project direction, with a requested competence area and one bounded review question. Only the assigned live specialist can submit the named review.
+
+The slice passed the complete prior durable regression chain plus a focused specialist-review suite at application head `fc91a4377e887cada269fb35b2192f5c3efad15b` through CI run 172. See [ADR-0003](adr/0003-assignment-scoped-specialist-review.md), the [specialist-review slice](INCREMENT_2_SPECIALIST_REVIEW.md), and the [validation record](validation/increment-2-specialist-review.md).
+
+Validated scope includes reviewer-code identity without workspace membership, exact accepted-artifact/version assignment, bounded competence/question, authenticated reviewer identity, three explicit specialist conclusions, revision snapshots, separation of owner and specialist authority, direct-table denial, tenant/session/assignment-revocation isolation, idempotent retries, injected-failure rollback, restart/resume, database interruption/recovery, zero external-reference fetches, keyboard focus, and desktop/390 px mobile rendered review.
+
+A specialist review records qualified judgment within its declared competence and scope. It does not change artifact acceptance, requirement/criterion/evidence state, release state, verification, validation, release readiness, or production authorization.
+
 ### Remaining Increment 2 scope
 
-Specialist-review decision and technical-requirement flow; work-state transitions, collaborator/specialist assignment, work dependencies and broader durable links; multiple acceptance-criterion lifecycle; evidence freshness/outdated-state handling, evidence acceptance or specialist review, and explicit verification decisions; maintenance records; later lifecycle behavior; change-impact handling; and supporting audit/seed behavior remain In progress or unimplemented. No hosted project has been provisioned.
+Specialist-review flow for consequential technical decisions and technical requirements; work-state transitions, collaborator membership/administration and work assignment, work dependencies and broader durable links; multiple acceptance-criterion lifecycle; evidence freshness/outdated-state handling, specialist evidence review and explicit verification decisions; maintenance records; later lifecycle behavior; change-impact handling; and supporting audit/seed behavior remain In progress or unimplemented. No hosted project has been provisioned.
 
 Later artifact-version, accepted-version replacement/supersession, and file-import behavior are assigned to Increment 3 rather than duplicated in the remaining Increment 2 scope.
 
