@@ -7,6 +7,7 @@ import { workspaceService } from "@/lib/application/workspaces";
 import { decisionService } from "@/lib/application/decisions";
 import { workItemService } from "@/lib/application/work-items";
 import { requirementService } from "@/lib/application/requirements";
+import { evidenceService } from "@/lib/application/evidence";
 export type FormState = { error: string };
 async function checkOrigin() {
   const origin = (await headers()).get("origin");
@@ -138,4 +139,38 @@ export async function createRequirement(_: FormState, form: FormData): Promise<F
   revalidatePath(`/workspaces/${workspaceId}`);
   revalidatePath("/workspaces");
   redirect(`/workspaces/${workspaceId}#requirements`);
+}
+export async function createEvidence(_: FormState, form: FormData): Promise<FormState> {
+  await checkOrigin();
+  const workspaceId = String(form.get("workspaceId") ?? "");
+  const acceptanceCriterionId = String(form.get("acceptanceCriterionId") ?? "");
+  const service = await evidenceService();
+  try {
+    await service.create({
+      workspaceId,
+      acceptanceCriterionId,
+      title: String(form.get("title") ?? ""),
+      result: String(form.get("result") ?? ""),
+      sourceNote: String(form.get("sourceNote") ?? ""),
+      effect: String(form.get("effect") ?? "") as "Supports" | "Challenges" | "Inconclusive",
+      requestId: String(form.get("requestId") ?? ""),
+    });
+  } catch (error) {
+    const code = error instanceof Error ? error.message : "UNKNOWN";
+    console.error(JSON.stringify({ operation: "record_criterion_evidence", workspace_id: workspaceId, acceptance_criterion_id: acceptanceCriterionId, outcome: "failed", code }));
+    return {
+      error: code === "INVALID_INPUT"
+        ? "Complete the evidence fields and choose how the result relates to the criterion."
+        : code === "REQUEST_CONFLICT"
+          ? "This evidence request was already used with different details. Reload the workspace before starting again."
+          : code === "INVALID_TARGET"
+            ? "This acceptance criterion is not available in this workspace."
+            : code === "ACCESS_DENIED"
+              ? "This workspace is not available for evidence changes."
+              : "We could not confirm the evidence save. Existing records are unchanged. Retry with the same details to avoid a duplicate.",
+    };
+  }
+  revalidatePath(`/workspaces/${workspaceId}`);
+  revalidatePath("/workspaces");
+  redirect(`/workspaces/${workspaceId}#criterion-${acceptanceCriterionId}`);
 }
