@@ -1,4 +1,4 @@
-export type StageState = "complete" | "active" | "upcoming" | "blocked";
+export type StageState = "complete" | "active" | "upcoming" | "reopened" | "blocked";
 
 export type JourneyStage = {
   number: number;
