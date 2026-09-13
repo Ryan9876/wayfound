@@ -45,7 +45,7 @@ Do not delete an accepted ADR because a later decision replaces it. Mark it `Sup
 | [0001](0001-web-application-foundation.md) | Web application foundation | Accepted | 2026-09-13 | — |
 | [0002](0002-durable-workspace-identity.md) | Durable workspace identity and persistence | Accepted | 2026-09-13 | — |
 | [0003](0003-assignment-scoped-specialist-review.md) | Assignment-scoped specialist review authority | Accepted | 2026-09-13 | — |
-| [0004](0004-technical-decision-review-and-acceptance.md) | Technical decision review and acceptance authority | Proposed | 2026-09-13 | — |
+| [0004](0004-technical-decision-review-and-acceptance.md) | Technical decision review and acceptance authority | Accepted | 2026-09-13 | — |
 
 ## Change rule
 
