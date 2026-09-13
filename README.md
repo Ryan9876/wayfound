@@ -8,7 +8,7 @@ Wayfound is a software-delivery guidance and coordination workspace for capable 
 
 Increment 1 is **Validated** at application commit `4cbc8fd`; see the [validation record](docs/validation/increment-1.md). Increment 2 is **In progress** under [accepted ADR-0002](docs/adr/0002-durable-workspace-identity.md) and [accepted ADR-0003](docs/adr/0003-assignment-scoped-specialist-review.md).
 
-Eight Increment 2 slices are **Validated**:
+Nine Increment 2 slices are **Validated**:
 
 - authenticated create/list/open/resume workspace continuity at application commit `603f028`, [validation record](docs/validation/increment-2-durable-workspace.md);
 - owner-authorized durable product/business decisions at application commit `548f1bb`, [validation record](docs/validation/increment-2-decisions.md);
@@ -17,9 +17,10 @@ Eight Increment 2 slices are **Validated**:
 - owner-recorded durable criterion evidence at application commit `4f67d99`, [validation record](docs/validation/increment-2-evidence.md);
 - durable proposed artifacts with stable artifact/version identities and external references at application commit `8d36ade`, [validation record](docs/validation/increment-2-artifacts.md);
 - explicit owner acceptance of one proposed artifact version as current project direction at repository head `3ca0ea4`, [validation record](docs/validation/increment-2-artifact-acceptance.md);
-- assignment-scoped specialist artifact review at application head `fc91a43`, [validation record](docs/validation/increment-2-specialist-review.md).
+- assignment-scoped specialist artifact review at application head `fc91a43`, [validation record](docs/validation/increment-2-specialist-review.md);
+- owner work approval, start, block, and resume at application head `1c3d8a5`, CI run 179, [validation record](docs/validation/increment-2-work-lifecycle.md).
 
-The [owner work lifecycle slice](docs/INCREMENT_2_WORK_LIFECYCLE.md) is **In progress**. It adds explicit approval, start, block, and resume with revision checks and durable history. Complete validation remains pending.
+The [owner work lifecycle slice](docs/INCREMENT_2_WORK_LIFECYCLE.md) adds explicit approval, start, block, and resume with required reasons, revision checks, and durable history. Only the current workspace owner who owns the work can change its state. The slice does not add work assignment, completion, verification, or technical approval.
 
 The repository does not claim production readiness or release.
 

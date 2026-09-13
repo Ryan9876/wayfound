@@ -1,7 +1,9 @@
 # Increment 2 — Owner work lifecycle
 
-**Status:** In progress  
-**Parent:** Increment 2 — Durable workspace record  
+**Status:** Validated
+
+**Parent:** Increment 2 — Durable workspace record
+
 **Architecture basis:** Accepted ADR-0002; ADR-0003 remains unchanged
 
 ## Outcome and scope
@@ -40,6 +42,8 @@ Use the established Work card, forms, typography, and responsive layout. Show ac
 Stale-state errors instruct the owner to reload and review the current work. Unknown or cross-workspace targets fail. Ambiguous save errors offer an identical retry without asserting that an unconfirmed mutation did not commit. Database interruption shows a recoverable error, never fixture state. The only adapter retry remains exact `PGRST303` / `JWT issued at future` with the existing bounded delays.
 
 ## Acceptance criteria
+
+Behavioral criteria passed at application head `1c3d8a52a820163340b8742f3f8f3a24f7115545`, CI run [179](https://github.com/Ryan9876/wayfound/actions/runs/34786632363). See the [validation record](validation/increment-2-work-lifecycle.md) for executed evidence, rendered inspection, and limits. Final reconciliation CI is reported separately.
 
 1. The built UI performs all four allowed transitions and renders exact persisted state, reason, stable IDs, actor, timestamp, and history at desktop and 390 px mobile widths.
 2. New work still starts Proposed. Invalid input, missing confirmation, unknown targets, cross-workspace targets, skipped transitions, repeated states, stale revisions, and unsupported completion/release states fail without changes.

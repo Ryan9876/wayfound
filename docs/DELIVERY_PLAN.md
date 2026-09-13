@@ -112,11 +112,11 @@ A specialist review records qualified judgment within its declared competence an
 
 ### Slice 9 — Owner work approval, start, block, and resume
 
-**Status:** In progress
+**Status:** Validated
 
 The current owner can record state changes for work they own, with a required reason, explicit confirmation, revision checks, and durable transition history. The slice advances P0 durable-record, honest-status, and ownership requirements without adding membership roles, work assignment, completion, verification, or technical approval.
 
-See the [slice specification](INCREMENT_2_WORK_LIFECYCLE.md). Complete validation is pending. The prior eight slices retain their recorded validation evidence.
+The slice passed the complete durable regression chain and focused lifecycle tests at application head `1c3d8a52a820163340b8742f3f8f3a24f7115545`, CI run 179. Desktop and 390 px mobile screenshots were inspected. See the [slice specification](INCREMENT_2_WORK_LIFECYCLE.md) and [validation record](validation/increment-2-work-lifecycle.md).
 
 ### Remaining Increment 2 scope
 

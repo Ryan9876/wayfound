@@ -10,7 +10,7 @@ The foundation prototype deliberately uses local fixture data for the illustrati
 
 ## 2. Current implementation boundary
 
-The current implementation contains:
+The current implementation contains (validation status is recorded per slice below):
 
 - a responsive application shell and approved Wayfound visual tokens;
 - desktop and mobile primary navigation;
@@ -18,7 +18,7 @@ The current implementation contains:
 - representative Work, Handoffs, Records, and Release & Care views;
 - authenticated PostgreSQL-backed create/list/open/resume workspace routes;
 - durable owner-authorized product-scope and business decision records;
-- durable owner-owned proposed work-item records with explicit outcomes, completion conditions, and expected evidence;
+- durable owner-owned work-item records created as Proposed, with explicit outcomes, completion conditions, expected evidence, and owner-controlled approval/start/block/resume history;
 - durable owner-approved product requirements with one linked acceptance criterion and stable identifiers;
 - durable owner-recorded evidence results linked to acceptance criteria with stable identifiers, provenance, effect, and requirement/criterion revision snapshots;
 - durable artifact identities with one stable initial artifact-version identity and an HTTP or HTTPS external reference that Wayfound records without fetching;
@@ -87,7 +87,7 @@ The implemented durable slices use authenticated users, workspace-scoped owner m
 
 Owner-decision creation derives actor identity, release, and stage from durable state. It requires explicit product-owner authority confirmation and records `decision.accepted` in the audit log. The database constrains the implemented decision authority to `owner` and status to `Accepted`.
 
-Proposed-work-item creation derives the owner actor, release, and stage from the verified session and current workspace membership. The database constrains the implemented work-item status to `Proposed` and records `work_item.proposed` in the audit log. This slice does not allow an owner to claim that another collaborator or specialist accepted assignment.
+Proposed-work-item creation derives the owner actor, release, and stage from the verified session and current workspace membership. Creation constrains initial work-item status to `Proposed` and records `work_item.proposed` in the audit log. The separate owner lifecycle command permits only the transitions defined in section 12 and records `work_item.transitioned`. This slice does not allow an owner to claim that another collaborator or specialist accepted assignment.
 
 Owner-requirement creation derives the approving actor, release, and stage from the verified session and current owner membership. It requires explicit owner-authority confirmation, constrains kind to `product`, authority to `owner`, and status to `Approved`, creates one acceptance criterion in the same transaction, and records `requirement.approved` in the audit log. This action does not confer specialist approval on consequential technical choices.
 
@@ -173,12 +173,12 @@ The owner artifact-acceptance slice is **Validated** at repository head `3ca0ea4
 
 The assignment-scoped specialist artifact-review slice is **Validated** at application head `fc91a4377e887cada269fb35b2192f5c3efad15b` through CI run 172. It gives authenticated specialists a stable reviewer code without workspace membership, lets the owner assign one specialist to one exact accepted artifact version, records named qualified judgment with revision snapshots, proves that the specialist cannot execute owner mutations, and preserves the boundary between specialist review and verification. See [validation/increment-2-specialist-review.md](validation/increment-2-specialist-review.md).
 
-No hosted project or production deployment exists. Broader Increment 2 remains In progress for work-state transitions and assignment, collaborator administration and broader durable record links, technical-decision/requirement specialist review, multiple criterion lifecycle, evidence freshness and verification lifecycle, maintenance, and later lifecycle/change-impact behavior. Later artifact-version, accepted-version replacement/supersession, and file-import behavior are assigned to Increment 3.
+No hosted project or production deployment exists. Broader Increment 2 remains In progress for work completion transitions and assignment, collaborator administration and broader durable record links, technical-decision/requirement specialist review, multiple criterion lifecycle, evidence freshness and verification lifecycle, maintenance, and later lifecycle/change-impact behavior. Later artifact-version, accepted-version replacement/supersession, and file-import behavior are assigned to Increment 3.
 
 
 ## 12. Owner work lifecycle extension
 
-**Status:** In progress; complete validation pending.
+**Status:** Validated at application head `1c3d8a52a820163340b8742f3f8f3a24f7115545`, CI run 179. See [validation evidence](validation/increment-2-work-lifecycle.md).
 
 [Owner work lifecycle](INCREMENT_2_WORK_LIFECYCLE.md) extends the durable work record with Proposed → Approved → In progress, In progress → Blocked, and Blocked → In progress. The owner must have current explicit owner membership and must own the target work item. Approval accepts planned work within owner authority only. It does not approve consequential technical choices or establish specialist review, completion, verification, or release authority.
 
