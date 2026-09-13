@@ -1,12 +1,13 @@
 import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 import { WorkspaceFrame } from "@/components/workspace-frame";
-import { CreateDecisionForm, CreateWorkItemForm, CreateRequirementForm, CreateEvidenceForm } from "@/components/workspace-forms";
+import { CreateDecisionForm, CreateWorkItemForm, CreateRequirementForm, CreateEvidenceForm, CreateArtifactForm } from "@/components/workspace-forms";
 import { workspaceService } from "@/lib/application/workspaces";
 import { decisionService } from "@/lib/application/decisions";
 import { workItemService } from "@/lib/application/work-items";
 import { requirementService } from "@/lib/application/requirements";
 import { evidenceService } from "@/lib/application/evidence";
+import { artifactService } from "@/lib/application/artifacts";
 import { stageCatalog } from "@/lib/domain/journey";
 
 export const dynamic = "force-dynamic";
@@ -20,6 +21,7 @@ export default async function WorkspacePage({ params }: { params: Promise<{ id: 
   const workItems = await (await workItemService()).list(id);
   const requirements = await (await requirementService()).list(id);
   const evidence = await (await evidenceService()).list(id);
+  const artifacts = await (await artifactService()).list(id);
   const current = stageCatalog.find(stage => stage.number === workspace.release.current_stage)!;
 
   return <WorkspaceFrame signedIn>
@@ -35,7 +37,7 @@ export default async function WorkspacePage({ params }: { params: Promise<{ id: 
           <span className="eyebrow">Next action · Guidance</span>
           <h2>Clarify who experiences this problem.</h2>
           <p>Describe one situation in which the problem occurs and the outcome that would improve it.</p>
-          <div className="entry-note"><strong>Why this matters</strong><p>A clear problem gives the project a useful starting point. Requirements, acceptance criteria, and evidence remain distinct project records.</p></div>
+          <div className="entry-note"><strong>Why this matters</strong><p>A clear problem gives the project a useful starting point. Requirements, acceptance criteria, evidence, and artifacts remain distinct project records.</p></div>
         </article>
         <article className="durable-card problem-record">
           <span className="eyebrow">Your problem statement</span>
@@ -55,7 +57,7 @@ export default async function WorkspacePage({ params }: { params: Promise<{ id: 
           <article className="durable-card work-item-form-card"><span className="eyebrow">Owner-planned work</span><h3>Add proposed work</h3><p>This records planned work only. It does not start execution, assign a specialist, or claim implementation or verification.</p><CreateWorkItemForm workspaceId={workspace.id} requestId={randomUUID()} /></article>
         </section>
 
-        <section id="requirements" className="requirement-section" aria-labelledby="requirements-title">
+        <section id="requirements" className="requirement-section" aria-labelledby="requirements-title" aria-label="Requirements">
           <div className="requirement-section-header"><div><span className="eyebrow">Project record</span><h2 id="requirements-title">Requirements</h2><p>Approved product behavior with stable requirement, criterion, and evidence links.</p></div><span className="status-chip">{requirements.length} approved</span></div>
           {requirements.length ? <div className="requirement-list">{requirements.map(requirement => <article className="durable-card requirement-card" key={requirement.id}>
             <span className="eyebrow">Approved product requirement</span>
@@ -85,6 +87,24 @@ export default async function WorkspacePage({ params }: { params: Promise<{ id: 
             <code className="requirement-id">Requirement ID: {requirement.id}</code>
           </article>)}</div> : <article className="durable-card"><h3>No approved requirements yet.</h3><p>Record product behavior only when you are ready to approve it as project direction.</p></article>}
           <article className="durable-card requirement-form-card"><span className="eyebrow">Product-owner authority</span><h3>Record an approved product requirement</h3><p>Use this for product or business behavior within your authority. Consequential technical implementation choices still require qualified specialist review.</p><CreateRequirementForm workspaceId={workspace.id} requestId={randomUUID()} /></article>
+        </section>
+
+        <section id="artifacts" className="artifact-section" aria-labelledby="artifacts-title" aria-label="Artifacts">
+          <div className="artifact-section-header"><div><span className="eyebrow">Project record</span><h2 id="artifacts-title">Artifacts</h2><p>Versioned project outputs remain proposed until an explicit later acceptance workflow changes project direction.</p></div><span className="status-chip">{artifacts.length} proposed</span></div>
+          {artifacts.length ? <div className="artifact-list">{artifacts.map(artifact => {
+            const version = artifact.versions[0];
+            return <article className="durable-card artifact-card" key={artifact.id}>
+              <span className="eyebrow">Proposed artifact · Version {version.version_number}</span>
+              <h3>{artifact.title}</h3>
+              <p className="artifact-kind"><strong>Kind:</strong> {artifact.kind}</p>
+              <div className="artifact-detail"><strong>Summary</strong><p>{version.summary}</p></div>
+              <div className="artifact-reference"><strong>External reference</strong><p>{version.reference_label}</p><a href={version.reference_url} target="_blank" rel="noreferrer">{version.reference_url}</a><small>Wayfound stores this reference. It does not fetch the referenced content in this slice.</small></div>
+              <div className="artifact-meta"><span><strong>Status:</strong> {version.lifecycle}</span><span><strong>Version:</strong> {version.version_number}</span><span><strong>Stage:</strong> {version.stage_number} · {stageCatalog[version.stage_number - 1].name}</span><span><strong>Recorder:</strong> Product owner</span></div>
+              <code>Artifact ID: {artifact.id}</code><code>Version ID: {version.id}</code>
+              <p className="artifact-warning"><strong>Not accepted project direction.</strong> This version remains Proposed until a later authorized acceptance workflow changes its lifecycle.</p>
+            </article>;
+          })}</div> : <article className="durable-card"><h3>No proposed artifacts yet.</h3><p>Record a versioned project output when you have an external reference that should remain part of project continuity.</p></article>}
+          <article className="durable-card artifact-form-card"><span className="eyebrow">Versioned project output</span><h3>Record a proposed artifact</h3><p>This creates a stable artifact identity and version 1 as Proposed. It does not accept the artifact or fetch its external content.</p><CreateArtifactForm workspaceId={workspace.id} requestId={randomUUID()} /></article>
         </section>
       </section>
 
