@@ -154,7 +154,7 @@ try {
     ok(await clients[index].auth.signInWithPassword({email:emails[index],password}));
   }
   const workspace=await createWorkspace(clients[0],'Owner A');
-  const otherWorkspace=await createWorkspace(clients[3],'Owner B');
+  await createWorkspace(clients[3],'Owner B');
   const ownerActor=(await sql.query('select id from wayfound.actors where provider_subject=$1',[users[0].id])).rows[0].id;
   const specialistCode=ok(await rpc(clients[1],'ensure_specialist_reviewer_identity'));
   const outsiderCode=ok(await rpc(clients[2],'ensure_specialist_reviewer_identity'));
@@ -300,14 +300,14 @@ try {
   await login(ownerPage,emails[0]);
   const workspaceUrl=`${base}/workspaces/${workspace}`;
   await ownerPage.goto(workspaceUrl);
-  await ownerPage.getByLabel('Choice title',{exact:true}).fill('UI authorization boundary');
-  await ownerPage.getByLabel('Technical choice',{exact:true}).fill('Use exact-resource authorization and transaction-scoped acceptance for consequential technical decisions.');
-  await ownerPage.getByLabel('Rationale',{exact:true}).last().fill('This preserves explicit authority while keeping qualified review separate.');
-  await ownerPage.getByLabel('Alternatives considered',{exact:true}).last().fill('Automatic specialist acceptance; owner-only acceptance without a hard review gate.');
-  await ownerPage.getByLabel('Known constraints and consequences',{exact:true}).last().fill('Adds one explicit specialist step and one owner acceptance step.');
-  await ownerPage.getByLabel('Required specialist competence',{exact:true}).fill('Application security and authorization architecture');
-  await ownerPage.getByLabel('Bounded review question',{exact:true}).fill('Does this exact authorization boundary have a blocking technical flaw?');
-  await ownerPage.getByText('I confirm this is a proposed consequential technical choice for qualified review. Saving it does not accept it as project direction.',{exact:true}).click();
+  await ownerPage.locator('#technical-choice-title').fill('UI authorization boundary');
+  await ownerPage.locator('#technical-choice-statement').fill('Use exact-resource authorization and transaction-scoped acceptance for consequential technical decisions.');
+  await ownerPage.locator('#technical-choice-rationale').fill('This preserves explicit authority while keeping qualified review separate.');
+  await ownerPage.locator('#technical-choice-alternatives').fill('Automatic specialist acceptance; owner-only acceptance without a hard review gate.');
+  await ownerPage.locator('#technical-choice-consequences').fill('Adds one explicit specialist step and one owner acceptance step.');
+  await ownerPage.locator('#technical-choice-competence').fill('Application security and authorization architecture');
+  await ownerPage.locator('#technical-choice-question').fill('Does this exact authorization boundary have a blocking technical flaw?');
+  await ownerPage.locator('#technical-choice-confirm').check();
   await ownerPage.getByRole('button',{name:'Record technical choice proposal',exact:true}).click();
   const uiCard=ownerPage.locator('#technical-decisions article').filter({has:ownerPage.getByRole('heading',{name:'UI authorization boundary',exact:true})}).first();
   await uiCard.getByText('Status: Proposed',{exact:true}).waitFor({timeout:30000});
