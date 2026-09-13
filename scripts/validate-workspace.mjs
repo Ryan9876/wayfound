@@ -123,7 +123,7 @@ async function inspect(page, name) {
     await page.screenshot({ path: `${output}/${name}-${label}.png`, fullPage: true });
 
     await page.evaluate(() => document.activeElement?.blur());
-    const targets = await page.locator('a[href],button:not([disabled]),input:not([type=hidden]),textarea').evaluateAll(elements =>
+    const targets = await page.locator('a[href],button:not([disabled]),input:not([type=hidden]),textarea,select').evaluateAll(elements =>
       elements
         .filter(element => element.getBoundingClientRect().width > 0)
         .map((element, index) => {
@@ -268,7 +268,62 @@ try {
   expectedError(await clients[0].schema('wayfound').from('work_items').select('*'), 'private work-item table read unexpectedly succeeded');
   expectedError(await clients[0].from('work_items').insert({ title: 'bypass' }), 'direct work-item table write unexpectedly succeeded');
 
-  const tables = ['actors', 'workspaces', 'memberships', 'releases', 'release_stages', 'audit_events', 'creation_requests', 'decisions', 'decision_requests', 'work_items', 'work_item_requests'];
+  const requirementArgs = {
+    p_workspace: id,
+    p_title: 'Identify the active borrower',
+    p_obligation: 'MUST',
+    p_requirement: 'The product records the person responsible for each active equipment checkout.',
+    p_acceptance_criterion: 'Given an equipment checkout is active, when the checkout record is viewed, then the responsible borrower is visible.',
+    p_authority_confirm: true,
+    p_request: randomUUID(),
+  };
+  const duplicateRequirement = await Promise.all([
+    rpc(clients[0], 'record_owner_requirement', requirementArgs),
+    rpc(clients[0], 'record_owner_requirement', requirementArgs),
+  ]);
+  const requirementId = ok(duplicateRequirement[0]);
+  duplicateRequirement.forEach(result => assert.equal(ok(result), requirementId));
+  const savedRequirements = ok(await rpc(clients[0], 'list_requirements', { p_workspace: id }));
+  assert.equal(savedRequirements.length, 1);
+  assert.equal(savedRequirements[0].id, requirementId);
+  assert.equal(savedRequirements[0].release_id, saved.release.id);
+  assert.equal(savedRequirements[0].stage_number, 1);
+  assert.equal(savedRequirements[0].title, requirementArgs.p_title);
+  assert.equal(savedRequirements[0].obligation, 'MUST');
+  assert.equal(savedRequirements[0].requirement, requirementArgs.p_requirement);
+  assert.equal(savedRequirements[0].kind, 'product');
+  assert.equal(savedRequirements[0].authority, 'owner');
+  assert.equal(savedRequirements[0].status, 'Approved');
+  assert.equal(savedRequirements[0].approving_actor_id, ownerActorId);
+  assert.equal(savedRequirements[0].acceptance_criteria.length, 1);
+  assert.equal(savedRequirements[0].acceptance_criteria[0].requirement_id, requirementId);
+  assert.equal(savedRequirements[0].acceptance_criteria[0].workspace_id, id);
+  assert.equal(savedRequirements[0].acceptance_criteria[0].statement, requirementArgs.p_acceptance_criterion);
+  assert.notEqual(savedRequirements[0].acceptance_criteria[0].id, requirementId);
+  expectedError(
+    await clients[0].rpc('record_owner_requirement', { ...requirementArgs, p_title: 'Changed' }),
+    'changed duplicate requirement request unexpectedly succeeded',
+  );
+  expectedError(
+    await clients[0].rpc('record_owner_requirement', { ...requirementArgs, p_request: randomUUID(), p_authority_confirm: false }),
+    'requirement without owner-authority confirmation unexpectedly succeeded',
+  );
+  expectedError(
+    await clients[0].rpc('record_owner_requirement', { ...requirementArgs, p_request: randomUUID(), p_obligation: 'REQUIRED' }),
+    'invalid requirement obligation unexpectedly succeeded',
+  );
+  assert.deepEqual(ok(await rpc(clients[1], 'list_requirements', { p_workspace: id })), []);
+  expectedError(
+    await clients[1].rpc('record_owner_requirement', { ...requirementArgs, p_request: randomUUID() }),
+    'non-owner requirement creation unexpectedly succeeded',
+  );
+  expectedError(await backend.client().rpc('list_requirements', { p_workspace: id }), 'anonymous requirement read unexpectedly succeeded');
+  expectedError(await clients[0].schema('wayfound').from('requirements').select('*'), 'private requirement table read unexpectedly succeeded');
+  expectedError(await clients[0].schema('wayfound').from('acceptance_criteria').select('*'), 'private acceptance-criterion table read unexpectedly succeeded');
+  expectedError(await clients[0].from('requirements').insert({ title: 'bypass' }), 'direct requirement table write unexpectedly succeeded');
+  expectedError(await clients[0].from('acceptance_criteria').insert({ statement: 'bypass' }), 'direct acceptance-criterion table write unexpectedly succeeded');
+
+  const tables = ['actors', 'workspaces', 'memberships', 'releases', 'release_stages', 'audit_events', 'creation_requests', 'decisions', 'decision_requests', 'work_items', 'work_item_requests', 'requirements', 'acceptance_criteria', 'requirement_requests'];
   async function counts() {
     return Promise.all(tables.map(async table => (await sql.query(`select count(*)::int n from wayfound.${table}`)).rows[0].n));
   }
@@ -315,23 +370,39 @@ try {
     await sql.query('drop trigger test_work_failure on wayfound.audit_events; drop function wayfound.test_work_failure()');
   }
 
+  const beforeRequirementFailure = await counts();
+  await sql.query(`create function wayfound.test_requirement_failure() returns trigger language plpgsql as $$begin if new.operation='requirement.approved' then raise exception 'Injected requirement audit failure'; end if; return new; end$$; create trigger test_requirement_failure before insert on wayfound.audit_events for each row execute function wayfound.test_requirement_failure()`);
+  try {
+    expectedError(
+      await clients[0].rpc('record_owner_requirement', { ...requirementArgs, p_request: randomUUID(), p_title: 'Rollback requirement' }),
+      'injected requirement creation failure unexpectedly succeeded',
+    );
+    assert.deepEqual(await counts(), beforeRequirementFailure);
+  } finally {
+    await sql.query('drop trigger test_requirement_failure on wayfound.audit_events; drop function wayfound.test_requirement_failure()');
+  }
+
   const membership = (await sql.query('delete from wayfound.memberships where workspace_id=$1 returning *', [id])).rows[0];
   assert.equal(ok(await rpc(clients[0], 'open_workspace', { p_id: id })), null);
   assert.deepEqual(ok(await rpc(clients[0], 'list_decisions', { p_workspace: id })), []);
   assert.deepEqual(ok(await rpc(clients[0], 'list_work_items', { p_workspace: id })), []);
+  assert.deepEqual(ok(await rpc(clients[0], 'list_requirements', { p_workspace: id })), []);
   expectedError(await clients[0].rpc('record_owner_decision', decisionArgs), 'membership-revoked decision retry unexpectedly succeeded');
   expectedError(await clients[0].rpc('create_proposed_work_item', workArgs), 'membership-revoked work-item retry unexpectedly succeeded');
+  expectedError(await clients[0].rpc('record_owner_requirement', requirementArgs), 'membership-revoked requirement retry unexpectedly succeeded');
   expectedError(await clients[0].rpc('create_workspace', args), 'membership-revoked workspace retry unexpectedly succeeded');
   await sql.query('insert into wayfound.memberships(workspace_id,actor_id,role) values($1,$2,$3)', [id, membership.actor_id, membership.role]);
 
   await sql.query("update auth.sessions set not_after=now()-interval '1 minute' where user_id=$1", [users[0].id]);
   expectedError(await clients[0].rpc('list_decisions', { p_workspace: id }), 'expired session decision read succeeded');
   expectedError(await clients[0].rpc('list_work_items', { p_workspace: id }), 'expired session work-item read succeeded');
+  expectedError(await clients[0].rpc('list_requirements', { p_workspace: id }), 'expired session requirement read succeeded');
   await sql.query('update auth.sessions set not_after=null where user_id=$1', [users[0].id]);
   const protectedAccess = ok(await clients[0].auth.getSession()).session.access_token;
   await sql.query('delete from auth.sessions where user_id=$1', [users[0].id]);
   await revokedRpc(protectedAccess, 'list_decisions', { p_workspace: id });
   await revokedRpc(protectedAccess, 'list_work_items', { p_workspace: id });
+  await revokedRpc(protectedAccess, 'list_requirements', { p_workspace: id });
   ok(await clients[0].auth.signInWithPassword({ email: emails[0], password }));
 
   await sql.query("update auth.sessions set not_after=now()-interval '1 minute' where user_id=$1", [users[1].id]);
@@ -367,6 +438,7 @@ try {
   assert(await page.getByText('Stage 1: Clarify', { exact: true }).isVisible());
   assert(await page.getByRole('heading', { name: 'No accepted decisions yet.', exact: true }).isVisible());
   assert(await page.getByRole('heading', { name: 'No proposed work yet.', exact: true }).isVisible());
+  assert(await page.getByRole('heading', { name: 'No approved requirements yet.', exact: true }).isVisible());
 
   await page.getByLabel('Decision title', { exact: true }).fill('Keep checkout staff-assisted');
   await page.getByLabel('Decision statement', { exact: true }).fill('Keep equipment checkout staff-assisted for Release 1.0.');
@@ -393,6 +465,22 @@ try {
   assert.equal(await page.getByText('Status: Validated', { exact: true }).count(), 0);
   await inspect(page, 'saved-work-item');
 
+  await page.getByLabel('Requirement title', { exact: true }).fill('Identify the active borrower');
+  await page.getByLabel('Obligation', { exact: true }).selectOption('MUST');
+  await page.getByLabel('Requirement statement', { exact: true }).fill('The product records the person responsible for each active equipment checkout.');
+  await page.getByLabel('Acceptance criterion', { exact: true }).fill('Given an equipment checkout is active, when the checkout record is viewed, then the responsible borrower is visible.');
+  await page.getByLabel(/I confirm this requirement states product or business behavior/).check();
+  await page.getByRole('button', { name: 'Record approved requirement', exact: true }).click();
+  await page.waitForURL(url => url.pathname === new URL(resumeUrl).pathname && url.hash === '#requirements');
+  await page.getByRole('heading', { name: 'Identify the active borrower', exact: true }).waitFor({ timeout: 30000 });
+  assert(await page.getByText('Status: Approved', { exact: true }).isVisible());
+  assert(await page.getByText('Authority: Product owner', { exact: true }).isVisible());
+  assert(await page.getByText('Acceptance criterion · Not verification evidence', { exact: true }).isVisible());
+  assert(await page.getByText('Given an equipment checkout is active, when the checkout record is viewed, then the responsible borrower is visible.', { exact: true }).isVisible());
+  assert(await page.getByText(/^Requirement ID: [0-9a-f-]{36}$/i).isVisible());
+  assert(await page.getByText(/^Criterion ID: [0-9a-f-]{36}$/i).isVisible());
+  await inspect(page, 'saved-requirement');
+
   await page.getByRole('link', { name: 'Your workspaces', exact: true }).click();
   await waitForWorkspaceList(page);
   await inspect(page, 'workspace-list');
@@ -416,6 +504,9 @@ try {
   assert(await page.getByRole('heading', { name: 'Observe one equipment checkout', exact: true }).isVisible());
   assert(await page.getByText('One checkout is observed and the findings are recorded.', { exact: true }).isVisible());
   assert(await page.getByText('Observation notes linked to this work item.', { exact: true }).isVisible());
+  assert(await page.getByRole('heading', { name: 'Identify the active borrower', exact: true }).isVisible());
+  assert(await page.getByText('The product records the person responsible for each active equipment checkout.', { exact: true }).isVisible());
+  assert(await page.getByText('Given an equipment checkout is active, when the checkout record is viewed, then the responsible borrower is visible.', { exact: true }).isVisible());
 
   const other = await browser.newContext();
   const otherPage = await other.newPage();
@@ -436,12 +527,14 @@ try {
   await page.getByRole('heading', { name: 'Community workshop', exact: true }).waitFor({ timeout: 30000 });
   assert(await page.getByRole('heading', { name: 'Keep checkout staff-assisted', exact: true }).isVisible());
   assert(await page.getByRole('heading', { name: 'Observe one equipment checkout', exact: true }).isVisible());
+  assert(await page.getByRole('heading', { name: 'Identify the active borrower', exact: true }).isVisible());
   assert.deepEqual(ok(await rpc(clients[0], 'open_workspace', { p_id: id })), saved);
   assert.deepEqual(ok(await rpc(clients[0], 'list_decisions', { p_workspace: id })), savedDecisions);
   assert.deepEqual(ok(await rpc(clients[0], 'list_work_items', { p_workspace: id })), savedWorkItems);
+  assert.deepEqual(ok(await rpc(clients[0], 'list_requirements', { p_workspace: id })), savedRequirements);
   await context.close();
 
-  console.log('PASS: real Supabase authentication, atomic workspace, owner-decision, and proposed work-item creation, idempotent retries, tenant isolation, authority boundaries, revocation, failure rollback, restart/resume, sign-out, database interruption/recovery, keyboard focus and responsive screenshots.');
+  console.log('PASS: real Supabase authentication, atomic workspace, owner-decision, proposed work-item, and owner-approved requirement creation, idempotent retries, tenant isolation, authority boundaries, revocation, failure rollback, restart/resume, sign-out, database interruption/recovery, keyboard focus and responsive screenshots.');
 } finally {
   if (browser) await browser.close();
   await stop();
