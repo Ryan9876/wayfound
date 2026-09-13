@@ -98,3 +98,7 @@ These versions remain implementation details within the approved Next.js 14+ arc
 ## 10. Reconsideration triggers
 
 Revisit the architecture when validated product behavior cannot be represented cleanly by the current record model, persistence or file-volume needs materially exceed the planned model, direct integrations enter approved scope, AI or external actions gain authority beyond drafting and recommendations, or security/privacy/availability/regulatory requirements materially change.
+
+## 11. Increment 2 preparation
+
+[ADR-0002](adr/0002-durable-workspace-identity.md) proposes the identity trust boundary and managed provider. It is not accepted. The [first-slice model](INCREMENT_2_SLICE.md) defines create/open/resume, workspace membership, transactions, audit, demo separation, and failure tests before fixture replacement. Authentication and persistence implementation remain Blocked on that decision.

@@ -10,7 +10,7 @@ Do not build deferred automation before the core orientation, continuity, and ev
 
 ## 2. Increment 1 — Foundation and orientation
 
-**Status:** In progress
+**Status:** Validated
 
 **Outcome:** A user can open the Borrow Desk prototype, understand the current release and stage, see one recommended next action with its reason, and move across the primary workspace areas.
 
@@ -30,11 +30,15 @@ Do not build deferred automation before the core orientation, continuity, and ev
 - keyboard and contrast review;
 - task test: identify current stage, next action, open assumption, and evidence state.
 
+**Evidence:** [Increment 1 validation record](validation/increment-1.md), application commit `4cbc8fddc092dc27ee3b59fddb039e42e7e3a1cf`, CI run 62. Rendered review found and corrected mobile Records overflow. The orientation task walkthrough passed. No independent user research or Released state is claimed.
+
 ## 3. Increment 2 — Durable workspace record
 
 **Status:** Proposed
 
 **Outcome:** An authenticated owner can create and resume a workspace without relying on chat history.
+
+**Preparation:** First-slice model and acceptance tests are [Proposed](INCREMENT_2_SLICE.md). Implementation is **Blocked** by owner approval of [ADR-0002](adr/0002-durable-workspace-identity.md), which introduces an identity trust boundary and provider dependency.
 
 **Expected scope:** authentication and workspace membership, PostgreSQL persistence, release/stage/decision/work/artifact/evidence/maintenance records, explicit lifecycle status, audit baseline, and seed/demo tooling.
 

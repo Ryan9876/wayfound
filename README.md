@@ -6,6 +6,8 @@ Wayfound is a software-delivery guidance and coordination workspace for capable 
 
 ## Current state
 
+Increment 1 is **Validated** at application commit `4cbc8fd`; see the [validation record](docs/validation/increment-1.md). Increment 2 implementation is **Blocked** on the [proposed identity and persistence decision](docs/adr/0002-durable-workspace-identity.md).
+
 The repository contains the first prototype vertical slice. It uses illustrative Borrow Desk fixture data and does not claim production readiness.
 
 Implemented in this slice:

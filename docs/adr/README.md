@@ -42,7 +42,8 @@ Do not delete an accepted ADR because a later decision replaces it. Mark it `Sup
 
 | ADR | Decision | Status | Date | Superseded by |
 | --- | --- | --- | --- | --- |
-| — | No architecture decisions recorded yet | — | — | — |
+| [0001](0001-web-application-foundation.md) | Web application foundation | Accepted | 2026-09-13 | — |
+| [0002](0002-durable-workspace-identity.md) | Durable workspace identity and persistence | Proposed | 2026-09-13 | — |
 
 ## Change rule
 
