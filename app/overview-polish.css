@@ -1,0 +1,288 @@
+/* Desktop-only Overview refinement.
+   Keeps mobile unchanged and preserves the approved Wayfound information model. */
+
+@media (min-width: 1180px) {
+  .overview .release-heading {
+    align-items: flex-end;
+    margin-bottom: 24px;
+  }
+
+  .overview .release-title-block {
+    max-width: 600px;
+  }
+
+  .overview .release-title-block h1 {
+    margin-top: 7px;
+    font-size: 38px;
+    letter-spacing: -0.042em;
+  }
+
+  .overview .release-title-block > p {
+    max-width: 570px;
+    color: #586864;
+  }
+
+  .overview .stage-block {
+    min-width: 382px;
+    gap: 12px;
+  }
+
+  .overview .phase-track {
+    padding: 10px 11px 8px;
+    border: 1px solid #dde3e0;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.72);
+    box-shadow: 0 1px 2px rgba(23, 43, 42, 0.025);
+  }
+
+  .overview .phase-step {
+    width: 70px;
+  }
+
+  .overview-primary-grid {
+    grid-template-columns: minmax(0, 1fr) 324px;
+    gap: 18px;
+    align-items: stretch;
+  }
+
+  .overview .next-action-card {
+    position: relative;
+    overflow: hidden;
+    min-height: 488px;
+    padding: 29px 30px 28px;
+    border-radius: 16px;
+    border-color: #c8d9d3;
+    background:
+      radial-gradient(circle at 94% 6%, rgba(23, 107, 91, 0.055), transparent 29%),
+      linear-gradient(145deg, #f7faf8 0%, #edf5f1 100%);
+    box-shadow: 0 1px 2px rgba(23, 43, 42, 0.035), 0 16px 38px rgba(23, 43, 42, 0.055);
+  }
+
+  .overview .next-action-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 30px;
+    right: 30px;
+    height: 2px;
+    background: var(--pine);
+    border-radius: 0 0 3px 3px;
+    opacity: 0.8;
+  }
+
+  .action-position {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 9px;
+    border: 1px solid #d3dfdb;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.68);
+    color: #53645f;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .action-position i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--pine);
+  }
+
+  .overview .action-intro {
+    grid-template-columns: 50px 1fr;
+    gap: 19px;
+    padding: 34px 0 28px;
+  }
+
+  .overview .round-icon {
+    width: 48px;
+    height: 48px;
+    border: 1px solid #cadbd5;
+    background: #e4f0eb;
+  }
+
+  .action-copy {
+    padding-top: 1px;
+  }
+
+  .action-kicker {
+    display: block;
+    margin-bottom: 6px;
+    color: #687873;
+    font-size: 10.5px;
+    font-weight: 700;
+  }
+
+  .overview .action-intro h2 {
+    max-width: 650px;
+    margin: 0 0 11px;
+    font-size: 34px;
+    line-height: 1.05;
+    letter-spacing: -0.043em;
+  }
+
+  .overview .action-intro p {
+    max-width: 650px;
+    font-size: 13.5px;
+    line-height: 1.62;
+  }
+
+  .overview .why-panel {
+    padding: 19px 20px 18px;
+    border: 1px solid #d4e0dc;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.58);
+  }
+
+  .overview .minto-line {
+    grid-template-columns: 76px 1fr;
+    gap: 12px;
+    margin-top: 11px;
+    padding-left: 12px;
+    border-left-width: 1px;
+  }
+
+  .overview .minto-line b {
+    font-size: 11px;
+  }
+
+  .overview .minto-line span {
+    font-size: 12.5px;
+    line-height: 1.48;
+  }
+
+  .overview .action-buttons {
+    margin-top: 22px;
+  }
+
+  .overview .button.primary {
+    min-height: 42px;
+    padding: 0 18px;
+  }
+
+  .overview .button.secondary {
+    min-height: 42px;
+    background: rgba(255, 255, 255, 0.58);
+  }
+
+  .overview-context-card {
+    min-height: 488px;
+    padding: 26px 24px 22px;
+    border-radius: 16px;
+    box-shadow: 0 1px 2px rgba(23, 43, 42, 0.025), 0 10px 26px rgba(23, 43, 42, 0.035);
+  }
+
+  .context-evidence {
+    display: grid;
+    gap: 10px;
+    margin: 19px 0 2px;
+    padding: 15px;
+    border: 1px solid #eadfc8;
+    border-radius: 11px;
+    background: #fcf8ef;
+  }
+
+  .context-evidence-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #5b4a24;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .overview-context-card .status-chip {
+    width: max-content;
+    padding: 6px 9px;
+    font-size: 10px;
+  }
+
+  .overview-context-card .context-list {
+    margin-top: 7px;
+  }
+
+  .overview-context-card .context-list > div {
+    padding: 18px 0;
+  }
+
+  .overview-context-card .context-list > div:last-child {
+    border-bottom: 0;
+  }
+
+  .overview-context-card .context-footer {
+    margin-top: auto;
+    padding-top: 18px;
+    border-top: 1px solid #e4e9e7;
+  }
+
+  .overview-section-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    margin: 31px 0 13px;
+  }
+
+  .overview-section-heading h2 {
+    margin: 5px 0 0;
+    font-size: 18px;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    font-weight: 680;
+  }
+
+  .overview-summary-grid {
+    margin-top: 0;
+    gap: 14px;
+  }
+
+  .overview-summary-card {
+    min-height: 164px;
+    padding: 20px 21px;
+    border-radius: 13px;
+    box-shadow: none;
+    background: rgba(255, 255, 255, 0.86);
+  }
+
+  .overview-summary-card .clean-list {
+    margin-top: 14px;
+    gap: 9px;
+  }
+
+  .overview-summary-card .clean-list li {
+    font-size: 11px;
+    line-height: 1.46;
+  }
+
+  .overview-summary-card .release-stat {
+    margin-top: 12px;
+  }
+
+  .overview-summary-card .release-stat strong {
+    font-size: 30px;
+  }
+
+  .overview-records-strip {
+    margin-top: 14px;
+    padding: 19px 21px;
+    border-radius: 13px;
+    box-shadow: none;
+    background: rgba(255, 255, 255, 0.72);
+  }
+
+  .overview-records-strip h3 {
+    margin-top: 4px;
+    font-size: 14px;
+  }
+
+  .overview-records-strip .record-items {
+    gap: 10px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .overview .release-heading {
+    margin-top: 2px;
+  }
+}
