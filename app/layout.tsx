@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
+import "./durable-workspace.css";
 import "./typography.css";
 import "./desktop-polish.css";
 import "./overview-polish.css";

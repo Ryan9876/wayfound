@@ -1,7 +1,7 @@
 # Wayfound Project Charter
 
 **Status:** Approved product-definition baseline  
-**Active delivery state:** Increment 1 Validated; Increment 2 identity and persistence decision Proposed
+**Active delivery state:** Increment 1 Validated; Increment 2 In progress under accepted ADR-0002
 
 ## 1. Product statement
 

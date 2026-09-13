@@ -22,7 +22,7 @@ The current implementation contains:
 - representative Work, Handoffs, Records, and Release & Care views;
 - fixture data with no production writes.
 
-The current implementation does not contain authentication, a database connection, durable artifact storage, external specialist connectors, automatic CI/CD evidence ingestion, production-changing actions, or a production authorization mechanism.
+The foundation routes retain fixtures. The Increment 2 routes add server-side authentication and PostgreSQL create/open/resume through scoped RPCs. Durable artifact storage, external specialist connectors, automatic CI/CD evidence ingestion, production-changing actions, and production release authorization remain unimplemented.
 
 ## 3. Target component boundaries
 
@@ -99,6 +99,10 @@ These versions remain implementation details within the approved Next.js 14+ arc
 
 Revisit the architecture when validated product behavior cannot be represented cleanly by the current record model, persistence or file-volume needs materially exceed the planned model, direct integrations enter approved scope, AI or external actions gain authority beyond drafting and recommendations, or security/privacy/availability/regulatory requirements materially change.
 
-## 11. Increment 2 preparation
+## 11. Increment 2 implementation
 
-[ADR-0002](adr/0002-durable-workspace-identity.md) proposes the identity trust boundary and managed provider. It is not accepted. The [first-slice model](INCREMENT_2_SLICE.md) defines create/open/resume, workspace membership, transactions, audit, demo separation, and failure tests before fixture replacement. Authentication and persistence implementation remain Blocked on that decision.
+[ADR-0002](adr/0002-durable-workspace-identity.md) was accepted following Ryan Smith's development-slice approval on 2026-09-13. Presentation uses `app/sign-in` and `app/workspaces`. `lib/application` validates input and authenticates the actor. `lib/auth` owns Supabase identity access. `lib/persistence` owns bounded database calls. `lib/domain` contains the shared journey catalog and input contract, with no provider or fixture dependency.
+
+The private `wayfound` schema owns workspace state. Privileged creation is a single scoped transaction behind invoker RPC wrappers; no direct client table writes or application service keys are permitted. Reads verify current provider session and membership. New workspaces have Stage 1 active and a Proposed release, with no evidence or completion claims. AI is not connected.
+
+Implementation is complete for the bounded slice. Validation is In progress against isolated Supabase in CI. No hosted project or production deployment exists. Later Increment 2 entities remain separate work.

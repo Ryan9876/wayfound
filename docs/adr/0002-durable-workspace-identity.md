@@ -1,14 +1,14 @@
 # ADR-0002 — Durable workspace identity and persistence
 
-**Status:** Proposed  
-**Date:** 2026-09-13  
+**Status:** Accepted
+**Date:** 2026-09-13
 **Decision owner:** Ryan Smith
 
-## Proposed decision
+## Decision
 
 Use Supabase Auth and managed PostgreSQL for the first authenticated workspace slice. Keep provider access in server-side adapters. Keep workspace authorization and deterministic transitions in Wayfound application services, with database access policies as defense in depth.
 
-This is a recommendation, not approval to provision a service, purchase a plan, migrate data, or implement the identity boundary. The owner must approve the dependency and trust boundary first.
+Ryan Smith approved this decision for the development slice on 2026-09-13. Implementation and isolated local/CI validation are authorized. Hosted provisioning, spending, and production migration are outside this approval.
 
 ## Facts and assumptions
 
@@ -37,7 +37,7 @@ Use provider-supported server session handling. Validate sessions before protect
 
 AI has no write or authorization capability in this slice. CI results do not change workspace lifecycle or evidence state.
 
-## Proposed implementation boundary
+## Implementation boundary
 
 Begin with password sign-in for test accounts in an isolated development environment. Public signup, invitations, account recovery, and production email delivery remain later work within Increment 2. Local seed tooling must provision test identities explicitly and refuse production configuration.
 
@@ -68,3 +68,11 @@ Recheck current provider APIs and security guidance before implementation. No pr
 | Date | Status | Reason |
 | --- | --- | --- |
 | 2026-09-13 | Proposed | Owner decision required for a new identity trust boundary and consequential provider dependency |
+
+| 2026-09-13 | Accepted | Ryan Smith approved the development slice in the project conversation |
+
+## Implementation detail — bounded database commands
+
+The first slice uses private `wayfound` tables with RLS and no direct client table grants. Public invoker RPC wrappers call private, narrowly scoped definer functions. The privilege elevation is deliberate: it permits one atomic creation while denying partial client writes. Each entry point validates the provider session, derives the subject from that session, and checks current membership. Functions fix their search path and revoke default PUBLIC execution. Auth sessions are checked in PostgreSQL so a revoked session cannot use an unexpired signed access token to read a workspace.
+
+This is an implementation of the approved boundary, not an unrestricted service-key path. No service key is used by the application. Local seed/test tooling alone uses local admin credentials and rejects non-loopback endpoints. The provider adapter calls these commands; direct calls enforce the same invariants.

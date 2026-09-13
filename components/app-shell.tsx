@@ -61,6 +61,7 @@ export function AppShell({ active, children }: AppShellProps) {
             <span className="profile-copy"><strong>Jordan Singh</strong><small>Product Lead</small></span>
             <ChevronDown size={15} aria-hidden="true" />
           </div>
+          <Link className="text-link" href="/workspaces">Your workspaces →</Link>
           <div className="sync-state">
             <span className="sync-dot" aria-hidden="true" />
             <span><strong>Prototype record</strong><small>Fixture data • not synced</small></span>

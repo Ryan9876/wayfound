@@ -34,11 +34,11 @@ Do not build deferred automation before the core orientation, continuity, and ev
 
 ## 3. Increment 2 — Durable workspace record
 
-**Status:** Proposed
+**Status:** In progress
 
 **Outcome:** An authenticated owner can create and resume a workspace without relying on chat history.
 
-**Preparation:** First-slice model and acceptance tests are [Proposed](INCREMENT_2_SLICE.md). Implementation is **Blocked** by owner approval of [ADR-0002](adr/0002-durable-workspace-identity.md), which introduces an identity trust boundary and provider dependency.
+**Preparation:** Ryan Smith approved [ADR-0002](adr/0002-durable-workspace-identity.md) for the development slice on 2026-09-13. The first create/open/resume slice is Implemented; real-backend and rendered validation are In progress. See [slice plan](INCREMENT_2_SLICE.md). No hosted project has been provisioned.
 
 **Expected scope:** authentication and workspace membership, PostgreSQL persistence, release/stage/decision/work/artifact/evidence/maintenance records, explicit lifecycle status, audit baseline, and seed/demo tooling.
 

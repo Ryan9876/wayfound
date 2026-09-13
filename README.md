@@ -6,7 +6,7 @@ Wayfound is a software-delivery guidance and coordination workspace for capable 
 
 ## Current state
 
-Increment 1 is **Validated** at application commit `4cbc8fd`; see the [validation record](docs/validation/increment-1.md). Increment 2 implementation is **Blocked** on the [proposed identity and persistence decision](docs/adr/0002-durable-workspace-identity.md).
+Increment 1 is **Validated** at application commit `4cbc8fd`; see the [validation record](docs/validation/increment-1.md). Increment 2 is **In progress** under [accepted ADR-0002](docs/adr/0002-durable-workspace-identity.md). The authenticated create/open/resume slice is Implemented; validation is In progress.
 
 The repository contains the first prototype vertical slice. It uses illustrative Borrow Desk fixture data and does not claim production readiness.
 
@@ -21,12 +21,13 @@ Implemented in this slice:
 
 Not implemented in this slice:
 
-- authentication;
-- persistent database storage;
+- hosted authentication/database provisioning;
 - artifact import or versioning;
 - specialist connector integrations;
 - automated verification ingestion;
 - production deployment actions.
+
+The persisted workspace is at `/workspaces`; sign-in is at `/sign-in`. Borrow Desk remains illustrative at `/demo` and the existing prototype routes. See [local development](docs/LOCAL_DEVELOPMENT.md) for an isolated Supabase setup.
 
 ## Run locally
 

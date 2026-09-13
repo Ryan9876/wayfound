@@ -1,7 +1,7 @@
 # Increment 2 — First durable workspace slice
 
-**Status:** Proposed  
-**Implementation state:** Blocked by ADR-0002 approval
+**Status:** In progress
+**Implementation state:** In progress; ADR-0002 approved by Ryan Smith on 2026-09-13
 
 ## Outcome and scope
 

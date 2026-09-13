@@ -7,7 +7,7 @@ function check(condition, message) {
   if (!condition) failures.push(message);
 }
 
-const stages = read("lib/demo-data.ts");
+const stages = read("lib/domain/journey.ts") + read("lib/demo-data.ts");
 const shell = read("components/app-shell.tsx");
 const overview = read("components/overview-dashboard.tsx");
 const journey = read("components/journey-view.tsx");

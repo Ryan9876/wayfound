@@ -83,3 +83,33 @@ jobs:
           if [ -f /tmp/wayfound-next.pid ]; then
             kill "$(cat /tmp/wayfound-next.pid)" || true
           fi
+
+  durable-workspace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install pinned dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Start isolated Supabase
+        run: npx supabase start -x realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+      - name: Build application
+        run: npm run build
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+      - name: Validate durable workspace
+        run: npm run test:workspace
+      - name: Upload workspace screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workspace-screenshots
+          path: artifacts/workspace
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Stop isolated Supabase
+        if: always()
+        run: npx supabase stop
