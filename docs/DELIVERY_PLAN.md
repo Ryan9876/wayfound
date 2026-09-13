@@ -14,35 +14,37 @@ Do not build deferred automation before the core orientation, continuity, and ev
 
 **Outcome:** A user can open the Borrow Desk prototype, understand the current release and stage, see one recommended next action with its reason, and move across the primary workspace areas.
 
-**Included:**
+**Included:** responsive desktop and mobile shell; Wayfound design tokens and logo direction; Overview dashboard; canonical 15-stage Journey; representative Work, Handoffs, Records, and Release & Care views; fixture data only.
 
-- responsive desktop and mobile shell;
-- Wayfound design tokens and logo direction;
-- Overview dashboard;
-- canonical 15-stage Journey view;
-- Work, Handoffs, Records, and Release & Care representative views;
-- fixture data only.
-
-**Validation:**
-
-- source/type checks when dependencies are available;
-- desktop and mobile visual review;
-- keyboard and contrast review;
-- task test: identify current stage, next action, open assumption, and evidence state.
-
-**Evidence:** [Increment 1 validation record](validation/increment-1.md), application commit `4cbc8fddc092dc27ee3b59fddb039e42e7e3a1cf`, CI run 62. Rendered review found and corrected mobile Records overflow. The orientation task walkthrough passed. No independent user research or Released state is claimed.
+**Evidence:** [Increment 1 validation record](validation/increment-1.md), application commit `4cbc8fddc092dc27ee3b59fddb039e42e7e3a1cf`, CI run 62. No independent user research or Released state is claimed.
 
 ## 3. Increment 2 — Durable workspace record
 
 **Status:** In progress
 
-**Outcome:** An authenticated owner can create and resume a workspace without relying on chat history.
+**Outcome:** An authenticated owner can create and resume a workspace without relying on chat history and can progressively build durable project records inside it.
 
-**First slice:** **Validated.** Ryan Smith approved [ADR-0002](adr/0002-durable-workspace-identity.md) for the development slice on 2026-09-13. The authenticated create/list/open/resume path passed real-backend and rendered acceptance tests at application commit `603f02862ae4090bd1853157e449a01508186f4c` through CI run 70. See the [slice plan](INCREMENT_2_SLICE.md) and [validation record](validation/increment-2-durable-workspace.md). No hosted project has been provisioned.
+### Slice 1 — Create, list, open, and resume
 
-**Validated first-slice scope:** Supabase authentication, workspace membership, PostgreSQL workspace/release/stage persistence, initial audit event, idempotent creation request, loading/empty/error states, tenant isolation, restart/resume behavior, and failure recovery for the bounded create/open/resume workflow.
+**Status:** Validated
 
-**Remaining expected scope:** decision, work, artifact, evidence, and maintenance records; explicit lifecycle behavior for those records; later audit coverage; and seed/demo tooling required by those later workflows. These items remain In progress or unimplemented and are not covered by the first-slice validation.
+Ryan Smith approved [ADR-0002](adr/0002-durable-workspace-identity.md) for the development slice on 2026-09-13. The authenticated create/list/open/resume path passed real-backend and rendered acceptance tests at application commit `603f02862ae4090bd1853157e449a01508186f4c` through CI run 70. See the [slice plan](INCREMENT_2_SLICE.md) and [validation record](validation/increment-2-durable-workspace.md).
+
+Validated scope includes Supabase authentication, workspace membership, PostgreSQL workspace/release/stage persistence, initial audit event, idempotent creation request, loading/empty/error states, tenant isolation, restart/resume behavior, and failure recovery.
+
+### Slice 2 — Owner-authorized durable decisions
+
+**Status:** Validated
+
+An authenticated workspace owner can record an accepted product-scope or business decision after explicitly confirming product-owner authority. The decision persists with its rationale, stage, `Accepted` status, and `owner` authority. Consequential technical decisions remain outside this action and require qualified specialist review.
+
+The slice passed real-backend and rendered acceptance tests at application commit `548f1bbb4264ca412bc808a94a60593bca2c3602` through CI run 92. See the [decision slice](INCREMENT_2_DECISIONS.md) and [validation record](validation/increment-2-decisions.md).
+
+Validated scope includes transactional decision acceptance, audit record, idempotent retries, direct-table denial, tenant/session/revocation isolation, injected-failure rollback, restart/resume, database interruption/recovery, and mobile/desktop rendered review.
+
+### Remaining Increment 2 scope
+
+Specialist-review decision flow, work records, artifact records, evidence records, maintenance records, later lifecycle behavior, change-impact handling, and supporting audit/seed behavior remain In progress or unimplemented. No hosted project has been provisioned.
 
 ## 4. Increment 3 — Versioned artifact import
 
