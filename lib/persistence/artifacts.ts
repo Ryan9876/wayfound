@@ -1,6 +1,6 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { ArtifactRecord, CreateArtifactInput } from "@/lib/domain/artifact";
+import type { AcceptArtifactVersionInput, ArtifactRecord, CreateArtifactInput } from "@/lib/domain/artifact";
 
 const JWT_FUTURE_RETRY_DELAYS_MS = [150, 350, 750] as const;
 
@@ -46,6 +46,24 @@ export class ArtifactStore {
     });
     if (error) {
       if (error.code === "22023") throw new Error("REQUEST_CONFLICT");
+      if (error.code === "42501") throw new Error("ACCESS_DENIED");
+      throw new Error("STORE_UNAVAILABLE");
+    }
+    return data;
+  }
+
+  async accept(input: AcceptArtifactVersionInput): Promise<string> {
+    const { data, error } = await this.rpc("accept_artifact_version", {
+      p_workspace: input.workspaceId,
+      p_artifact: input.artifactId,
+      p_version: input.versionId,
+      p_authority_confirm: input.confirmAuthority,
+      p_request: input.requestId,
+    });
+    if (error) {
+      if (error.code === "22023") throw new Error("REQUEST_CONFLICT");
+      if (error.code === "23503") throw new Error("INVALID_TARGET");
+      if (error.code === "55000") throw new Error("INVALID_STATE");
       if (error.code === "42501") throw new Error("ACCESS_DENIED");
       throw new Error("STORE_UNAVAILABLE");
     }
