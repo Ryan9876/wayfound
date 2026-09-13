@@ -105,7 +105,9 @@ jobs:
       - name: Validate durable workspace
         run: npm run test:workspace
       - name: Validate durable evidence
-        run: npm run test:evidence
+        run: |
+          WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
+          npm run test:evidence
       - name: Upload workspace screenshots
         if: always()
         uses: actions/upload-artifact@v4
