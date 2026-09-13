@@ -1,8 +1,9 @@
 # Increment 2 — Assignment-scoped specialist review
 
-**Status:** In progress  
+**Status:** Validated  
 **Parent increment:** Increment 2 — Durable workspace record  
-**Architecture basis:** ADR-0002 and ADR-0003
+**Architecture basis:** ADR-0002 and ADR-0003  
+**Validated head:** `fc91a4377e887cada269fb35b2192f5c3efad15b` through CI run 172
 
 ## 1. Outcome
 
@@ -149,6 +150,8 @@ A failed review submission MUST leave the assignment incomplete and MUST leave a
 
 ## 10. Acceptance criteria
 
+All criteria below passed in CI run 172:
+
 1. An authenticated non-anonymous specialist can obtain a stable reviewer code without receiving workspace membership.
 2. An authenticated current owner can assign a different valid reviewer code to the exact currently accepted artifact version after confirming the bounded review authority statement.
 3. Self-assignment by the workspace owner is rejected.
@@ -173,6 +176,8 @@ A failed review submission MUST leave the assignment incomplete and MUST leave a
 22. Supabase security advisor, TypeScript, production build, prior durable suites, and the focused specialist-review suite pass.
 23. Desktop and 390 px mobile rendered review shows reviewer identity, competence, conclusion, stable IDs, authority boundary, and no horizontal overflow.
 24. All visible controls are keyboard reachable with visible focus, and important status/conclusion is text rather than color-only.
+
+See [validation/increment-2-specialist-review.md](validation/increment-2-specialist-review.md) for exact evidence and limits.
 
 ## 11. Excluded behavior
 
