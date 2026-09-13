@@ -17,9 +17,10 @@ The current implementation contains:
 - the fixture-backed Borrow Desk scenario and canonical 15-stage journey;
 - representative Work, Handoffs, Records, and Release & Care views;
 - authenticated PostgreSQL-backed create/list/open/resume workspace routes;
-- durable owner-authorized product-scope and business decision records.
+- durable owner-authorized product-scope and business decision records;
+- durable owner-owned proposed work-item records with explicit outcomes, completion conditions, and expected evidence.
 
-The durable decision path does not authorize consequential technical decisions. Those require qualified specialist review and remain later scope. Durable artifact storage, artifact versioning, external specialist connectors, automatic CI/CD evidence ingestion, production-changing actions, and production release authorization remain unimplemented.
+The durable decision path does not authorize consequential technical decisions. Those require qualified specialist review and remain later scope. Proposed work items do not imply that execution started, a specialist accepted the work, implementation completed, or verification occurred. Work-state transitions, collaborator/specialist assignment, dependencies, durable requirements, artifact storage/versioning, evidence records, external specialist connectors, automatic CI/CD evidence ingestion, production-changing actions, and production release authorization remain unimplemented.
 
 ## 3. Component boundaries
 
@@ -29,11 +30,11 @@ Next.js App Router and React render the workspace. Interactive components use cl
 
 ### Application logic
 
-Server-side application functions enforce implemented workspace scope, identity, authorization, input validation, and decision authority boundaries. Later slices will add artifact lifecycle, reconciliation, change-impact, evidence, and release rules.
+Server-side application functions enforce implemented workspace scope, identity, authorization, input validation, decision authority boundaries, and proposed-work semantics. Later slices will add work-state transitions, assignment, requirement linkage, artifact lifecycle, reconciliation, change-impact, evidence, and release rules.
 
 ### Persistence
 
-PostgreSQL is authoritative for implemented durable workspace, release/stage, and owner-decision state. Artifact storage may use object storage when file size or immutability requirements justify it.
+PostgreSQL is authoritative for implemented durable workspace, release/stage, owner-decision, and proposed-work-item state. Artifact storage may use object storage when file size or immutability requirements justify it.
 
 ### AI guidance
 
@@ -50,6 +51,8 @@ For implemented persistent state:
 - the Wayfound database owns structured durable workspace state;
 - a saved owner decision is an accepted product-scope or business choice only after explicit owner-authority confirmation;
 - technical choices that require qualified specialist review are not accepted through the owner-decision action;
+- a newly recorded work item is planned work with status `Proposed` and does not establish execution, completion, review, or verification;
+- the authenticated owner actor and current release/stage are resolved from durable state instead of caller-supplied authority data;
 - external tool output is input to reconciliation, not automatic project truth;
 - chat history is not a project data source.
 
@@ -61,7 +64,9 @@ The implemented durable slices use authenticated users, workspace-scoped members
 
 Owner-decision creation derives actor identity, release, and stage from durable state. It requires explicit product-owner authority confirmation and records `decision.accepted` in the audit log. The database constrains the implemented decision authority to `owner` and status to `Accepted`.
 
-The broader production architecture must also provide qualified specialist-review records, explicit reviewer roles, validation at file and external-input boundaries, no committed secrets, and audit records for material acceptance and authorization events.
+Proposed-work-item creation derives the owner actor, release, and stage from the verified session and current workspace membership. The database constrains the implemented work-item status to `Proposed` and records `work_item.proposed` in the audit log. This slice does not allow an owner to claim that another collaborator or specialist accepted assignment.
+
+The broader production architecture must also provide qualified specialist-review records, explicit reviewer and collaborator roles, validation at file and external-input boundaries, no committed secrets, and audit records for material acceptance and authorization events.
 
 Security design that changes trust boundaries or introduces consequential dependencies requires an Architecture Decision Record.
 
@@ -73,8 +78,9 @@ Implemented examples:
 
 - durable workspace creation is transactional and leaves no partial record after an injected failure;
 - owner-decision creation is transactional and rolls back the decision, audit event, and request result when audit insertion fails;
+- proposed-work-item creation is transactional and rolls back the work item, audit event, and request result when audit insertion fails;
 - database interruption renders a recoverable error and does not substitute fixture data;
-- a successful same-route decision save explicitly revalidates the workspace before redirect so the rendered state matches committed state.
+- successful same-route decision and work-item saves explicitly revalidate the workspace before redirect so the rendered state matches committed state.
 
 Future failed imports must preserve accepted artifacts; failed reconciliation must not partially accept returned work; interrupted release actions must not be reported as successful without outcome evidence; unknown dependency impact remains unresolved rather than becoming “no impact.”
 
@@ -82,7 +88,7 @@ The persistence adapters use a bounded retry only for PostgREST error `PGRST303`
 
 ## 7. Observability
 
-Important failures must be diagnosable without logging secrets or unnecessary sensitive data. Implemented durable operations record scoped audit events and correlation/request context. Later observability work must extend this baseline to artifact, evidence, review, and release workflows.
+Important failures must be diagnosable without logging secrets or unnecessary sensitive data. Implemented durable mutations record scoped audit events and correlation/request context. Later observability work must extend this baseline to requirements, artifact, evidence, review, work-state transition, and release workflows.
 
 ## 8. Deployment and rollback
 
@@ -116,4 +122,6 @@ The create/list/open/resume slice is **Validated** at application commit `603f02
 
 The owner-authorized decision slice is **Validated** at application commit `548f1bbb4264ca412bc808a94a60593bca2c3602` through CI run 92. It records only product-scope and business decisions after explicit owner-authority confirmation. See [validation/increment-2-decisions.md](validation/increment-2-decisions.md).
 
-No hosted project or production deployment exists. Broader Increment 2 remains In progress for specialist review and later durable record workflows.
+The proposed-work-item slice is **Validated** at application commit `1f2a1c99856119c845a4495b61674bea415a4a77` through CI run 113. It records owner-owned bounded planned work with status `Proposed`, explicit completion conditions, and expected evidence, without implying execution or verification. See [validation/increment-2-work-items.md](validation/increment-2-work-items.md).
+
+No hosted project or production deployment exists. Broader Increment 2 remains In progress for specialist review, work-state transitions and assignment, requirements, artifacts, evidence, maintenance, and later durable record workflows.
