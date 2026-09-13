@@ -350,7 +350,7 @@ try {
   await specialistContext.close(); await ownerContext.close(); await stop(); await start();
   ownerContext=await browser.newContext(); ownerPage=await ownerContext.newPage();
   await login(ownerPage,emails[0]); await ownerPage.goto(workspaceUrl);
-  await ownerPage.getByRole('heading',{name:'UI authorization boundary',exact:true}).waitFor({timeout:30000});
+  await ownerPage.getByRole('heading',{name:'UI authorization boundary',exact:true,level:3}).first().waitFor({timeout:30000});
   await ownerPage.getByText('Accepted project direction after qualified review.',{exact:false}).waitFor();
   const afterRestart=(await list(clients[0],workspace)).find(x=>x.id===uiPersisted.id);
   assert.equal(afterRestart.decision.id,uiPersisted.decision.id,'restart changed accepted technical decision');
