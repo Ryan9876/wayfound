@@ -1,0 +1,337 @@
+/* Handoffs and Records refinement.
+   Keeps future handoffs honest and makes durable record state easier to scan. */
+
+.handoffs-page .page-title-row,
+.records-page .page-title-row {
+  margin-bottom: 24px;
+}
+
+.handoff-state-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border: 1px solid #d7e1dd;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.handoff-state-bar > div {
+  display: grid;
+  gap: 4px;
+}
+
+.handoff-state-bar strong {
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: #304843;
+}
+
+.handoff-feature-grid {
+  gap: 16px;
+}
+
+.handoff-package-card,
+.handoff-return-card {
+  min-height: 330px;
+}
+
+.handoff-package-card {
+  border-color: #c8d9d3;
+  background:
+    radial-gradient(circle at 95% 4%, rgba(23, 107, 91, 0.06), transparent 31%),
+    linear-gradient(145deg, #f8fbfa 0%, #eef5f2 100%);
+}
+
+.handoff-package-card .round-icon {
+  border: 1px solid #c5d8d2;
+  background: #e3efe9;
+}
+
+.handoff-package-card h2,
+.handoff-return-card h2 {
+  max-width: 490px;
+  font-size: 22px;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+}
+
+.handoff-package-card p,
+.handoff-return-card p {
+  max-width: 590px;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.handoff-feature-grid .feature-meta {
+  margin-top: auto;
+}
+
+.handoff-feature-grid .button:disabled {
+  margin-top: 18px;
+}
+
+.handoff-boundary-note {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  margin-top: 14px;
+  padding: 11px 14px;
+  border-left: 3px solid var(--ochre);
+  border-radius: 0 9px 9px 0;
+  background: #fbf7ed;
+  color: #5d5646;
+}
+
+.handoff-boundary-note strong,
+.handoff-boundary-note span {
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.handoff-boundary-note strong {
+  color: #5b4922;
+  white-space: nowrap;
+}
+
+.records-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  overflow: hidden;
+  margin-bottom: 14px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.records-summary > span {
+  min-height: 66px;
+  padding: 12px 14px;
+  display: grid;
+  align-content: center;
+  gap: 4px;
+  border-right: 1px solid #e4e9e7;
+}
+
+.records-summary > span:last-child {
+  border-right: 0;
+}
+
+.records-summary strong {
+  font-size: 18px;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.records-summary small {
+  font-size: 9px;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 700;
+  color: #778480;
+}
+
+.records-page .records-table {
+  box-shadow: none;
+}
+
+.records-page .table-row {
+  grid-template-columns: minmax(220px, 1.3fr) minmax(190px, 1fr) 140px 84px;
+  min-height: 64px;
+  padding-inline: 18px;
+}
+
+.records-page .table-head {
+  min-height: 42px;
+  background: #f5f7f6;
+}
+
+.records-page .record-name {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.records-page .record-name svg {
+  color: #6d7d79;
+  flex: 0 0 auto;
+}
+
+.records-page .record-name b {
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.records-page .record-field {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: #5d6d69;
+}
+
+.records-page .record-field small {
+  display: none;
+}
+
+.records-page .record-status {
+  font-weight: 650;
+}
+
+@media (min-width: 1180px) {
+  .handoffs-page,
+  .records-page {
+    max-width: 1120px;
+  }
+
+  .handoffs-page .page-title-row h1,
+  .records-page .page-title-row h1 {
+    font-size: 38px;
+    line-height: 1.04;
+  }
+}
+
+@media (max-width: 820px) {
+  .handoffs-page .page-title-row,
+  .records-page .page-title-row {
+    margin-bottom: 18px;
+  }
+
+  .handoff-state-bar {
+    align-items: flex-start;
+    padding: 13px 14px;
+  }
+
+  .handoff-feature-grid {
+    grid-template-columns: 1fr;
+    gap: 11px;
+  }
+
+  .handoff-package-card,
+  .handoff-return-card {
+    min-height: 0;
+  }
+
+  .handoff-package-card h2,
+  .handoff-return-card h2 {
+    font-size: 20px;
+  }
+
+  .handoff-package-card p,
+  .handoff-return-card p {
+    font-size: 12.5px;
+  }
+
+  .handoff-boundary-note {
+    display: grid;
+    gap: 3px;
+    margin-top: 11px;
+  }
+
+  .handoff-boundary-note strong,
+  .handoff-boundary-note span {
+    font-size: 11.5px;
+  }
+
+  .records-summary {
+    grid-template-columns: repeat(2, 1fr);
+    margin-bottom: 11px;
+  }
+
+  .records-summary > span:nth-child(2) {
+    border-right: 0;
+  }
+
+  .records-summary > span:nth-child(-n + 2) {
+    border-bottom: 1px solid #e4e9e7;
+  }
+
+  .records-summary > span {
+    min-height: 58px;
+    padding: 10px 12px;
+  }
+
+  .records-page .records-table {
+    display: grid;
+    gap: 9px;
+    overflow: visible;
+    border: 0;
+    background: transparent;
+  }
+
+  .records-page .table-head {
+    display: none;
+  }
+
+  .records-page .record-row {
+    min-height: 0;
+    padding: 14px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px 18px;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.82);
+  }
+
+  .records-page .record-name {
+    grid-column: 1 / -1;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e6ebe8;
+  }
+
+  .records-page .record-name b {
+    font-size: 13px;
+  }
+
+  .records-page .record-field {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 3px 7px;
+    font-size: 11.5px;
+  }
+
+  .records-page .record-field small {
+    display: block;
+    grid-column: 1 / -1;
+    font-size: 8.5px;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 0.075em;
+    font-weight: 700;
+    color: #7d8986;
+  }
+
+  .records-page .record-field:nth-child(2) {
+    grid-column: 1 / -1;
+  }
+
+  .records-page .record-status {
+    justify-self: start;
+  }
+
+  .records-page .record-field.mono {
+    justify-self: end;
+    text-align: right;
+  }
+}
+
+@media (max-width: 520px) {
+  .handoff-state-bar {
+    display: grid;
+    gap: 10px;
+  }
+
+  .handoff-state-bar .row-status {
+    width: max-content;
+  }
+
+  .records-page .record-row {
+    padding: 13px;
+  }
+}
