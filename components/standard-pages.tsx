@@ -69,8 +69,14 @@ export function RecordsView() {
 function RecordRow({name,stage,status,version}:{name:string;stage:string;status:string;version:string}) {return <div className="table-row record-row" role="row"><span className="record-name"><FileText size={16} /><b>{name}</b></span><span className="record-field"><small>Stage</small>{stage}</span><span className="record-field record-status"><small>Status</small><i className={`record-dot ${status === "Accepted" ? "accepted" : status === "Proposed" ? "proposed" : "neutral"}`} />{status}</span><span className="record-field mono"><small>Version</small>{version}</span></div>}
 
 export function ReleaseCareView() {
-  return <section className="standard-page"><PageHeading eyebrow="Release & Care" title="Release only what the evidence supports." text="Readiness is separate from implementation. This prototype does not claim release readiness." />
+  return <section className="standard-page release-care-page"><PageHeading eyebrow="Release & Care" title="Release only what the evidence supports." text="Readiness is separate from implementation. This prototype does not claim release readiness." />
     <div className="readiness-banner"><ShieldCheck size={22} /><div><strong>Release readiness is not yet applicable.</strong><p>Borrow Desk is in Stage 2. No implementation, verification, deployment, or support evidence exists in this illustrative project.</p></div></div>
+    <div className="release-state-summary" aria-label="Release readiness prerequisites">
+      <span><small>Release packet</small><strong>Not started</strong></span>
+      <span><small>Verification evidence</small><strong>None yet</strong></span>
+      <span><small>Operations owner</small><strong>Not assigned</strong></span>
+    </div>
+    <div className="release-check-heading"><div><span className="eyebrow">Readiness checks</span><h2>Evidence required before release.</h2></div><span>6 checks</span></div>
     <div className="readiness-grid">
       {["Functionality","Usability","Accessibility","Security","Recovery","Support ownership"].map(item => <article className="readiness-card" key={item}><span><Clock3 size={16} />Pending</span><h3>{item}</h3><p>Required evidence will appear here when this check becomes applicable.</p></article>)}
     </div>
