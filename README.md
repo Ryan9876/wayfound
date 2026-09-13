@@ -6,11 +6,11 @@ Wayfound is a software-delivery guidance and coordination workspace for capable 
 
 ## Current state
 
-Increment 1 is **Validated** at application commit `4cbc8fd`; see the [validation record](docs/validation/increment-1.md). Increment 2 is **In progress** under [accepted ADR-0002](docs/adr/0002-durable-workspace-identity.md). The authenticated create/open/resume slice is Implemented; validation is In progress.
+Increment 1 is **Validated** at application commit `4cbc8fd`; see the [validation record](docs/validation/increment-1.md). Increment 2 is **In progress** under [accepted ADR-0002](docs/adr/0002-durable-workspace-identity.md). Its first authenticated create/list/open/resume slice is **Validated** at application commit `603f028`; see the [durable-workspace validation record](docs/validation/increment-2-durable-workspace.md).
 
-The repository contains the first prototype vertical slice. It uses illustrative Borrow Desk fixture data and does not claim production readiness.
+The repository contains the validated fixture-backed foundation prototype and the first validated durable-workspace slice. This state does not claim production readiness or release.
 
-Implemented in this slice:
+Implemented and validated foundation behavior:
 
 - responsive application shell;
 - desktop and mobile navigation;
@@ -19,9 +19,19 @@ Implemented in this slice:
 - representative Work, Handoffs, Records, and Release & Care views;
 - Wayfound visual tokens and prototype logo mark.
 
-Not implemented in this slice:
+Implemented and validated durable-workspace behavior:
+
+- Supabase authentication for the bounded local/CI slice;
+- PostgreSQL-backed create, list, open, and resume workspace flow;
+- workspace membership isolation;
+- Proposed release with Stage 1 active and all 15 stage records;
+- transactional creation, retry protection, and initial audit event;
+- recoverable loading, empty, authorization, and database-failure states.
+
+Not yet implemented or validated as broader product behavior:
 
 - hosted authentication/database provisioning;
+- decision, work, artifact, evidence, and maintenance record workflows;
 - artifact import or versioning;
 - specialist connector integrations;
 - automated verification ingestion;
