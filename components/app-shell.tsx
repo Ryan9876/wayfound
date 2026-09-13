@@ -24,12 +24,16 @@ const nav = [
   { key: "release-care", label: "Release & Care", href: "/release-care", icon: Leaf },
 ] as const;
 
+type ActiveKey = (typeof nav)[number]["key"] | "more";
+
 type AppShellProps = {
-  active: (typeof nav)[number]["key"];
+  active: ActiveKey;
   children: React.ReactNode;
 };
 
 export function AppShell({ active, children }: AppShellProps) {
+  const moreActive = active === "more" || active === "handoffs" || active === "records" || active === "release-care";
+
   return (
     <div className="app-shell">
       <aside className="sidebar" aria-label="Primary navigation">
@@ -85,7 +89,7 @@ export function AppShell({ active, children }: AppShellProps) {
         <Link href="/" className={active === "overview" ? "mobile-nav-item active" : "mobile-nav-item"} aria-current={active === "overview" ? "page" : undefined}><House size={20} /><span>Overview</span></Link>
         <Link href="/journey" className={active === "journey" ? "mobile-nav-item active" : "mobile-nav-item"} aria-current={active === "journey" ? "page" : undefined}><Map size={20} /><span>Journey</span></Link>
         <Link href="/work" className={active === "work" ? "mobile-nav-item active" : "mobile-nav-item"} aria-current={active === "work" ? "page" : undefined}><BookOpenCheck size={20} /><span>Work</span></Link>
-        <Link href="/release-care" className={active === "release-care" ? "mobile-nav-item active" : "mobile-nav-item"} aria-current={active === "release-care" ? "page" : undefined}><MoreHorizontal size={20} /><span>More</span></Link>
+        <Link href="/more" className={moreActive ? "mobile-nav-item active" : "mobile-nav-item"} aria-current={moreActive ? "page" : undefined}><MoreHorizontal size={20} /><span>More</span></Link>
       </nav>
     </div>
   );
