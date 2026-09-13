@@ -255,7 +255,7 @@ try {
   page = await context.newPage();
   await login(page, emails[1]);
   await page.getByRole('link', { name: /Community workshop/ }).click();
-  assert.equal(page.url(), resumeUrl);
+  await page.waitForURL(resumeUrl);
   await page.getByRole('heading', { name: 'Community workshop', exact: true }).waitFor({ timeout: 30000 });
   assert(await page.getByText('Track the equipment that volunteers borrow.', { exact: true }).isVisible());
 
