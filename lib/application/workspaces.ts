@@ -6,7 +6,7 @@ import { validateCreate, type CreateInput } from "@/lib/domain/workspace";
 export async function workspaceService() {
   const client = await identityClient();
   const { data, error } = await client.auth.getUser();
-  if (error && error.status && error.status >= 500) throw new Error("IDENTITY_UNAVAILABLE");
+  if (error && error.name !== "AuthSessionMissingError" && (!error.status || error.status >= 500)) throw new Error("IDENTITY_UNAVAILABLE");
   if (!data.user || data.user.is_anonymous) redirect("/sign-in");
   const store = new WorkspaceStore(client);
   return {

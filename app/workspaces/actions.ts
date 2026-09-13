@@ -23,11 +23,14 @@ export async function signIn(_: FormState, form: FormData): Promise<FormState> {
 export async function signOut() {
   await checkOrigin();
   const client = await identityClient(true);
-  await client.auth.signOut({ scope: "local" });
-  // Always remove this browser's session, including when the provider is unavailable.
-  const { cookies } = await import("next/headers");
-  const jar = await cookies();
-  jar.getAll().filter(c => c.name.startsWith("sb-")).forEach(c => jar.delete(c.name));
+  try {
+    await client.auth.signOut({ scope: "local" });
+  } finally {
+    // Remove this browser's session even if the provider call throws.
+    const { cookies } = await import("next/headers");
+    const jar = await cookies();
+    jar.getAll().filter(c => c.name.startsWith("sb-")).forEach(c => jar.delete(c.name));
+  }
   redirect("/sign-in");
 }
 export async function createWorkspace(_: FormState, form: FormData): Promise<FormState> {

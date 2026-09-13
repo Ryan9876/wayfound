@@ -46,8 +46,9 @@ try {
   users.push(ok(await backend.admin.auth.admin.createUser({email:emails[i],password,email_confirm:true})).user);
   ok(await clients[i].auth.signInWithPassword({email:emails[i],password}));
  }
- const id=ok(await clients[0].rpc('create_workspace',args));
  const duplicate=await Promise.all([clients[0].rpc('create_workspace',args),clients[0].rpc('create_workspace',args)]);
+ const id=ok(duplicate[0]);
+ assert((await backend.client().auth.signUp({email:`uninvited-${randomUUID()}@example.test`,password})).error,'public signup must stay disabled');
  duplicate.forEach(r=>assert.equal(ok(r),id));
  assert((await clients[0].rpc('create_workspace',{...args,p_name:'Changed'})).error);
  const saved=ok(await clients[0].rpc('open_workspace',{p_id:id}));
@@ -60,6 +61,7 @@ try {
  assert((await clients[0].from('workspaces').insert({name:'bypass'})).error);
  const tables=['actors','workspaces','memberships','releases','release_stages','audit_events','creation_requests'];
  async function counts(){return Promise.all(tables.map(async t=>(await sql.query(`select count(*)::int n from wayfound.${t}`)).rows[0].n));}
+ for (const invalid of [{p_name:''},{p_problem:' '},{p_release:'x'.repeat(81)},{p_request:null}]) assert((await clients[0].rpc('create_workspace',{...args,...invalid})).error);
  const before=await counts();
  await sql.query(`create function wayfound.test_failure() returns trigger language plpgsql as $$begin raise exception 'Injected audit failure'; end$$; create trigger test_failure before insert on wayfound.audit_events for each row execute function wayfound.test_failure()`);
  try{assert((await clients[0].rpc('create_workspace',{...args,p_request:randomUUID()})).error);assert.deepEqual(await counts(),before);}finally{await sql.query('drop trigger test_failure on wayfound.audit_events; drop function wayfound.test_failure()');}
@@ -67,6 +69,9 @@ try {
  assert.equal(ok(await clients[0].rpc('open_workspace',{p_id:id})),null);
  assert((await clients[0].rpc('create_workspace',args)).error);
  await sql.query('insert into wayfound.memberships(workspace_id,actor_id,role) values($1,$2,$3)',[id,membership.actor_id,membership.role]);
+ await sql.query("update auth.sessions set not_after=now()-interval '1 minute' where user_id=$1",[users[1].id]);
+ assert((await clients[1].rpc('list_workspaces')).error,'expired session read succeeded');
+ await sql.query('update auth.sessions set not_after=null where user_id=$1',[users[1].id]);
  // Revoked sessions cannot reuse a still-signed access token for data access.
  const access=ok(await clients[1].auth.getSession()).session.access_token;
  await sql.query('delete from auth.sessions where user_id=$1',[users[1].id]);
@@ -75,6 +80,7 @@ try {
  await start();browser=await chromium.launch();
  let context=await browser.newContext();let page=await context.newPage();
  await page.goto(base+'/sign-in');await inspect(page,'sign-in');
+ await page.getByLabel('Email',{exact:true}).fill(emails[1]);await page.getByLabel('Password',{exact:true}).fill('incorrect-password');await page.getByRole('button',{name:'Sign in',exact:true}).click();await page.getByRole('alert').waitFor();assert(page.url().endsWith('/sign-in'));
  await login(page,emails[1]);await inspect(page,'empty-workspaces');
  await page.getByLabel('Project name',{exact:true}).fill('Community workshop');
  await page.getByLabel('What problem do you want to solve?').fill('Track the equipment that volunteers borrow.');
