@@ -46,14 +46,14 @@ jobs:
       - name: Capture UI screenshots
         run: |
           mkdir -p artifacts/ui-screenshots
-          npx --yes playwright@1.55.0 screenshot --browser=chromium --device="iPhone 14" --wait-for-timeout=1200 http://127.0.0.1:3000 artifacts/ui-screenshots/overview-mobile-first.png
-          npx --yes playwright@1.55.0 screenshot --browser=chromium --device="iPhone 14" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000 artifacts/ui-screenshots/overview-mobile-full.png
-          npx --yes playwright@1.55.0 screenshot --browser=chromium --device="iPhone 14" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/journey artifacts/ui-screenshots/journey-mobile-full.png
-          npx --yes playwright@1.55.0 screenshot --browser=chromium --device="iPhone 14" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/work artifacts/ui-screenshots/work-mobile-full.png
-          npx --yes playwright@1.55.0 screenshot --browser=chromium --device="iPhone 14" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/more artifacts/ui-screenshots/more-mobile-full.png
-          npx --yes playwright@1.55.0 screenshot --browser=chromium --device="iPhone 14" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/handoffs artifacts/ui-screenshots/handoffs-mobile-full.png
-          npx --yes playwright@1.55.0 screenshot --browser=chromium --device="iPhone 14" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/records artifacts/ui-screenshots/records-mobile-full.png
-          npx --yes playwright@1.55.0 screenshot --browser=chromium --device="iPhone 14" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/release-care artifacts/ui-screenshots/release-care-mobile-full.png
+          npx --yes playwright@1.55.0 screenshot --browser=chromium --viewport-size="390,844" --wait-for-timeout=1200 http://127.0.0.1:3000 artifacts/ui-screenshots/overview-mobile-first.png
+          npx --yes playwright@1.55.0 screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000 artifacts/ui-screenshots/overview-mobile-full.png
+          npx --yes playwright@1.55.0 screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/journey artifacts/ui-screenshots/journey-mobile-full.png
+          npx --yes playwright@1.55.0 screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/work artifacts/ui-screenshots/work-mobile-full.png
+          npx --yes playwright@1.55.0 screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/more artifacts/ui-screenshots/more-mobile-full.png
+          npx --yes playwright@1.55.0 screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/handoffs artifacts/ui-screenshots/handoffs-mobile-full.png
+          npx --yes playwright@1.55.0 screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/records artifacts/ui-screenshots/records-mobile-full.png
+          npx --yes playwright@1.55.0 screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/release-care artifacts/ui-screenshots/release-care-mobile-full.png
           npx --yes playwright@1.55.0 screenshot --browser=chromium --viewport-size="1440,1200" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000 artifacts/ui-screenshots/overview-desktop-full.png
           npx --yes playwright@1.55.0 screenshot --browser=chromium --viewport-size="1440,1200" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/journey artifacts/ui-screenshots/journey-desktop-full.png
           npx --yes playwright@1.55.0 screenshot --browser=chromium --viewport-size="1440,1200" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/work artifacts/ui-screenshots/work-desktop-full.png
