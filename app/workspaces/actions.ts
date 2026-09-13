@@ -8,6 +8,7 @@ import { decisionService } from "@/lib/application/decisions";
 import { workItemService } from "@/lib/application/work-items";
 import { requirementService } from "@/lib/application/requirements";
 import { evidenceService } from "@/lib/application/evidence";
+import { artifactService } from "@/lib/application/artifacts";
 export type FormState = { error: string };
 async function checkOrigin() {
   const origin = (await headers()).get("origin");
@@ -173,4 +174,35 @@ export async function createEvidence(_: FormState, form: FormData): Promise<Form
   revalidatePath(`/workspaces/${workspaceId}`);
   revalidatePath("/workspaces");
   redirect(`/workspaces/${workspaceId}#criterion-${acceptanceCriterionId}`);
+}
+export async function createArtifact(_: FormState, form: FormData): Promise<FormState> {
+  await checkOrigin();
+  const workspaceId = String(form.get("workspaceId") ?? "");
+  const service = await artifactService();
+  try {
+    await service.create({
+      workspaceId,
+      title: String(form.get("title") ?? ""),
+      kind: String(form.get("kind") ?? ""),
+      summary: String(form.get("summary") ?? ""),
+      referenceLabel: String(form.get("referenceLabel") ?? ""),
+      referenceUrl: String(form.get("referenceUrl") ?? ""),
+      requestId: String(form.get("requestId") ?? ""),
+    });
+  } catch (error) {
+    const code = error instanceof Error ? error.message : "UNKNOWN";
+    console.error(JSON.stringify({ operation: "create_proposed_artifact", workspace_id: workspaceId, outcome: "failed", code }));
+    return {
+      error: code === "INVALID_INPUT"
+        ? "Complete the artifact fields and enter an HTTP or HTTPS reference URL."
+        : code === "REQUEST_CONFLICT"
+          ? "This artifact request was already used with different details. Reload the workspace before starting again."
+          : code === "ACCESS_DENIED"
+            ? "This workspace is not available for artifact changes."
+            : "We could not confirm the artifact save. Existing records are unchanged. Retry with the same details to avoid a duplicate.",
+    };
+  }
+  revalidatePath(`/workspaces/${workspaceId}`);
+  revalidatePath("/workspaces");
+  redirect(`/workspaces/${workspaceId}#artifacts`);
 }
