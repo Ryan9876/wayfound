@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { identityClient } from "@/lib/auth/server";
 import { workspaceService } from "@/lib/application/workspaces";
+import { decisionService } from "@/lib/application/decisions";
 export type FormState = { error: string };
 async function checkOrigin() {
   const origin = (await headers()).get("origin");
@@ -44,4 +45,31 @@ export async function createWorkspace(_: FormState, form: FormData): Promise<For
     return { error: error instanceof Error && error.message === "INVALID_INPUT" ? "Check the fields and try again." : error instanceof Error && error.message === "REQUEST_CONFLICT" ? "This request was already used with different details. Open your workspace list before starting again." : "We could not confirm the save. Your existing work is unchanged. Retry with the same details to avoid a duplicate." };
   }
   redirect(`/workspaces/${id}`);
+}
+export async function createDecision(_: FormState, form: FormData): Promise<FormState> {
+  await checkOrigin();
+  const workspaceId = String(form.get("workspaceId") ?? "");
+  const service = await decisionService();
+  try {
+    await service.create({
+      workspaceId,
+      title: String(form.get("title") ?? ""),
+      decision: String(form.get("decision") ?? ""),
+      rationale: String(form.get("rationale") ?? ""),
+      requestId: String(form.get("requestId") ?? ""),
+    });
+  } catch (error) {
+    const code = error instanceof Error ? error.message : "UNKNOWN";
+    console.error(JSON.stringify({ operation: "create_decision", workspace_id: workspaceId, outcome: "failed", code }));
+    return {
+      error: code === "INVALID_INPUT"
+        ? "Check the decision fields and try again."
+        : code === "REQUEST_CONFLICT"
+          ? "This decision request was already used with different details. Reload the workspace before starting again."
+          : code === "ACCESS_DENIED"
+            ? "This workspace is not available for decision changes."
+            : "We could not confirm the decision save. Existing records are unchanged. Retry with the same details to avoid a duplicate.",
+    };
+  }
+  redirect(`/workspaces/${workspaceId}#decisions`);
 }
