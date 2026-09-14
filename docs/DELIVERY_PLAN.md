@@ -6,7 +6,7 @@
 
 Deliver Wayfound as validated vertical slices. Each slice must improve a complete user outcome and leave the repository coherent.
 
-Do not build deferred automation before the core orientation, continuity, and evidence model is understandable to intended users.
+The active first-version product model is defined by ADR-0005: one authenticated human product owner works with AI assistance. Multi-human collaboration is deferred. Existing specialist-review slices remain valid historical implementation evidence but are not required in the active single-user product surface.
 
 ## 2. Increment 1 — Foundation and orientation
 
@@ -14,167 +14,95 @@ Do not build deferred automation before the core orientation, continuity, and ev
 
 **Outcome:** A user can open the Borrow Desk prototype, understand the current release and stage, see one recommended next action with its reason, and move across the primary workspace areas.
 
-**Included:** responsive desktop and mobile shell; Wayfound design tokens and logo direction; Overview dashboard; canonical 15-stage Journey; representative Work, Handoffs, Records, and Release & Care views; fixture data only.
-
 **Evidence:** [Increment 1 validation record](validation/increment-1.md), application commit `4cbc8fddc092dc27ee3b59fddb039e42e7e3a1cf`, CI run 62. No independent user research or Released state is claimed.
 
-## 3. Increment 2 — Durable workspace record
+## 3. Increment 2 — Durable single-owner workspace record
 
 **Status:** In progress
 
-**Outcome:** An authenticated owner can create and resume a workspace without relying on chat history and can progressively build durable project records inside it.
+**Outcome:** One authenticated owner can create and resume a workspace without relying on chat history and can progressively build durable project records inside it.
 
-### Slice 1 — Create, list, open, and resume
+### Validated slices
 
-**Status:** Validated
+1. **Create, list, open, and resume** — Validated at `603f02862ae4090bd1853157e449a01508186f4c`, CI run 70. See [slice](INCREMENT_2_SLICE.md) and [validation](validation/increment-2-durable-workspace.md).
+2. **Owner-authorized durable decisions** — Validated at `548f1bbb4264ca412bc808a94a60593bca2c3602`, CI run 92. See [slice](INCREMENT_2_DECISIONS.md) and [validation](validation/increment-2-decisions.md).
+3. **Owner-owned proposed work items** — Validated at `1f2a1c99856119c845a4495b61674bea415a4a77`, CI run 113. See [slice](INCREMENT_2_WORK_ITEMS.md) and [validation](validation/increment-2-work-items.md).
+4. **Owner-approved product requirements** — Validated at `9e2af6940ce4d440fed00825620e0b693eff17c2`, CI run 131. See [slice](INCREMENT_2_REQUIREMENTS.md) and [validation](validation/increment-2-requirements.md).
+5. **Durable criterion evidence** — Validated at `4f67d99078600735f086ae894017481234a5a109`, CI run 151. See [slice](INCREMENT_2_EVIDENCE.md) and [validation](validation/increment-2-evidence.md).
+6. **Durable proposed artifacts** — Validated at `8d36adede6c4b5c5570b7a3e37a519588124500b`, CI run 157. See [slice](INCREMENT_2_ARTIFACTS.md) and [validation](validation/increment-2-artifacts.md).
+7. **Owner artifact acceptance** — Validated at `3ca0ea4a1fe931e80a9466250915efe623827847`, CI run 164. See [slice](INCREMENT_2_ARTIFACT_ACCEPTANCE.md) and [validation](validation/increment-2-artifact-acceptance.md).
+8. **Assignment-scoped specialist artifact review** — Validated at `fc91a4377e887cada269fb35b2192f5c3efad15b`, CI run 172. See [ADR-0003](adr/0003-assignment-scoped-specialist-review.md), [slice](INCREMENT_2_SPECIALIST_REVIEW.md), and [validation](validation/increment-2-specialist-review.md). This capability is retained as historical validated implementation but is outside the active single-user first-version surface under ADR-0005.
+9. **Owner work approval, start, block, and resume** — Validated at `1c3d8a52a820163340b8742f3f8f3a24f7115545`, CI run 179. See [slice](INCREMENT_2_WORK_LIFECYCLE.md) and [validation](validation/increment-2-work-lifecycle.md).
+10. **Consequential technical decision review and acceptance** — Validated at `bb77ce1abba4ebe5a32bfbc32583e3ddbecd792b`, CI run 201. See [ADR-0004](adr/0004-technical-decision-review-and-acceptance.md), [slice](INCREMENT_2_TECHNICAL_DECISIONS.md), and [validation](validation/increment-2-technical-decisions.md). The authenticated human-review mechanism is retained but hidden from active single-user test mode under ADR-0005.
+11. **Consequential technical requirement review and approval** — Validated at application head `ec9612e2e87c05780558471a9ab9d76246be417b`, CI run 220, with documentation reconciled at `272abdf56da913b23de47721919f329fa68863da`, CI run 221. See [slice](INCREMENT_2_TECHNICAL_REQUIREMENTS.md) and [validation](validation/increment-2-technical-requirements.md). The authenticated human-review mechanism is retained but hidden from active single-user test mode under ADR-0005.
 
-Ryan Smith approved [ADR-0002](adr/0002-durable-workspace-identity.md) for the development slice on 2026-09-13. The authenticated create/list/open/resume path passed real-backend and rendered acceptance tests at application commit `603f02862ae4090bd1853157e449a01508186f4c` through CI run 70. See the [slice plan](INCREMENT_2_SLICE.md) and [validation record](validation/increment-2-durable-workspace.md).
+### Active remaining Increment 2 scope
 
-Validated scope includes Supabase authentication, workspace membership, PostgreSQL workspace/release/stage persistence, initial audit event, idempotent creation request, loading/empty/error states, tenant isolation, restart/resume behavior, and failure recovery.
+The active single-user scope now prioritizes:
 
-### Slice 2 — Owner-authorized durable decisions
+1. work completion / implementation-state transition without implying verification;
+2. durable AI-assistance provenance and AI-review records with explicit owner disposition;
+3. work dependencies and broader durable links;
+4. multiple acceptance-criterion lifecycle;
+5. evidence freshness/outdated-state handling and explicit verification decisions;
+6. maintenance records and later lifecycle behavior;
+7. change-impact handling;
+8. supporting audit, recovery, and seed behavior.
 
-**Status:** Validated
+Accepted technical-decision replacement/supersession, approved technical-requirement replacement/withdrawal/supersession/deprecation, and dependency-impact behavior remain future scope. Later artifact-version, accepted-version replacement/supersession, and file-import behavior are assigned to Increment 3.
 
-An authenticated workspace owner can record an accepted product-scope or business decision after explicitly confirming product-owner authority. The decision persists with its rationale, stage, `Accepted` status, and `owner` authority. Consequential technical decisions remain outside this action.
+### Removed from active Increment 2 scope by ADR-0005
 
-The slice passed real-backend and rendered acceptance tests at application commit `548f1bbb4264ca412bc808a94a60593bca2c3602` through CI run 92. See the [decision slice](INCREMENT_2_DECISIONS.md) and [validation record](validation/increment-2-decisions.md).
+The following items are no longer required for the active first version:
 
-Validated scope includes transactional decision acceptance, audit record, idempotent retries, direct-table denial, tenant/session/revocation isolation, injected-failure rollback, restart/resume, database interruption/recovery, and mobile/desktop rendered review.
+- collaborator membership/administration;
+- ownership transfer;
+- human work assignment;
+- reviewer-code exchange as a normal user workflow;
+- additional authenticated human-specialist surfaces.
 
-### Slice 3 — Owner-owned proposed work items
-
-**Status:** Validated
-
-An authenticated workspace owner can record bounded planned work with an outcome, completion condition, expected evidence, current stage, and explicit owner. New work items remain `Proposed`; recording them does not start execution, assign a specialist, or claim implementation, review, or verification.
-
-The slice passed real-backend and rendered acceptance tests at application commit `1f2a1c99856119c845a4495b61674bea415a4a77` through CI run 113. See the [work-item slice](INCREMENT_2_WORK_ITEMS.md) and [validation record](validation/increment-2-work-items.md).
-
-Validated scope includes transactional work-item creation, audit record, idempotent retries, direct-table denial, tenant/session/revocation isolation, injected-failure rollback, restart/resume, database interruption/recovery, explicit text status, and mobile/desktop rendered review.
-
-### Slice 4 — Owner-approved product requirements
-
-**Status:** Validated
-
-An authenticated workspace owner can record an approved product requirement with a `MUST`, `SHOULD`, or `MAY` obligation and exactly one durable acceptance criterion. The requirement records current release/stage, owner authority, and stable identifiers. The criterion remains an observable condition and is explicitly not verification evidence.
-
-The slice passed real-backend and rendered acceptance tests at application commit `9e2af6940ce4d440fed00825620e0b693eff17c2` through CI run 131. See the [requirement slice](INCREMENT_2_REQUIREMENTS.md) and [validation record](validation/increment-2-requirements.md).
-
-Validated scope includes transactional requirement-and-criterion creation, explicit owner-authority confirmation, obligation validation, audit record, idempotent retries, direct-table denial, tenant/session/revocation isolation, injected-failure rollback, restart/resume, database interruption/recovery, stable identifiers, honest evidence language, and mobile/desktop rendered review.
-
-Consequential technical implementation requirements remain outside this owner-only action and use the separate qualified-review path described in Slice 11.
-
-### Slice 5 — Durable criterion evidence
-
-**Status:** Validated
-
-An authenticated workspace owner can record a durable evidence result against an existing acceptance criterion. Each evidence record captures result, source/provenance, effect (`Supports`, `Challenges`, or `Inconclusive`), stable identifier, recorder, release/stage, and the linked requirement and criterion revisions.
-
-The slice passed the existing durable regression suite and a focused evidence-specific acceptance suite at application commit `4f67d99078600735f086ae894017481234a5a109` through CI run 151. See the [evidence slice](INCREMENT_2_EVIDENCE.md) and [validation record](validation/increment-2-evidence.md).
-
-Validated scope includes transactional evidence creation, requirement-to-criterion-to-evidence traceability, revision snapshots, idempotent retries, criterion/workspace integrity, direct-table denial, tenant/session/revocation isolation, injected-failure rollback, restart/resume, database interruption/recovery, keyboard focus, and mobile/desktop rendered review.
-
-Recording evidence does not mark the acceptance criterion satisfied, passed, verified, or validated and does not change the linked requirement from `Approved`.
-
-### Slice 6 — Durable proposed artifacts
-
-**Status:** Validated
-
-An authenticated workspace owner can record a durable artifact identity with one stable initial version and an external reference. Version 1 is constrained to lifecycle `Proposed`; creation by itself does not make the artifact accepted project direction.
-
-The slice passed all existing durable regression suites and a focused artifact-specific acceptance suite at application commit `8d36adede6c4b5c5570b7a3e37a519588124500b` through CI run 157. See the [artifact slice](INCREMENT_2_ARTIFACTS.md) and [validation record](validation/increment-2-artifacts.md).
-
-Validated scope includes transactional artifact-plus-version creation, stable artifact/version identifiers, derived owner/release/stage context, idempotent retries, HTTP/HTTPS reference validation, direct-table denial, tenant/session/revocation isolation, injected-failure rollback, restart/resume, database interruption/recovery, keyboard focus, mobile/desktop rendered review, and explicit proof that Wayfound stores the external reference without fetching it.
-
-### Slice 7 — Owner artifact acceptance
-
-**Status:** Validated
-
-An authenticated current workspace owner can explicitly accept one existing proposed artifact version as the version currently accepted as project direction. The action requires product-owner authority confirmation, changes that exact version from `Proposed` to `Accepted`, stores the artifact accepted-version pointer, accepting actor and acceptance time, increments artifact/version revisions, and records `artifact.accepted` in the audit log.
-
-The slice passed the full prior durable regression chain plus a focused acceptance suite at repository head `3ca0ea4a1fe931e80a9466250915efe623827847` through CI run 164. See the [artifact-acceptance slice](INCREMENT_2_ARTIFACT_ACCEPTANCE.md) and [validation record](validation/increment-2-artifact-acceptance.md).
-
-Validated scope includes exact artifact/version target integrity, explicit owner authority, idempotent retry, invalid-state rejection, direct-table denial, tenant/session/revocation isolation, injected-failure rollback, restart/resume, database interruption/recovery, zero external-reference fetches, keyboard focus, and mobile/desktop rendered review.
-
-Artifact acceptance records product-owner project direction only. It does not establish qualified specialist review, technical correctness, verification, validation, release readiness, or production authorization.
-
-### Slice 8 — Assignment-scoped specialist artifact review
-
-**Status:** Validated
-
-An authenticated specialist can establish a stable reviewer code without gaining workspace membership. The current workspace owner can assign that specialist to one exact artifact version that is currently accepted as project direction, with a requested competence area and one bounded review question. Only the assigned live specialist can submit the named review.
-
-The slice passed the complete prior durable regression chain plus a focused specialist-review suite at application head `fc91a4377e887cada269fb35b2192f5c3efad15b` through CI run 172. See [ADR-0003](adr/0003-assignment-scoped-specialist-review.md), the [specialist-review slice](INCREMENT_2_SPECIALIST_REVIEW.md), and the [validation record](validation/increment-2-specialist-review.md).
-
-Validated scope includes reviewer-code identity without workspace membership, exact accepted-artifact/version assignment, bounded competence/question, authenticated reviewer identity, three explicit specialist conclusions, revision snapshots, separation of owner and specialist authority, direct-table denial, tenant/session/assignment-revocation isolation, idempotent retries, injected-failure rollback, restart/resume, database interruption/recovery, zero external-reference fetches, keyboard focus, and desktop/390 px mobile rendered review.
-
-A specialist review records qualified judgment within its declared competence and scope. It does not change artifact acceptance, requirement/criterion/evidence state, release state, verification, validation, release readiness, or production authorization.
-
-### Slice 9 — Owner work approval, start, block, and resume
-
-**Status:** Validated
-
-The current owner can record state changes for work they own, with a required reason, explicit confirmation, revision checks, and durable transition history. The slice advances P0 durable-record, honest-status, and ownership requirements without adding membership roles, work assignment, completion, verification, or technical approval.
-
-The slice passed the complete durable regression chain and focused lifecycle tests at application head `1c3d8a52a820163340b8742f3f8f3a24f7115545`, CI run 179. Desktop and 390 px mobile screenshots were inspected. See the [slice specification](INCREMENT_2_WORK_LIFECYCLE.md) and [validation record](validation/increment-2-work-lifecycle.md).
-
-### Slice 10 — Consequential technical decision review and acceptance
-
-**Status:** Validated
-
-[ADR-0004](adr/0004-technical-decision-review-and-acceptance.md) defines split authority for consequential technical choices. A current owner records a proposal and assigns an authenticated specialist by reviewer code to the exact proposal revision. Only `No blocking finding` makes that exact revision eligible; the specialist review does not auto-accept. The current owner then performs a separate explicit acceptance action to establish project direction.
-
-The slice passed the complete prior durable regression chain and focused technical-decision authority tests at application head `bb77ce1abba4ebe5a32bfbc32583e3ddbecd792b`, [CI run 201](https://github.com/Ryan9876/wayfound/actions/runs/34790448518). Desktop and 390 px mobile proposal, specialist-review, owner-acceptance, and outage states were inspected. See the [slice specification](INCREMENT_2_TECHNICAL_DECISIONS.md) and [validation record](validation/increment-2-technical-decisions.md).
-
-Validated scope includes proposal-only initial state, exact-revision assignment and review snapshots, owner self-review denial, all three specialist conclusions, separate owner acceptance, stale-review invalidation after revision change, one-winner concurrent acceptance, idempotent replay/conflict handling, direct-table denial, tenant/session/membership/assignment isolation, injected-audit rollback and retry, restart/re-login persistence, database interruption/recovery, keyboard access, and desktop/390 px rendered review.
-
-Acceptance records project direction after qualified review. It does not establish verification, validation, release readiness, or production authorization.
-
-### Slice 11 — Consequential technical requirement review and approval
-
-**Status:** Validated
-
-The accepted ADR-0004 split-authority rule is reused for consequential technical requirements. A current owner records a technical requirement proposal containing one proposed acceptance criterion and assigns an authenticated specialist by reviewer code to the exact proposal revision. The specialist reviews the exact requirement and criterion together. Only `No blocking finding` makes that revision eligible; review does not approve the requirement. The current owner then performs a separate explicit approval action.
-
-The slice passed the complete prior durable regression chain and focused technical-requirement authority tests at application head `ec9612e2e87c05780558471a9ab9d76246be417b`, [CI run 220](https://github.com/Ryan9876/wayfound/actions/runs/34793249123). Desktop and 390 px proposal, specialist-review, approved/canonical requirement, stale-review-history, and outage states were inspected. See the [slice specification](INCREMENT_2_TECHNICAL_REQUIREMENTS.md) and [validation record](validation/increment-2-technical-requirements.md).
-
-Validated scope includes proposal-only initial state, exact-revision review of the requirement and proposed criterion, reviewer-code assignment without workspace membership, owner self-review denial, all three specialist conclusions, separate owner approval, canonical requirement/criterion creation as `technical` / `owner-after-specialist-review` / `Approved`, preservation of the owner-only product-requirement command, stale-review invalidation after material requirement or criterion revision, visible earlier review history, one-winner concurrent approval, idempotent replay/conflict handling, direct-table denial, tenant/session/membership/assignment isolation, injected-audit rollback and retry, restart/re-login persistence, database interruption/recovery, keyboard access, and desktop/390 px rendered review.
-
-Approval records required technical project direction after qualified review. It does not establish verification, validation, release readiness, or production authorization.
-
-### Remaining Increment 2 scope
-
-Work completion transitions, collaborator membership/administration and work assignment, work dependencies and broader durable links; multiple acceptance-criterion lifecycle; evidence freshness/outdated-state handling, specialist evidence review and explicit verification decisions; maintenance records; later lifecycle behavior; change-impact handling; and supporting audit/seed behavior remain In progress or unimplemented. No hosted project has been provisioned.
-
-Accepted technical-decision replacement/supersession, approved technical-requirement replacement/withdrawal/supersession/deprecation, and dependency-impact behavior remain future scope. Later artifact-version, accepted-version replacement/supersession, and file-import behavior are assigned to Increment 3 rather than duplicated in the remaining Increment 2 scope.
+The existing validated specialist implementation is preserved in the repository. It is not deleted or relabeled as AI review.
 
 ## 4. Increment 3 — Versioned artifact import
 
 **Status:** Proposed
 
-**Outcome:** An owner can import revised specifications without losing or silently replacing the accepted version.
+**Outcome:** The owner can import revised specifications without losing or silently replacing the accepted version.
 
 **Expected scope:** proposed artifact versions beyond the initial durable record, preservation of the currently accepted version while a later version is proposed, explicit later-version acceptance/replacement behavior, file/import boundaries, failed-import records, retry history, and a plain-English change summary or documented alternative comparison before accepting an imported revision.
 
-## 5. Increment 4 — Manual specialist handoff and reconciliation
+## 5. Increment 4 — AI-assisted review and reconciliation
 
 **Status:** Proposed
 
-**Outcome:** The owner can prepare a bounded specialist package, return with specialist output, and reconcile it against accepted scope and decisions.
+**Outcome:** The owner can request bounded AI analysis against an exact project record or revision, understand the findings and provenance, and explicitly decide what becomes project direction without confusing AI output with verification.
 
-**Expected scope:** handoff package generation, return intake, contradiction/open-question capture, acceptance by artifact or bounded change, and named reviewer records.
+**Expected scope:** bounded AI-review request, target-revision snapshot, model/tool provenance, requested review purpose, findings, uncertainty where useful, owner disposition, durable history, stale-review handling after material target change, and clear separation from objective verification evidence.
+
+Optional external human-review packaging remains deferred unless the product owner later approves it.
 
 ## 6. Increment 5 — Impact, readiness, release, and care
 
 **Status:** Proposed
 
-**Outcome:** Changes expose affected evidence, and a release can be reviewed against a concrete packet with named operating ownership.
+**Outcome:** Changes expose affected evidence, and the owner can review a concrete release packet, record the release decision, and retain operating responsibility.
 
 **Expected scope:** dependency and impact records, outdated-evidence handling, requirement-to-criterion-to-evidence traceability, readiness view, release packet and scoped authorization, deployment outcome record, and maintenance due items.
 
 ## 7. Deferred roadmap
 
-Do not include these items without an approved scope change: verified direct specialist connectors, automatic CI/CD evidence ingestion, automatic repository change analysis, scheduling integrations, portfolio reporting, or automatic production actions.
+Do not include these items without an approved scope change:
+
+- collaborator accounts or invitations;
+- human work assignment inside Wayfound;
+- specialist reviewer accounts or reviewer-code workflows as active product features;
+- mandatory human handoff/return workflows;
+- verified direct specialist connectors;
+- automatic CI/CD evidence ingestion;
+- automatic repository change analysis;
+- scheduling integrations;
+- portfolio reporting;
+- automatic production actions.
 
 ## 8. Completion rule
 
