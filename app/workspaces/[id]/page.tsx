@@ -5,6 +5,7 @@ import { WorkspaceFrame } from "@/components/workspace-frame";
 import { CreateDecisionForm, CreateWorkItemForm, CreateRequirementForm, CreateEvidenceForm, CreateArtifactForm, AcceptArtifactVersionForm } from "@/components/workspace-forms";
 import { SpecialistReviewOwnerPanel } from "@/components/specialist-review-owner-panel";
 import { AcceptTechnicalChoiceForm, AssignTechnicalChoiceReviewForm, CreateTechnicalChoiceForm, ReviseTechnicalChoiceForm } from "@/components/technical-decision-forms";
+import { TechnicalRequirementOwnerPanel } from "@/components/technical-requirement-owner-panel";
 import { workspaceService } from "@/lib/application/workspaces";
 import { decisionService } from "@/lib/application/decisions";
 import { workItemService } from "@/lib/application/work-items";
@@ -13,6 +14,7 @@ import { evidenceService } from "@/lib/application/evidence";
 import { artifactService } from "@/lib/application/artifacts";
 import { specialistReviewService } from "@/lib/application/specialist-reviews";
 import { technicalDecisionService } from "@/lib/application/technical-decisions";
+import { technicalRequirementService } from "@/lib/application/technical-requirements";
 import { stageCatalog } from "@/lib/domain/journey";
 
 export const dynamic = "force-dynamic";
@@ -25,6 +27,7 @@ export default async function WorkspacePage({ params }: { params: Promise<{ id: 
   const decisions = await (await decisionService()).list(id);
   const technicalChoices = await (await technicalDecisionService()).listForOwner(id);
   const workItems = await (await workItemService()).list(id);
+  const technicalRequirements = await (await technicalRequirementService()).listForOwner(id);
   const requirements = await (await requirementService()).list(id);
   const evidence = await (await evidenceService()).list(id);
   const artifacts = await (await artifactService()).list(id);
@@ -119,10 +122,12 @@ export default async function WorkspacePage({ params }: { params: Promise<{ id: 
           <article className="durable-card work-item-form-card"><span className="eyebrow">Owner-planned work</span><h3>Add proposed work</h3><p>This records planned work only. It does not start execution, assign a specialist, or claim implementation or verification.</p><CreateWorkItemForm workspaceId={workspace.id} requestId={randomUUID()} /></article>
         </section>
 
+        <TechnicalRequirementOwnerPanel workspaceId={workspace.id} proposals={technicalRequirements} />
+
         <section id="requirements" className="requirement-section" aria-labelledby="requirements-title" aria-label="Requirements">
-          <div className="requirement-section-header"><div><span className="eyebrow">Project record</span><h2 id="requirements-title">Requirements</h2><p>Approved product behavior with stable requirement, criterion, and evidence links.</p></div><span className="status-chip">{requirements.length} approved</span></div>
+          <div className="requirement-section-header"><div><span className="eyebrow">Project record</span><h2 id="requirements-title">Requirements</h2><p>Approved product behavior and specialist-reviewed technical behavior with stable requirement, criterion, and evidence links.</p></div><span className="status-chip">{requirements.length} approved</span></div>
           {requirements.length ? <div className="requirement-list">{requirements.map(requirement => <article className="durable-card requirement-card" key={requirement.id}>
-            <span className="eyebrow">Approved product requirement</span>
+            <span className="eyebrow">Approved {requirement.kind === "technical" ? "technical" : "product"} requirement</span>
             <h3>{requirement.title}</h3>
             <p className="requirement-statement"><strong>{requirement.obligation}</strong><span>{requirement.requirement}</span></p>
             {requirement.acceptance_criteria.map(criterion => {
@@ -145,10 +150,11 @@ export default async function WorkspacePage({ params }: { params: Promise<{ id: 
                 </div>
               </div>;
             })}
-            <div className="requirement-meta"><span><strong>Status:</strong> {requirement.status}</span><span><strong>Authority:</strong> Product owner</span><span><strong>Stage:</strong> {requirement.stage_number} · {stageCatalog[requirement.stage_number - 1].name}</span><span><strong>Revision:</strong> {requirement.revision}</span></div>
+            <div className="requirement-meta"><span><strong>Status:</strong> {requirement.status}</span><span><strong>Kind:</strong> {requirement.kind === "technical" ? "Technical" : "Product"}</span><span><strong>Authority:</strong> {requirement.authority === "owner-after-specialist-review" ? "Owner after required specialist review" : "Product owner"}</span><span><strong>Stage:</strong> {requirement.stage_number} · {stageCatalog[requirement.stage_number - 1].name}</span><span><strong>Revision:</strong> {requirement.revision}</span></div>
             <code className="requirement-id">Requirement ID: {requirement.id}</code>
-          </article>)}</div> : <article className="durable-card"><h3>No approved requirements yet.</h3><p>Record product behavior only when you are ready to approve it as project direction.</p></article>}
-          <article className="durable-card requirement-form-card"><span className="eyebrow">Product-owner authority</span><h3>Record an approved product requirement</h3><p>Use this for product or business behavior within your authority. Consequential technical implementation choices still require qualified specialist review.</p><CreateRequirementForm workspaceId={workspace.id} requestId={randomUUID()} /></article>
+            {requirement.kind === "technical" ? <p className="evidence-warning"><strong>Approval is not verification.</strong> This technical requirement became project direction after qualified specialist review. Its acceptance criterion still requires separate evidence and verification.</p> : null}
+          </article>)}</div> : <article className="durable-card"><h3>No approved requirements yet.</h3><p>Record product behavior directly or use the reviewed technical requirement flow when the requirement is consequential technical behavior.</p></article>}
+          <article className="durable-card requirement-form-card"><span className="eyebrow">Product-owner authority</span><h3>Record an approved product requirement</h3><p>Use this only for product or business behavior within your authority. Consequential technical implementation requirements use the separate reviewed technical-requirement flow above.</p><CreateRequirementForm workspaceId={workspace.id} requestId={randomUUID()} /></article>
         </section>
 
         <section id="artifacts" className="artifact-section" aria-labelledby="artifacts-title" aria-label="Artifacts">
