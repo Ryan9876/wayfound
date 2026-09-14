@@ -13,10 +13,10 @@
 
 | Preferred term | Meaning | Do not use as an interchangeable synonym |
 | --- | --- | --- |
-| requirement | An approved statement of required product or system behavior | idea, wish, task |
+| requirement | An approved statement of required product or system behavior | idea, wish, task, unreviewed proposal |
 | acceptance criterion | An observable condition used to determine whether a requirement or work item is satisfied | requirement, test result |
 | work item | A bounded unit of planned delivery work | requirement |
-| decision | An approved choice among alternatives or a choice that establishes project direction | assumption |
+| decision | An approved choice among alternatives or a choice that establishes project direction | assumption, unreviewed proposal |
 | assumption | An unverified statement used temporarily for reasoning or planning | fact, decision |
 | fact | Information supported by an authoritative source or direct observation | assumption, hypothesis |
 | hypothesis | A possible explanation that requires validation | root cause, fact |
@@ -36,6 +36,8 @@
 | --- | --- | --- |
 | owner | The person accountable for product and business decisions for a Wayfound project | every contributor, specialist |
 | specialist | A qualified person or tool performing bounded specialist work; a human specialist reviews matters that require qualified judgment | owner |
+| technical choice proposal | A consequential technical choice that is still awaiting required qualified review and owner acceptance as project direction | decision, accepted technical decision |
+| technical requirement proposal | A proposed statement of consequential technical behavior, including its proposed acceptance criterion, that is still awaiting required qualified review and owner approval | requirement, approved technical requirement |
 | stage | One of the 15 canonical areas of work in the Wayfound journey | gate when sequence is not mandatory |
 | release | A bounded product scope with its own readiness, authorization, deployment, and operating record | entire project |
 | artifact | A versioned project output such as a problem brief, requirement set, design, decision record, or returned specialist document | evidence when it is not evidence |
