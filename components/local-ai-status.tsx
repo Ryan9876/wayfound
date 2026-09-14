@@ -11,8 +11,10 @@ type TestResult = {
   responseTimeMs: number | null;
   promptTokens: number | null;
   completionTokens: number | null;
+  reasoningTokens: number | null;
   totalTokens: number | null;
   tokensPerSecond: number | null;
+  timeToFirstTokenMs: number | null;
   detail: string;
 };
 
@@ -79,7 +81,9 @@ export function LocalAiStatus({ status }: { status: LocalAiStatusRecord }) {
             <div><dt>Input tokens</dt><dd>{metric(result.promptTokens)}</dd></div>
             <div><dt>Output tokens</dt><dd>{metric(result.completionTokens)}</dd></div>
             <div><dt>Total tokens</dt><dd>{metric(result.totalTokens)}</dd></div>
+            {result.reasoningTokens !== null ? <div><dt>Reasoning tokens</dt><dd>{metric(result.reasoningTokens)}</dd></div> : null}
             {result.tokensPerSecond !== null ? <div><dt>Generation</dt><dd>{metric(result.tokensPerSecond, " tok/s")}</dd></div> : null}
+            {result.timeToFirstTokenMs !== null ? <div><dt>First token</dt><dd>{metric(result.timeToFirstTokenMs, " ms")}</dd></div> : null}
           </dl>
           {result.response ? <p className="local-ai-test-response"><strong>Response:</strong> {result.response}</p> : null}
           <p className="local-ai-test-detail">{result.detail}</p>
