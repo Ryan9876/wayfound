@@ -15,7 +15,7 @@ Wayfound probes loopback-only default endpoints:
 - LM Studio: `http://127.0.0.1:1234`
 - Ollama: `http://127.0.0.1:11434`
 
-LM Studio discovery uses its native `GET /api/v1/models` endpoint so Wayfound can distinguish available models from loaded model instances. Its health test uses the OpenAI-compatible `POST /v1/chat/completions` endpoint.
+LM Studio discovery uses its native `GET /api/v1/models` endpoint so Wayfound can distinguish available models from loaded model instances. Its health test uses the native `POST /api/v1/chat` endpoint so Wayfound can use provider-reported input, output, reasoning, generation-rate, and time-to-first-token metrics.
 
 Ollama discovery uses `GET /api/ps` for running models and `GET /api/tags` for installed models. Its health test uses `POST /api/chat` with streaming disabled.
 
@@ -47,7 +47,9 @@ The indicator also identifies the selected provider and model when known. Color 
 
 When a provider and model are known, the connection control exposes a `Test AI` button.
 
-The test sends a minimal deterministic prompt asking the selected local model to return the marker `WAYFOUND_LOCAL_AI_OK`. The test passes only when a model inference response contains that marker. The test does not create or modify project records.
+The test sends a minimal deterministic prompt asking the selected local model to return the marker `WAYFOUND_LOCAL_AI_OK`. The test passes only when a completed model response contains that marker. The test does not create or modify project records.
+
+The health check tests basic inference connectivity, not reasoning quality. For Glimmer through LM Studio, Wayfound explicitly requests reasoning `off`; for Ollama, Wayfound sends `think: false`. This prevents a reasoning model from consuming the small health-check output budget before it reaches the deterministic final response. The output budget remains bounded at 128 tokens.
 
 The result shows:
 
@@ -56,17 +58,19 @@ The result shows:
 - end-to-end response time measured by Wayfound;
 - input/prompt tokens when reported by the provider;
 - output/completion tokens when reported by the provider;
-- total tokens, using the provider total where available or the sum of input and output counts;
-- generation tokens per second when sufficient provider timing data is available;
-- the short model response and a plain-English result detail.
+- reasoning tokens when LM Studio reports them;
+- total tokens, calculated from provider-reported input and output counts;
+- generation tokens per second when reported or derivable from provider timing data;
+- time to first token when LM Studio reports it;
+- the short final model response and a plain-English result detail.
 
-A metric that the provider does not report must be labeled `Not reported`; Wayfound must not invent token counts or timing data.
+A metric that the provider does not report must be labeled `Not reported` or omitted when optional; Wayfound must not invent token counts or timing data.
 
-The inference request uses a bounded timeout. A timeout, HTTP failure, malformed response, or incorrect marker produces a visible failed result and does not cause cloud fallback.
+The inference request uses a bounded timeout. A timeout, HTTP failure, malformed response, exhausted output budget without a final response, or incorrect marker produces a visible failed result and does not cause cloud fallback.
 
 ## Security and authority boundary
 
-- The health-test route requires an authenticated Wayfound session.
+- The health-test route requires an authenticated Wayfound owner session.
 - The route is available only while single-user mode is active.
 - Provider targets are fixed loopback addresses; the browser does not receive or choose an arbitrary provider URL.
 - The test result is transient UI state and is not durable project evidence.
@@ -89,7 +93,9 @@ The inference request uses a bounded timeout. A timeout, HTTP failure, malformed
 5. Given both providers are running with usable models, when discovery completes, then LM Studio is selected and the other provider is not silently substituted.
 6. Given local discovery fails, when Wayfound determines AI state, then it does not send a request to a public/cloud AI endpoint.
 7. Given a provider and model are selected, when the owner presses `Test AI`, then Wayfound performs one bounded local inference request using the selected provider and model.
-8. Given the model returns `WAYFOUND_LOCAL_AI_OK`, when the test completes, then the interface shows `Passed`, response time, input tokens, output tokens, total tokens, and generation speed when available.
-9. Given a provider omits a token or timing metric, when the result renders, then the interface shows `Not reported` or omits an optional derived metric rather than inventing a value.
-10. Given the model does not return the expected marker or the inference request fails, when the test completes, then the interface shows `Failed` with a plain-English reason and does not switch to a cloud provider.
-11. Given an unauthenticated request calls the health-test route, then Wayfound rejects it without starting local inference.
+8. Given Glimmer is selected in LM Studio, when the owner presses `Test AI`, then Wayfound uses LM Studio native chat with reasoning disabled for the health-check request.
+9. Given the model returns `WAYFOUND_LOCAL_AI_OK`, when the test completes, then the interface shows `Passed`, response time, input tokens, output tokens, total tokens, and provider performance metrics when available.
+10. Given LM Studio reports reasoning-token or time-to-first-token metrics, when the result renders, then those metrics are shown without exposing reasoning text.
+11. Given a provider omits a token or timing metric, when the result renders, then the interface shows `Not reported` or omits an optional metric rather than inventing a value.
+12. Given the model does not return the expected marker or the inference request fails, when the test completes, then the interface shows `Failed` with a plain-English reason and does not switch to a cloud provider.
+13. Given an unauthenticated request calls the health-test route, then Wayfound rejects it without starting local inference.
