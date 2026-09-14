@@ -159,6 +159,44 @@ jobs:
         run: |
           WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
           npm run test:technical-requirements
+      - name: Validate automatic single-user owner session
+        env:
+          WAYFOUND_SEED_EMAIL: owner-auto@wayfound.local
+          WAYFOUND_SEED_PASSWORD: Wayfound-Auto-Owner-2026!
+        run: |
+          set -euo pipefail
+          npx supabase db reset --local
+          STATUS_JSON="$(npx supabase status -o json)"
+          export SUPABASE_URL="$(printf '%s' "$STATUS_JSON" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const j=JSON.parse(s);process.stdout.write(j.API_URL||"")})')"
+          export SUPABASE_PUBLISHABLE_KEY="$(printf '%s' "$STATUS_JSON" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const j=JSON.parse(s);process.stdout.write(j.PUBLISHABLE_KEY||j.ANON_KEY||"")})')"
+          export APP_ORIGIN=http://127.0.0.1:3200
+          export WAYFOUND_SINGLE_USER_MODE=true
+          export WAYFOUND_SINGLE_USER_AUTO_SIGN_IN=true
+          export WAYFOUND_LOCAL_TEST=1
+          export WAYFOUND_SINGLE_USER_OWNER_EMAIL="$WAYFOUND_SEED_EMAIL"
+          export WAYFOUND_SINGLE_USER_OWNER_PASSWORD="$WAYFOUND_SEED_PASSWORD"
+          npm run seed:single-user-local
+          rm -rf .next
+          npm run build
+          npm run start -- --hostname 127.0.0.1 --port 3200 > /tmp/wayfound-auto-session.log 2>&1 &
+          APP_PID=$!
+          trap 'kill "$APP_PID" >/dev/null 2>&1 || true' EXIT
+          npx --yes wait-on@8.0.1 http://127.0.0.1:3200/workspaces
+          rm -f /tmp/wayfound-auto-cookies.txt
+          curl -fsS -c /tmp/wayfound-auto-cookies.txt http://127.0.0.1:3200/workspaces -o /tmp/wayfound-auto-workspaces.html
+          grep -F 'Your workspaces' /tmp/wayfound-auto-workspaces.html
+          if grep -Fq 'Sign in to Wayfound' /tmp/wayfound-auto-workspaces.html; then
+            echo 'Interactive login leaked into the no-login workspace experience.' >&2
+            exit 1
+          fi
+          if grep -Fq 'Sign out' /tmp/wayfound-auto-workspaces.html; then
+            echo 'Sign-out control leaked into the no-login workspace experience.' >&2
+            exit 1
+          fi
+          curl -sS -D /tmp/wayfound-auto-signin.headers -o /dev/null -b /tmp/wayfound-auto-cookies.txt http://127.0.0.1:3200/sign-in
+          tr -d '\r' < /tmp/wayfound-auto-signin.headers | grep -Ei '^location: /workspaces$'
+          kill "$APP_PID" >/dev/null 2>&1 || true
+          trap - EXIT
       - name: Upload workspace screenshots
         if: always()
         uses: actions/upload-artifact@v4
