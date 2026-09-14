@@ -1,6 +1,7 @@
 # Increment 2 — Additional product acceptance criteria
 
-**Status:** In progress
+**Status:** Validated at application/test head `21d2afdec3a7880656c84e77b2753e2d9d80d871`, CI run 375  
+**Validation:** [validation/increment-2-multiple-criteria.md](validation/increment-2-multiple-criteria.md)  
 **Basis:** Approved multiple acceptance-criterion priority; WF-REC-001, WF-REC-002, WF-OWN-001, WF-AI-002; ADR-0002 and ADR-0005.
 
 ## Outcome and bounded scope
@@ -45,6 +46,8 @@ Keep the add form closed until requested. Show the condition, required reason an
 7. No work, decision, artifact, release, stage, approval, verification or AI authority changes.
 8. Browser creation, failure retention, keyboard/focus, unique IDs and desktop/390 px overflow checks pass. Inspect actual screenshots before UI validation.
 9. Full existing CI regression chain, TypeScript, production build and database security checks pass at an identified application head. Record validation and reconcile project records, then require green exact reconciliation-head CI.
+
+Acceptance criteria 1–8 and the application-head portion of criterion 9 passed at `21d2afdec3a7880656c84e77b2753e2d9d80d871` through CI run 375. The desktop and 390 px screenshots from artifact `10371314321` were directly inspected. Repository-wide reconciliation still requires green CI on the exact reconciliation head before the final status update is complete.
 
 ## Recovery and limits
 
