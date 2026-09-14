@@ -21,7 +21,7 @@ function WithdrawCriterion({
 
   return <div className="work-item-detail" role="group" aria-label={`Acceptance criterion: ${criterion.statement}`}>
     <span className="status-chip">{criterion.lifecycle}</span>
-    <p><strong>{criterion.statement}</strong></p>
+    <p><strong>Condition:</strong> {criterion.statement}</p>
     {criterion.lifecycle === "Withdrawn" ? <>
       <p className="form-help">This condition is no longer active. Existing evidence remains historical; withdrawal is not a verification decision and no new evidence can be recorded for it.</p>
       {criterion.withdrawal && <p className="form-help">Withdrawn because: {criterion.withdrawal.reason} · Requirement revision {criterion.withdrawal.from_requirement_revision} → {criterion.withdrawal.to_requirement_revision} · Criterion revision {criterion.withdrawal.from_criterion_revision} → {criterion.withdrawal.to_criterion_revision}</p>}
