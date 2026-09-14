@@ -116,9 +116,9 @@ async function inspect(page, name) {
     await page.screenshot({ path: `${output}/${name}-${label}.png`, fullPage: true });
 
     await page.evaluate(() => document.activeElement?.blur());
-    const targets = await page.locator('a[href],button:not([disabled]),input:not([type=hidden]),textarea,select').evaluateAll(elements =>
+    const targets = await page.locator('a[href],button:not([disabled]),input:not([type=hidden]),textarea,select,summary').evaluateAll(elements =>
       elements
-        .filter(element => element.getBoundingClientRect().width > 0)
+        .filter(element => element.checkVisibility() && element.getBoundingClientRect().width > 0)
         .map((element, index) => {
           element.dataset.evidenceFocusId = String(index);
           return String(index);

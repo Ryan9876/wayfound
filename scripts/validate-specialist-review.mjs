@@ -114,8 +114,8 @@ async function inspect(page, name) {
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${name} ${label} overflow`);
     await page.screenshot({ path: `${output}/${name}-${label}.png`, fullPage: true });
     await page.evaluate(() => document.activeElement?.blur());
-    const targets = await page.locator('a[href],button:not([disabled]),input:not([type=hidden]),textarea,select').evaluateAll(elements =>
-      elements.filter(element => element.getBoundingClientRect().width > 0).map((element, index) => {
+    const targets = await page.locator('a[href],button:not([disabled]),input:not([type=hidden]),textarea,select,summary').evaluateAll(elements =>
+      elements.filter(element => element.checkVisibility() && element.getBoundingClientRect().width > 0).map((element, index) => {
         element.dataset.specialistReviewFocusId = String(index);
         return String(index);
       }),

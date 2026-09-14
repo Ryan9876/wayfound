@@ -83,7 +83,7 @@ async function inspect(page,name) {
     await page.evaluate(()=>document.activeElement?.blur());
     const targets=await page.locator('a[href],button:not([disabled]),input:not([type=hidden]),textarea,select,summary').evaluateAll(elements=>
       elements.filter(element=>{
-        if (element.getBoundingClientRect().width<=0) return false;
+        if (!element.checkVisibility() || element.getBoundingClientRect().width<=0) return false;
         if (element.matches('summary')) return true;
         return element.closest('details:not([open])')===null;
       }).map((element,index)=>{ element.dataset.technicalRequirementFocusId=String(index); return String(index); }));

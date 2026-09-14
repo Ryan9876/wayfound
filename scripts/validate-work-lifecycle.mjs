@@ -116,7 +116,7 @@ async function inspect(page, name) {
     await page.locator('#work-items').screenshot({ path: `${output}/${name}-${label}-work.png` });
     await page.evaluate(() => document.activeElement?.blur());
     const targets = await page.locator('a[href],button:not([disabled]),input:not([type=hidden]),textarea,select,summary').evaluateAll(elements =>
-      elements.filter(element => element.getBoundingClientRect().width > 0).map((element, index) => {
+      elements.filter(element => element.checkVisibility() && element.getBoundingClientRect().width > 0).map((element, index) => {
         element.dataset.artifactAcceptFocusId = String(index);
         return String(index);
       }),
