@@ -85,6 +85,9 @@ async function assertUniqueIds(page) {
   });
   assert.deepEqual(duplicateIds, [], `duplicate DOM IDs: ${duplicateIds.join(', ')}`);
 }
+async function createWorkspace(client, name) {
+  return ok(await rpc(client, 'create_workspace', { p_name: name, p_problem: 'Keep multiple product conditions and exact evidence links.', p_release: 'Release 1.0', p_request: randomUUID() }));
+}
 async function createRequirement(client, workspace, title) {
   return ok(await rpc(client, 'record_owner_requirement', { p_workspace: workspace, p_title: title, p_obligation: 'MUST', p_requirement: 'Keep checkout records understandable.', p_acceptance_criterion: 'The owner can see the borrower.', p_authority_confirm: true, p_request: randomUUID() }));
 }

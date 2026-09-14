@@ -115,4 +115,3 @@ begin
   from wayfound.requirements r where r.workspace_id=p_workspace
  ),'[]'::jsonb);
 end $$;
-

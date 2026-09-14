@@ -132,6 +132,10 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Check database security
         run: npx supabase db advisors --local --type security --fail-on error
+      - name: Validate additional product criteria
+        run: |
+          WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
+          npm run test:multiple-criteria
       - name: Validate durable workspace
         run: npm run test:workspace
       - name: Validate durable evidence
@@ -178,10 +182,6 @@ jobs:
         run: |
           WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
           npm run test:technical-requirements
-      - name: Validate additional product criteria
-        run: |
-          WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
-          npm run test:multiple-criteria
       - name: Validate automatic single-user owner session
         env:
           WAYFOUND_SEED_EMAIL: owner-auto@wayfound.local
