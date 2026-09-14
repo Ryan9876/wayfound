@@ -3,7 +3,12 @@ alter table wayfound.work_items drop constraint work_items_status_check;
 alter table wayfound.work_items add constraint work_items_status_check
  check(status in ('Proposed','Approved','In progress','Blocked','Implemented'));
 
+-- The original owner-work-lifecycle migration created its state-machine CHECK
+-- without an explicit name. PostgreSQL named that constraint
+-- work_item_transitions_check1 in the clean migration history used by CI.
+-- Drop both historical auto-name variants before installing the named rule.
 alter table wayfound.work_item_transitions drop constraint if exists work_item_transitions_check;
+alter table wayfound.work_item_transitions drop constraint if exists work_item_transitions_check1;
 alter table wayfound.work_item_transitions drop constraint if exists work_item_transitions_state_check;
 alter table wayfound.work_item_transitions add constraint work_item_transitions_state_check
  check ((from_status='Proposed' and to_status='Approved') or
