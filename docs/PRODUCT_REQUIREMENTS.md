@@ -258,3 +258,12 @@ A future requirement retains its normative strength only after its feature enter
 The requirements above define expected behavior. They do not claim that all behavior is implemented, reviewed, verified, or released.
 
 Existing validation records for authenticated human specialist-review slices remain valid evidence of those historical implementations. ADR-0005 removes those multi-human workflows from active first-version product scope; it does not rewrite their past validation state.
+
+### WF-UI-004 — Plain-language guidance and progressive disclosure
+
+**Priority:** P0
+**Status:** Approved by the project owner's UX instruction
+
+The active single-user workspace MUST lead with the current stage and next useful action. Overview MUST include What we know, What we still need to answer, and Recent changes based on saved records or explicitly labeled guidance. It MUST NOT invent facts, evidence, completed stages, or release readiness.
+
+Creation forms MUST remain closed until requested. Primary copy MUST use common words; canonical metadata and authority detail MUST remain accessible through secondary labels or Details. Navigation MUST separate Overview, Journey, Work, Records, and Release & Care while preserving workspace identity. Simplified copy MUST NOT change authority, confirmation, status, or evidence semantics.

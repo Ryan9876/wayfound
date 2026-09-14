@@ -37,6 +37,9 @@ jobs:
       - name: Check local AI connection contract
         run: npm run test:local-ai-connection
 
+      - name: Check workspace guidance contract
+        run: npm run test:workspace-guidance
+
       - name: Check TypeScript
         run: npm run lint
 
@@ -184,7 +187,7 @@ jobs:
           npx --yes wait-on@8.0.1 http://127.0.0.1:3200/workspaces
           rm -f /tmp/wayfound-auto-cookies.txt
           curl -fsS -c /tmp/wayfound-auto-cookies.txt http://127.0.0.1:3200/workspaces -o /tmp/wayfound-auto-workspaces.html
-          grep -F 'Your workspaces' /tmp/wayfound-auto-workspaces.html
+          grep -F 'Your projects' /tmp/wayfound-auto-workspaces.html
           if grep -Fq 'Sign in to Wayfound' /tmp/wayfound-auto-workspaces.html; then
             echo 'Interactive login leaked into the no-login workspace experience.' >&2
             exit 1
@@ -195,6 +198,7 @@ jobs:
           fi
           curl -sS -D /tmp/wayfound-auto-signin.headers -o /dev/null -b /tmp/wayfound-auto-cookies.txt http://127.0.0.1:3200/sign-in
           tr -d '\r' < /tmp/wayfound-auto-signin.headers | grep -Ei '^location: /workspaces$'
+          WAYFOUND_UI_TEST_URL=http://127.0.0.1:3200 npm run test:workspace-ui
           kill "$APP_PID" >/dev/null 2>&1 || true
           trap - EXIT
       - name: Upload workspace screenshots

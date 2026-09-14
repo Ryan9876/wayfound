@@ -68,7 +68,7 @@ export async function createDecision(_: FormState, form: FormData): Promise<Form
     console.error(JSON.stringify({ operation: "record_owner_decision", workspace_id: workspaceId, outcome: "failed", code }));
     return {
       error: code === "INVALID_INPUT"
-        ? "Complete the decision fields and confirm that this choice is within product-owner authority."
+        ? "Complete the decision fields and confirm this is your product or business decision."
         : code === "REQUEST_CONFLICT"
           ? "This decision request was already used with different details. Reload the workspace before starting again."
           : code === "ACCESS_DENIED"
@@ -78,7 +78,7 @@ export async function createDecision(_: FormState, form: FormData): Promise<Form
   }
   revalidatePath(`/workspaces/${workspaceId}`);
   revalidatePath("/workspaces");
-  redirect(`/workspaces/${workspaceId}#decisions`);
+  redirect(`/workspaces/${workspaceId}${process.env.WAYFOUND_SINGLE_USER_MODE === "true" ? "?view=records" : ""}#decisions`);
 }
 export async function createWorkItem(_: FormState, form: FormData): Promise<FormState> {
   await checkOrigin();
@@ -108,7 +108,7 @@ export async function createWorkItem(_: FormState, form: FormData): Promise<Form
   }
   revalidatePath(`/workspaces/${workspaceId}`);
   revalidatePath("/workspaces");
-  redirect(`/workspaces/${workspaceId}#work-items`);
+  redirect(`/workspaces/${workspaceId}${process.env.WAYFOUND_SINGLE_USER_MODE === "true" ? "?view=work" : ""}#work-items`);
 }
 export async function createRequirement(_: FormState, form: FormData): Promise<FormState> {
   await checkOrigin();
@@ -129,7 +129,7 @@ export async function createRequirement(_: FormState, form: FormData): Promise<F
     console.error(JSON.stringify({ operation: "record_owner_requirement", workspace_id: workspaceId, outcome: "failed", code }));
     return {
       error: code === "INVALID_INPUT"
-        ? "Complete the requirement and acceptance criterion, then confirm product-owner authority."
+        ? "Describe the requirement and how to check it, then confirm your approval."
         : code === "REQUEST_CONFLICT"
           ? "This requirement request was already used with different details. Reload the workspace before starting again."
           : code === "ACCESS_DENIED"
@@ -139,7 +139,7 @@ export async function createRequirement(_: FormState, form: FormData): Promise<F
   }
   revalidatePath(`/workspaces/${workspaceId}`);
   revalidatePath("/workspaces");
-  redirect(`/workspaces/${workspaceId}#requirements`);
+  redirect(`/workspaces/${workspaceId}${process.env.WAYFOUND_SINGLE_USER_MODE === "true" ? "?view=records" : ""}#requirements`);
 }
 export async function createEvidence(_: FormState, form: FormData): Promise<FormState> {
   await checkOrigin();
@@ -173,7 +173,7 @@ export async function createEvidence(_: FormState, form: FormData): Promise<Form
   }
   revalidatePath(`/workspaces/${workspaceId}`);
   revalidatePath("/workspaces");
-  redirect(`/workspaces/${workspaceId}#criterion-${acceptanceCriterionId}`);
+  redirect(`/workspaces/${workspaceId}${process.env.WAYFOUND_SINGLE_USER_MODE === "true" ? "?view=records" : ""}#criterion-${acceptanceCriterionId}`);
 }
 export async function createArtifact(_: FormState, form: FormData): Promise<FormState> {
   await checkOrigin();
@@ -204,7 +204,7 @@ export async function createArtifact(_: FormState, form: FormData): Promise<Form
   }
   revalidatePath(`/workspaces/${workspaceId}`);
   revalidatePath("/workspaces");
-  redirect(`/workspaces/${workspaceId}#artifacts`);
+  redirect(`/workspaces/${workspaceId}${process.env.WAYFOUND_SINGLE_USER_MODE === "true" ? "?view=records" : ""}#artifacts`);
 }
 export async function acceptArtifactVersion(_: FormState, form: FormData): Promise<FormState> {
   await checkOrigin();
@@ -225,7 +225,7 @@ export async function acceptArtifactVersion(_: FormState, form: FormData): Promi
     console.error(JSON.stringify({ operation: "accept_artifact_version", workspace_id: workspaceId, artifact_id: artifactId, version_id: versionId, outcome: "failed", code }));
     return {
       error: code === "INVALID_INPUT"
-        ? "Confirm product-owner authority before accepting this artifact version."
+        ? "Confirm that you choose this version as project direction."
         : code === "REQUEST_CONFLICT"
           ? "This acceptance request was already used with different details. Reload the workspace before starting again."
           : code === "INVALID_TARGET"
@@ -239,7 +239,7 @@ export async function acceptArtifactVersion(_: FormState, form: FormData): Promi
   }
   revalidatePath(`/workspaces/${workspaceId}`);
   revalidatePath("/workspaces");
-  redirect(`/workspaces/${workspaceId}#artifact-${artifactId}`);
+  redirect(`/workspaces/${workspaceId}${process.env.WAYFOUND_SINGLE_USER_MODE === "true" ? "?view=records" : ""}#artifact-${artifactId}`);
 }
 
 export async function transitionWorkItem(_: FormState, form: FormData): Promise<FormState> {
@@ -271,5 +271,5 @@ export async function transitionWorkItem(_: FormState, form: FormData): Promise<
   }
   revalidatePath(`/workspaces/${workspaceId}`);
   revalidatePath("/workspaces");
-  redirect(`/workspaces/${workspaceId}#work-item-${workItemId}`);
+  redirect(`/workspaces/${workspaceId}${process.env.WAYFOUND_SINGLE_USER_MODE === "true" ? "?view=work" : ""}#work-item-${workItemId}`);
 }

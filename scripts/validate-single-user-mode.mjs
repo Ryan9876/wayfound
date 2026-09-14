@@ -30,8 +30,8 @@ requireText(envExample, 'WAYFOUND_SINGLE_USER_MODE=false', 'environment contract
 requireText(envExample, 'WAYFOUND_SINGLE_USER_AUTO_SIGN_IN=false', 'no-login environment contract');
 requireText(envExample, 'WAYFOUND_LOCAL_TEST=0', 'local-test environment guard');
 requireText(frame, 'process.env.WAYFOUND_SINGLE_USER_MODE === "true"', 'workspace frame mode gate');
-requireText(frame, '!singleUserMode && <Link href="/specialist-reviews">Specialist reviews</Link>', 'specialist navigation gate');
-requireText(frame, '!noInteractiveLogin && <form action={signOut}>', 'sign-out hidden in no-login mode');
+if (!/!singleUserMode\s*&&\s*\(\s*<Link href="\/specialist-reviews">Specialist reviews<\/Link>/.test(frame)) throw new Error('specialist navigation gate');
+if (!/!noInteractiveLogin\s*&&\s*\(\s*<form action=\{signOut\}>/.test(frame)) throw new Error('sign-out hidden in no-login mode');
 requireText(layout, 'className={singleUserMode ? "single-user-mode" : undefined}', 'single-user body marker');
 requireText(css, '.single-user-mode #technical-decisions', 'technical decision human-review surface');
 requireText(css, '.single-user-mode #technical-requirements', 'technical requirement human-review surface');

@@ -121,10 +121,10 @@ export function LocalAiStatus({ status }: { status: LocalAiStatusRecord }) {
       {result ? (
         <div className={`local-ai-test-result ${result.ok ? "local-ai-test-pass" : "local-ai-test-fail"}`} role="status">
           <div className="local-ai-test-summary">
-            <strong>{result.ok ? "Passed" : "Failed"}</strong>
+            <strong>{result.ok ? "Passed" : "Failed"}</strong><button type="button" className="local-ai-test-button" onClick={() => setResult(null)}>Close result</button>
             <span>{result.providerLabel ?? provider}{result.model ? ` · ${result.model}` : ""}</span>
           </div>
-          <dl className="local-ai-test-metrics">
+          <details className="local-ai-metrics-details"><summary>Performance details</summary><dl className="local-ai-test-metrics">
             <div><dt>Response time</dt><dd>{metric(result.responseTimeMs, " ms")}</dd></div>
             <div><dt>Input tokens</dt><dd>{metric(result.promptTokens)}</dd></div>
             <div><dt>Output tokens</dt><dd>{metric(result.completionTokens)}</dd></div>
@@ -132,7 +132,7 @@ export function LocalAiStatus({ status }: { status: LocalAiStatusRecord }) {
             {result.reasoningTokens !== null ? <div><dt>Reasoning tokens</dt><dd>{metric(result.reasoningTokens)}</dd></div> : null}
             {result.tokensPerSecond !== null ? <div><dt>Generation</dt><dd>{metric(result.tokensPerSecond, " tok/s")}</dd></div> : null}
             {result.timeToFirstTokenMs !== null ? <div><dt>First token</dt><dd>{metric(result.timeToFirstTokenMs, " ms")}</dd></div> : null}
-          </dl>
+          </dl></details>
           {result.response ? <p className="local-ai-test-response"><strong>Response:</strong> {result.response}</p> : null}
           <p className="local-ai-test-detail">{result.detail}</p>
 

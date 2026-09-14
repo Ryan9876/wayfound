@@ -105,7 +105,7 @@ async function login(page, email) {
   await page.getByLabel('Password', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await page.waitForURL(`${base}/workspaces`);
-  await page.getByRole('heading', { name: 'Continue with a clear next step.', exact: true }).waitFor({ timeout: 30000 });
+  await page.getByRole('heading', { name: 'What would you like to work on?', exact: true }).waitFor({ timeout: 30000 });
 }
 
 async function inspect(page, name) {

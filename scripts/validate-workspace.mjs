@@ -104,7 +104,7 @@ async function stop() {
 }
 
 async function waitForWorkspaceList(page) {
-  await page.getByRole('heading', { name: 'Continue with a clear next step.', exact: true }).waitFor({ timeout: 30000 });
+  await page.getByRole('heading', { name: 'What would you like to work on?', exact: true }).waitFor({ timeout: 30000 });
 }
 
 async function login(page, email) {

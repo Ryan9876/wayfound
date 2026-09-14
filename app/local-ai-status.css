@@ -342,3 +342,7 @@
     gap: 2px;
   }
 }
+
+.local-ai-metrics-details > summary { min-height: 44px; padding: 12px 0; cursor: pointer; font-weight: 600; }
+.local-ai-metrics-details > summary:focus-visible { outline: 3px solid var(--pine); outline-offset: 3px; }
+.local-ai-test-summary { flex-wrap: wrap; }
