@@ -1,3 +1,5 @@
+import type { AiReviewRecord } from "@/lib/domain/ai-review";
+
 export type WorkItemRecord = {
   id: string;
   workspace_id: string;
@@ -10,6 +12,7 @@ export type WorkItemRecord = {
   owner_actor_id: string;
   status: WorkItemStatus;
   transitions: WorkItemTransition[];
+  ai_reviews: AiReviewRecord[];
   revision: number;
   created_at: string;
   updated_at: string;
