@@ -9,6 +9,7 @@
     "lint": "tsc --noEmit",
     "test:prototype": "node scripts/validate-prototype.mjs",
     "test:accessibility": "node scripts/validate-accessibility.mjs",
+    "test:single-user-mode": "node scripts/validate-single-user-mode.mjs",
     "test:workspace": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-workspace.mjs",
     "test:evidence": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-evidence.mjs",
     "test:artifacts": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-artifacts.mjs",
