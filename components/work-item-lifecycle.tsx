@@ -2,6 +2,7 @@
 import { useActionState, useState } from "react";
 import { transitionWorkItem } from "@/app/workspaces/actions";
 import { AiWorkReview } from "@/components/ai-work-review";
+import { WorkItemDependencies } from "@/components/work-item-dependencies";
 import type { WorkItemRecord } from "@/lib/domain/work-item";
 
 type WorkAction = {
@@ -160,6 +161,11 @@ export function WorkItemLifecycle({ item, requestId }: { item: WorkItemRecord; r
           </ol>
         </details>
       )}
+      <WorkItemDependencies
+        item={item}
+        addRequestId={requestId}
+        removeRequestId={requestId}
+      />
       {item.status === "Implemented" && (
         <>
           <p className="form-help">Implementation is recorded. Verification and release status remain separate.</p>
