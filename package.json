@@ -18,7 +18,8 @@
     "test:specialist-review": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-specialist-review.mjs",
     "test:technical-decisions": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-technical-decisions.mjs",
     "test:technical-requirements": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-technical-requirements.mjs",
-    "seed:local": "WAYFOUND_LOCAL_TEST=1 node scripts/seed-local.mjs"
+    "seed:local": "WAYFOUND_LOCAL_TEST=1 node scripts/seed-local.mjs",
+    "seed:single-user-local": "WAYFOUND_LOCAL_TEST=1 node scripts/seed-single-user-local.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",
