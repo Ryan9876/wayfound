@@ -39,12 +39,13 @@ The active first-version product model is defined by ADR-0005: one authenticated
 13. **Durable advisory AI review of exact implemented work** — Validated at application head `dc819b65d42a1bc57e4eb7115ce5ed53bafcbca4`, CI run 329. See [slice](INCREMENT_2_AI_REVIEW.md) and [validation](validation/increment-2-ai-review.md). The review snapshots one exact `Implemented` work revision, uses only supported loopback local AI, records provider/model provenance and advisory result or failure, and requires explicit owner disposition without altering verification or project authority.
 14. **Durable work-item dependencies** — Validated at application/test head `a3484c37199e0072b05eaf5f9979eff6406774b0`, CI run 346. See [slice](INCREMENT_2_WORK_DEPENDENCIES.md) and [validation](validation/increment-2-work-dependencies.md). The owner can create and remove acyclic same-workspace work dependencies with durable history and revision snapshots; dependency state does not automatically change work status or establish readiness, verification, or impact propagation.
 15. **Durable work-to-project-direction links** — Validated at application/test head `ccf138887980c9bc7c53a3a9817c9c75572278c3`, CI run 367. See [slice](INCREMENT_2_WORK_DIRECTION_LINKS.md) and [validation](validation/increment-2-work-direction-links.md). The owner can record that work relies on an accepted owner decision or exact current accepted artifact version with authoritative revision snapshots and reversible history. The link records reliance only and does not establish that impact exists, is known, or is resolved.
+16. **Additional product acceptance criteria** — Validated at application/test head `21d2afdec3a7880656c84e77b2753e2d9d80d871`, CI run 375. See [slice](INCREMENT_2_MULTIPLE_CRITERIA.md) and [validation](validation/increment-2-multiple-criteria.md). The owner can add later conditions to an existing approved product requirement while preserving exact criterion/evidence identity and revision snapshots. The owner-only path cannot add conditions to technical requirements, and criterion creation does not establish evidence freshness, verification, or completion.
 
 ### Active remaining Increment 2 scope
 
 The active single-user scope now prioritizes:
 
-1. multiple acceptance-criterion lifecycle — [additional product criteria slice](INCREMENT_2_MULTIPLE_CRITERIA.md) In progress; technical multi-criterion proposals and criterion change/withdrawal remain later scope;
+1. remaining acceptance-criterion lifecycle beyond validated additive product criteria, including criterion change/withdrawal behavior and any future technical multi-criterion design;
 2. evidence freshness/outdated-state handling and explicit verification decisions;
 3. maintenance records and later lifecycle behavior;
 4. change-impact handling, including dependency/project-direction impact behavior;
