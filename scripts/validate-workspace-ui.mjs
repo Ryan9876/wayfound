@@ -62,7 +62,22 @@ try {
   await page.getByLabel('I approve this work.', { exact: false }).check();
   await page.getByRole('button', { name: 'Approve work', exact: true }).click();
   await visible(page.locator('.work-item-card .status-chip').getByText('Approved', { exact: true }));
-  await uniqueIds(); await screenshot('work-desktop');
+  await open('Start work');
+  await fill('What work has started?', 'I started the checkout observation.');
+  await page.getByLabel('I confirm that I have started this work.', { exact: true }).check();
+  await page.getByRole('button', { name: 'Start work', exact: true }).click();
+  await visible(page.locator('.work-item-card .status-chip').getByText('In progress', { exact: true }));
+  await open('Mark implemented');
+  await fill('What was completed?', 'One checkout observation was completed and recorded.');
+  await page.getByLabel('I confirm that the described work is complete as implemented work.', { exact: false }).check();
+  await page.getByRole('button', { name: 'Mark implemented', exact: true }).click();
+  await visible(page.locator('.work-item-card .status-chip').getByText('Implemented', { exact: true }));
+  await visible(page.getByText('Implementation is recorded. Verification and release status remain separate.', { exact: true }));
+  await hidden(page.getByRole('button', { name: 'Mark implemented', exact: true }));
+  await uniqueIds(); await screenshot('work-implemented-desktop');
+  await page.goto(workspaceUrl);
+  await visible(page.locator('.guided-next').getByRole('heading', { name: 'Describe one real situation', exact: true }));
+  await visible(page.getByRole('link', { name: 'Plan this step', exact: false }));
   await page.goto(`${workspaceUrl}?view=records`);
   await hidden(page.getByLabel('What did you decide?', { exact: true }));
   await open('Add decision'); await fill('Decision title', 'Focus on staff'); await fill('What did you decide?', 'The first version is for staff.'); await fill('Why?', 'Staff handle checkout today.');
@@ -119,5 +134,5 @@ try {
   await visible(backPage.getByRole('heading', { name: 'More', exact: true }));
   await backPage.close();
   assert.deepEqual(errors, []);
-  console.log('PASS: active single-user UI creation, required confirmations, saved statuses, navigation, disclosure, evidence distinction, unique DOM IDs, desktop/mobile rendering, reload, and browser back.');
+  console.log('PASS: active single-user UI creation, work implementation completion, required confirmations, saved statuses, next-action guidance, navigation, disclosure, evidence distinction, unique DOM IDs, desktop/mobile rendering, reload, and browser back.');
 } finally { await browser.close(); }
