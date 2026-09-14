@@ -205,7 +205,8 @@ try {
   assert.equal(await card.getByLabel('Why is this condition needed?').inputValue(),'We need a second observable product condition.','error discarded reason');
   await card.getByLabel('What condition must be met?').fill('The owner can see when equipment is due.');
   await card.getByRole('button',{name:'Save acceptance criterion',exact:true}).click();
-  await card.getByText('The owner can see when equipment is due.',{exact:true}).waitFor({timeout:30000});
+  await page.waitForURL(/#criterion-/, {timeout:30000});
+  await card.locator('.requirement-criterion').getByText('The owner can see when equipment is due.',{exact:true}).waitFor({timeout:30000});
   const uiSaved = await requirement(workspace,uiId);
   assert.equal(uiSaved.acceptance_criteria.length,2);
   await evidence(workspace,uiSaved.acceptance_criteria[0].id,'Evidence for only the first condition');
