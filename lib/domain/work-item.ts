@@ -13,6 +13,8 @@ export type WorkItemRecord = {
   status: WorkItemStatus;
   transitions: WorkItemTransition[];
   ai_reviews: AiReviewRecord[];
+  dependencies: WorkItemDependencyRecord[];
+  dependents: WorkItemDependencyRecord[];
   revision: number;
   created_at: string;
   updated_at: string;
@@ -56,6 +58,7 @@ export type WorkItemStatus =
   | "In progress"
   | "Blocked"
   | "Implemented";
+
 export type WorkItemTransition = {
   id: string;
   actor_id: string;
@@ -66,6 +69,25 @@ export type WorkItemTransition = {
   reason: string;
   created_at: string;
 };
+
+export type WorkItemDependencyRecord = {
+  id: string;
+  workspace_id: string;
+  dependent_work_item_id: string;
+  prerequisite_work_item_id: string;
+  dependent_revision: number;
+  prerequisite_revision: number;
+  reason: string;
+  created_by_actor_id: string;
+  created_at: string;
+  dependent_title: string;
+  dependent_status: WorkItemStatus;
+  dependent_current_revision: number;
+  prerequisite_title: string;
+  prerequisite_status: WorkItemStatus;
+  prerequisite_current_revision: number;
+};
+
 export type TransitionWorkItemInput = {
   workspaceId: string;
   workItemId: string;
@@ -75,11 +97,55 @@ export type TransitionWorkItemInput = {
   confirm: boolean;
   requestId: string;
 };
+
 export function validateTransitionWorkItem(input: TransitionWorkItemInput): TransitionWorkItemInput {
   const result = { ...input, reason: input.reason.trim() };
   if (!UUID.test(result.workspaceId) || !UUID.test(result.workItemId) || !UUID.test(result.requestId) ||
       !Number.isSafeInteger(result.expectedRevision) || result.expectedRevision < 1 || result.expectedRevision > 2147483647 ||
       !["Approved", "In progress", "Blocked", "Implemented"].includes(result.targetStatus) ||
       !result.reason || result.reason.length > 2000 || result.confirm !== true) throw new Error("INVALID_INPUT");
+  return result;
+}
+
+export type AddWorkItemDependencyInput = {
+  workspaceId: string;
+  dependentWorkItemId: string;
+  prerequisiteWorkItemId: string;
+  reason: string;
+  confirm: boolean;
+  requestId: string;
+};
+
+export function validateAddWorkItemDependency(input: AddWorkItemDependencyInput): AddWorkItemDependencyInput {
+  const result = { ...input, reason: input.reason.trim() };
+  if (
+    !UUID.test(result.workspaceId) ||
+    !UUID.test(result.dependentWorkItemId) ||
+    !UUID.test(result.prerequisiteWorkItemId) ||
+    result.dependentWorkItemId === result.prerequisiteWorkItemId ||
+    !UUID.test(result.requestId) ||
+    !result.reason || result.reason.length > 2000 ||
+    result.confirm !== true
+  ) throw new Error("INVALID_INPUT");
+  return result;
+}
+
+export type RemoveWorkItemDependencyInput = {
+  workspaceId: string;
+  dependencyId: string;
+  reason: string;
+  confirm: boolean;
+  requestId: string;
+};
+
+export function validateRemoveWorkItemDependency(input: RemoveWorkItemDependencyInput): RemoveWorkItemDependencyInput {
+  const result = { ...input, reason: input.reason.trim() };
+  if (
+    !UUID.test(result.workspaceId) ||
+    !UUID.test(result.dependencyId) ||
+    !UUID.test(result.requestId) ||
+    !result.reason || result.reason.length > 2000 ||
+    result.confirm !== true
+  ) throw new Error("INVALID_INPUT");
   return result;
 }
