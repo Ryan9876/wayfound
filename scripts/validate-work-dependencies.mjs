@@ -347,8 +347,8 @@ try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1200 } });
   await login(page, emails[0]);
   await page.goto(`${base}/workspaces/${workspace}?view=work#work-item-${uiDependent}`);
-  const dependentCard = page.locator('.work-item-card').filter({ hasText: uiDependentTitle });
-  const prerequisiteCard = page.locator('.work-item-card').filter({ hasText: uiPrerequisiteTitle });
+  const dependentCard = page.locator(`#work-item-${uiDependent}`);
+  const prerequisiteCard = page.locator(`#work-item-${uiPrerequisite}`);
   await dependentCard.getByText('Add dependency', { exact: true }).click();
   await dependentCard.getByLabel('What work must this depend on?').selectOption(uiPrerequisite);
   await dependentCard.getByLabel('Why is this dependency needed?').fill('The UI dependent work needs the UI prerequisite result first.');
