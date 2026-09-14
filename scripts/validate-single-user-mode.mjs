@@ -5,7 +5,7 @@ const requireText = (source, text, label) => {
   if (!source.includes(text)) throw new Error(`${label}: expected ${JSON.stringify(text)}`);
 };
 
-const [envExample, frame, layout, css, proxy, autoSession, signInPage, charter, requirements, delivery, packageJson, singleUserSeed, localBackend, localDevelopment, noLoginSpec, adr6] = await Promise.all([
+const [envExample, frame, layout, css, proxy, autoSession, signInPage, workspaceService, workspaceError, charter, requirements, delivery, packageJson, singleUserSeed, localBackend, localDevelopment, noLoginSpec, adr6] = await Promise.all([
   read('.env.example'),
   read('components/workspace-frame.tsx'),
   read('app/layout.tsx'),
@@ -13,6 +13,8 @@ const [envExample, frame, layout, css, proxy, autoSession, signInPage, charter, 
   read('proxy.ts'),
   read('lib/auth/single-user-auto-session.ts'),
   read('app/sign-in/page.tsx'),
+  read('lib/application/workspaces.ts'),
+  read('app/workspaces/error.tsx'),
   read('docs/PROJECT_CHARTER.md'),
   read('docs/PRODUCT_REQUIREMENTS.md'),
   read('docs/DELIVERY_PLAN.md'),
@@ -45,7 +47,9 @@ requireText(autoSession, 'process.env.WAYFOUND_LOCAL_TEST !== "1"', 'explicit lo
 requireText(autoSession, 'url.hostname === "127.0.0.1" || url.hostname === "localhost"', 'loopback runtime guard');
 requireText(autoSession, 'WAYFOUND_SINGLE_USER_OWNER_EMAIL', 'owner email configuration');
 requireText(autoSession, 'WAYFOUND_SINGLE_USER_OWNER_PASSWORD', 'owner password configuration');
-requireText(signInPage, 'Interactive login is intentionally disabled in this single-user mode.', 'no interactive fallback');
+requireText(signInPage, 'if (singleUserInteractiveLoginDisabled()) redirect("/workspaces")', 'no-login route redirect');
+requireText(workspaceService, 'if (singleUserInteractiveLoginDisabled()) throw new Error("IDENTITY_UNAVAILABLE")', 'no-login session failure surface');
+if (workspaceError.includes('/sign-in')) throw new Error('workspace error must not expose sign-in in single-user-first UI');
 requireText(charter, 'one authenticated product owner', 'single-human charter');
 requireText(charter, 'AI is a system capability, not a second human participant and not an independent authority', 'AI authority boundary');
 requireText(requirements, 'WF-AI-002', 'AI self-approval prohibition');
@@ -62,4 +66,4 @@ requireText(noLoginSpec, 'must continue to use the publishable/anon key and auth
 requireText(adr6, 'will not require interactive login', 'accepted no-login decision');
 requireText(adr6, 'row-level security, actor attribution, audit history', 'identity preservation decision');
 
-console.log('PASS: single-user mode keeps one authenticated owner and explicit AI boundaries, hides deferred human collaboration, supports loopback-only one-account seeding, and can remove interactive login through a separately guarded local automatic owner session without bypassing RLS.');
+console.log('PASS: single-user mode keeps one authenticated owner and explicit AI boundaries, hides deferred human collaboration, supports loopback-only one-account seeding, and removes the login page from the active local automatic-owner flow without bypassing RLS.');
