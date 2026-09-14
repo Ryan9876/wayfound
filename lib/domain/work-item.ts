@@ -15,6 +15,7 @@ export type WorkItemRecord = {
   ai_reviews: AiReviewRecord[];
   dependencies: WorkItemDependencyRecord[];
   dependents: WorkItemDependencyRecord[];
+  dependency_candidates: WorkItemDependencyCandidate[];
   revision: number;
   created_at: string;
   updated_at: string;
@@ -86,6 +87,13 @@ export type WorkItemDependencyRecord = {
   prerequisite_title: string;
   prerequisite_status: WorkItemStatus;
   prerequisite_current_revision: number;
+};
+
+export type WorkItemDependencyCandidate = {
+  id: string;
+  title: string;
+  status: WorkItemStatus;
+  revision: number;
 };
 
 export type TransitionWorkItemInput = {
