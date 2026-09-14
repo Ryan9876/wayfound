@@ -28,7 +28,7 @@ requireText(proxy, 'request.nextUrl.pathname === "/specialist-reviews"', 'specia
 requireText(proxy, 'new URL("/workspaces", request.url)', 'specialist route redirect');
 requireText(proxy, 'request.nextUrl.pathname === "/handoffs"', 'handoffs route gate');
 requireText(proxy, 'new URL("/records", request.url)', 'handoffs route redirect');
-requireText(charter, 'single authenticated product owner', 'single-human charter');
+requireText(charter, 'one authenticated product owner', 'single-human charter');
 requireText(charter, 'AI is a system capability, not a second human participant and not an independent authority', 'AI authority boundary');
 requireText(requirements, 'WF-AI-002', 'AI self-approval prohibition');
 requireText(delivery, 'collaborator membership/administration', 'removed collaboration scope record');
