@@ -22,6 +22,7 @@ export function TechnicalRequirementOwnerPanel({ workspaceId, proposals }: { wor
       const reviewedRevision = proposal.approval?.proposal_revision ?? proposal.revision;
       const currentAssignment = proposal.assignments.find(item => item.proposal_revision === reviewedRevision) ?? null;
       const qualifyingReview = proposal.status === "Proposed" && currentAssignment?.review?.conclusion === "No blocking finding" ? currentAssignment.review : null;
+      const earlierAssignments = proposal.assignments.filter(item => item.id !== currentAssignment?.id);
       return <article className="durable-card requirement-card" id={`technical-requirement-${proposal.id}`} key={proposal.id}>
         <span className="eyebrow">Technical requirement proposal · {proposal.status}</span>
         <h3>{proposal.title}</h3>
@@ -57,7 +58,7 @@ export function TechnicalRequirementOwnerPanel({ workspaceId, proposals }: { wor
           <p className="artifact-warning artifact-accepted-warning"><strong>Approved project direction after qualified review.</strong> This does not establish verification, validation, release readiness, or production authorization.</p>
         </div> : <p role="alert" className="form-error">Approved technical requirement proposal is missing its durable approval linkage.</p>}
 
-        {proposal.assignments.length > 1 ? <details className="artifact-acceptance-action"><summary>Earlier review history</summary>{proposal.assignments.filter(item => item.id !== currentAssignment?.id).map(item => <div className="entry-note" key={item.id}><strong>Revision {item.proposal_revision} · {item.review?.conclusion ?? item.status}</strong><p>Assignment {item.id}{item.review ? ` · Review ${item.review.id}` : ""}</p></div>)}</details> : null}
+        {earlierAssignments.length ? <details className="artifact-acceptance-action"><summary>Earlier review history</summary>{earlierAssignments.map(item => <div className="entry-note" key={item.id}><strong>Revision {item.proposal_revision} · {item.review?.conclusion ?? item.status}</strong><p>Assignment {item.id}{item.review ? ` · Review ${item.review.id}` : ""}</p></div>)}</details> : null}
       </article>;
     })}</div> : <article className="durable-card"><h3>No consequential technical requirements yet.</h3><p>Use this flow only when required technical behavior needs qualified specialist judgment before it becomes an approved requirement.</p></article>}
 
