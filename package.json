@@ -19,6 +19,7 @@
     "test:work-completion": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-work-completion.mjs",
     "test:ai-review": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-ai-review.mjs",
     "test:work-dependencies": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-work-dependencies.mjs",
+    "test:work-direction-links": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-work-direction-links.mjs",
     "test:specialist-review": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-specialist-review.mjs",
     "test:technical-decisions": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-technical-decisions.mjs",
     "test:technical-requirements": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-technical-requirements.mjs",
