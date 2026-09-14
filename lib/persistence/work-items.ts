@@ -1,6 +1,12 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { CreateWorkItemInput, TransitionWorkItemInput, WorkItemRecord } from "@/lib/domain/work-item";
+import type {
+  AddWorkItemDependencyInput,
+  CreateWorkItemInput,
+  RemoveWorkItemDependencyInput,
+  TransitionWorkItemInput,
+  WorkItemRecord,
+} from "@/lib/domain/work-item";
 
 const JWT_FUTURE_RETRY_DELAYS_MS = [150, 350, 750] as const;
 
@@ -50,11 +56,16 @@ export class WorkItemStore {
     }
     return data;
   }
+
   async transition(input: TransitionWorkItemInput): Promise<string> {
     const { data, error } = await this.rpc("transition_work_item", {
-      p_workspace: input.workspaceId, p_work_item: input.workItemId,
-      p_expected_revision: input.expectedRevision, p_target_status: input.targetStatus,
-      p_reason: input.reason, p_confirm: input.confirm, p_request: input.requestId,
+      p_workspace: input.workspaceId,
+      p_work_item: input.workItemId,
+      p_expected_revision: input.expectedRevision,
+      p_target_status: input.targetStatus,
+      p_reason: input.reason,
+      p_confirm: input.confirm,
+      p_request: input.requestId,
     });
     if (error) {
       if (error.code === "22023") throw new Error("REQUEST_CONFLICT");
@@ -66,4 +77,40 @@ export class WorkItemStore {
     return data;
   }
 
+  async addDependency(input: AddWorkItemDependencyInput): Promise<string> {
+    const { data, error } = await this.rpc("add_work_item_dependency", {
+      p_workspace: input.workspaceId,
+      p_dependent_work_item: input.dependentWorkItemId,
+      p_prerequisite_work_item: input.prerequisiteWorkItemId,
+      p_reason: input.reason,
+      p_confirm: input.confirm,
+      p_request: input.requestId,
+    });
+    if (error) {
+      if (error.code === "22023") throw new Error("REQUEST_CONFLICT");
+      if (error.code === "42501") throw new Error("ACCESS_DENIED");
+      if (error.code === "23503") throw new Error("INVALID_TARGET");
+      if (error.code === "55000" || error.code === "23505") throw new Error("INVALID_STATE");
+      throw new Error("STORE_UNAVAILABLE");
+    }
+    return data;
+  }
+
+  async removeDependency(input: RemoveWorkItemDependencyInput): Promise<string> {
+    const { data, error } = await this.rpc("remove_work_item_dependency", {
+      p_workspace: input.workspaceId,
+      p_dependency: input.dependencyId,
+      p_reason: input.reason,
+      p_confirm: input.confirm,
+      p_request: input.requestId,
+    });
+    if (error) {
+      if (error.code === "22023") throw new Error("REQUEST_CONFLICT");
+      if (error.code === "42501") throw new Error("ACCESS_DENIED");
+      if (error.code === "23503") throw new Error("INVALID_TARGET");
+      if (error.code === "55000") throw new Error("INVALID_STATE");
+      throw new Error("STORE_UNAVAILABLE");
+    }
+    return data;
+  }
 }
