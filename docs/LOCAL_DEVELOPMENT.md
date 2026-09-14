@@ -104,6 +104,29 @@ The focused suite exercises:
 
 The generated AI result is advisory only. The regression verifies that review output and owner disposition remain separate from objective verification and project-authority records.
 
+## Durable work-dependency regression
+
+After building, run `npm run test:work-dependencies` on the same isolated disposable stack. CI runs this after the durable AI work-review suite and before the technical-authority regressions.
+
+The focused suite exercises:
+
+- owner-only creation and removal of same-workspace work-item dependencies;
+- stable dependency identity plus dependent/prerequisite revision snapshots at creation time;
+- live linked-work status while saved creation revisions remain immutable;
+- **Depends on** and reverse **Needed by** read-model behavior;
+- self-link, duplicate active link, unknown/cross-workspace target, foreign-owner, revoked-membership, and direct-table denial;
+- direct and indirect cycle prevention;
+- serialized concurrent opposite-edge requests so a two-node cycle cannot be committed;
+- one durable winner for distinct concurrent same-edge requests;
+- exact idempotent replay and changed-payload request-key conflict handling for create and remove;
+- transactional audit-failure rollback and retry for both operations;
+- reversible removal history without deleting creation metadata;
+- later re-creation of the same edge as a new durable record after removal;
+- persistence across sign-out/re-login;
+- rendered Work-view creation/removal, keyboard focus, and desktop/390 px screenshots.
+
+A dependency is a relationship record only. The regression verifies that adding or removing one does not automatically block, resume, complete, verify, validate, or release either work item and does not mutate unrelated project-authority state.
+
 ## Consequential technical-decision regression
 
 After building, run `npm run test:technical-decisions` on the same isolated disposable stack. CI runs this after the prior durable regression chain.
