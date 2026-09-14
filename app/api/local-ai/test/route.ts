@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { identityClient } from "@/lib/auth/server";
-import { runLocalAiTest } from "@/lib/ai/local-ai";
+import { runLocalAiHealthTest } from "@/lib/ai/local-ai-health";
 
 export const dynamic = "force-dynamic";
 
@@ -13,10 +13,10 @@ export async function POST() {
     const client = await identityClient();
     const { data, error } = await client.auth.getUser();
     if (error || !data.user) {
-      return NextResponse.json({ error: "Sign in before testing local AI." }, { status: 401 });
+      return NextResponse.json({ error: "A Wayfound owner session is required before testing local AI." }, { status: 401 });
     }
 
-    const result = await runLocalAiTest();
+    const result = await runLocalAiHealthTest();
     return NextResponse.json(result, {
       status: result.ok ? 200 : 503,
       headers: { "Cache-Control": "private, no-store, max-age=0" },
