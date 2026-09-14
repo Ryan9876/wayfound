@@ -96,10 +96,10 @@ jobs:
           npx --yes wait-on@8.0.1 http://127.0.0.1:3001
           specialist_headers="$(curl -sSI http://127.0.0.1:3001/specialist-reviews | tr -d '\r')"
           printf '%s\n' "$specialist_headers"
-          printf '%s\n' "$specialist_headers" | grep -Ei '^location: https?://127\.0\.0\.1:3001/workspaces$'
+          printf '%s\n' "$specialist_headers" | grep -Ei '^location: /workspaces$'
           handoff_headers="$(curl -sSI http://127.0.0.1:3001/handoffs | tr -d '\r')"
           printf '%s\n' "$handoff_headers"
-          printf '%s\n' "$handoff_headers" | grep -Ei '^location: https?://127\.0\.0\.1:3001/records$'
+          printf '%s\n' "$handoff_headers" | grep -Ei '^location: /records$'
 
       - name: Stop single-user application
         if: always()
