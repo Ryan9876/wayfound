@@ -552,7 +552,7 @@ export function GuidedWorkspace({
                         </p>
                       </Details>
                     </article>
-                  ))}
+                  ))
                 ) : (
                   <Empty>
                     No requirements yet. Add one before linking evidence to its
