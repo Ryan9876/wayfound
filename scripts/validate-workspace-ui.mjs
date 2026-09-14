@@ -106,9 +106,18 @@ try {
     await visible(page.getByRole('navigation', { name: 'Mobile project navigation', exact: true }));
     await hidden(page.getByRole('navigation', { name: 'Project navigation', exact: true }));
   }
-  await page.getByRole('link', { name: 'Records Review decisions, requirements, evidence, and documents.' }).click();
-  await visible(page.getByRole('heading', { name: 'Records', exact: true }));
-  await page.goBack(); await visible(page.getByRole('heading', { name: 'More', exact: true }));
+  const backPage = await page.context().newPage();
+  backPage.on('pageerror', error => errors.push(error.message));
+  await backPage.setViewportSize({ width: 390, height: 844 });
+  await backPage.goto(`${workspaceUrl}?view=more`);
+  await visible(backPage.getByRole('heading', { name: 'More', exact: true }));
+  await backPage.getByRole('link', { name: 'Records Review decisions, requirements, evidence, and documents.' }).click();
+  await backPage.waitForURL(/view=records$/);
+  await visible(backPage.getByRole('heading', { name: 'Records', exact: true }));
+  await backPage.goBack();
+  await backPage.waitForURL(/view=more$/);
+  await visible(backPage.getByRole('heading', { name: 'More', exact: true }));
+  await backPage.close();
   assert.deepEqual(errors, []);
   console.log('PASS: active single-user UI creation, required confirmations, saved statuses, navigation, disclosure, evidence distinction, unique DOM IDs, desktop/mobile rendering, reload, and browser back.');
 } finally { await browser.close(); }
