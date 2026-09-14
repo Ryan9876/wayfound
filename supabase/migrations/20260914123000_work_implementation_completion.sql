@@ -42,14 +42,15 @@ begin
  select * into target from wayfound.work_items where workspace_id=p_workspace and id=p_work_item for update;
  if not found then raise exception 'Work item unavailable' using errcode='23503'; end if;
  if target.owner_actor_id <> actor then raise exception 'Access denied' using errcode='42501'; end if;
- if p_target_status='Implemented' and target.status <> 'In progress' then
-  raise exception 'Work must be in progress before implementation can be recorded' using errcode='22023';
- end if;
 
  select * into previous from wayfound.work_item_transition_requests where actor_id=actor and request_id=p_request;
  if found then
   if previous.payload <> body then raise exception 'Request key conflict' using errcode='22023'; end if;
   return previous.transition_id;
+ end if;
+
+ if p_target_status='Implemented' and target.status <> 'In progress' then
+  raise exception 'Work must be in progress before implementation can be recorded' using errcode='22023';
  end if;
 
  if target.revision <> p_expected_revision or not (
