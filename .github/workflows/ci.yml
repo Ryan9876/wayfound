@@ -162,6 +162,10 @@ jobs:
         run: |
           WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
           npm run test:ai-review
+      - name: Validate durable work dependencies
+        run: |
+          WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
+          npm run test:work-dependencies
       - name: Validate technical decision authority
         run: |
           WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
