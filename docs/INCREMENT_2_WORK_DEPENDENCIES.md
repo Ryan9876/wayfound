@@ -1,10 +1,12 @@
 # Increment 2 — Durable work-item dependencies
 
-**Status:** Approved for implementation
+**Status:** Validated at application/test head `a3484c37199e0072b05eaf5f9979eff6406774b0`, CI run 346
 
 **Parent:** Increment 2 — Durable single-owner workspace record
 
 **Architecture basis:** Accepted ADR-0002 and ADR-0005
+
+**Validation evidence:** [increment-2-work-dependencies.md](validation/increment-2-work-dependencies.md)
 
 ## Outcome
 
