@@ -7,6 +7,11 @@ import type {
   TransitionWorkItemInput,
   WorkItemRecord,
 } from "@/lib/domain/work-item";
+import type {
+  AddWorkArtifactLinkInput,
+  AddWorkDecisionLinkInput,
+  RemoveWorkDirectionLinkInput,
+} from "@/lib/domain/work-direction-link";
 
 const JWT_FUTURE_RETRY_DELAYS_MS = [150, 350, 750] as const;
 
@@ -100,6 +105,63 @@ export class WorkItemStore {
     const { data, error } = await this.rpc("remove_work_item_dependency", {
       p_workspace: input.workspaceId,
       p_dependency: input.dependencyId,
+      p_reason: input.reason,
+      p_confirm: input.confirm,
+      p_request: input.requestId,
+    });
+    if (error) {
+      if (error.code === "22023") throw new Error("REQUEST_CONFLICT");
+      if (error.code === "42501") throw new Error("ACCESS_DENIED");
+      if (error.code === "23503") throw new Error("INVALID_TARGET");
+      if (error.code === "55000") throw new Error("INVALID_STATE");
+      throw new Error("STORE_UNAVAILABLE");
+    }
+    return data;
+  }
+
+  async addDecisionLink(input: AddWorkDecisionLinkInput): Promise<string> {
+    const { data, error } = await this.rpc("link_work_to_decision", {
+      p_workspace: input.workspaceId,
+      p_work_item: input.workItemId,
+      p_decision: input.decisionId,
+      p_reason: input.reason,
+      p_confirm: input.confirm,
+      p_request: input.requestId,
+    });
+    if (error) {
+      if (error.code === "22023") throw new Error("REQUEST_CONFLICT");
+      if (error.code === "42501") throw new Error("ACCESS_DENIED");
+      if (error.code === "23503") throw new Error("INVALID_TARGET");
+      if (error.code === "55000" || error.code === "23505") throw new Error("INVALID_STATE");
+      throw new Error("STORE_UNAVAILABLE");
+    }
+    return data;
+  }
+
+  async addArtifactLink(input: AddWorkArtifactLinkInput): Promise<string> {
+    const { data, error } = await this.rpc("link_work_to_artifact", {
+      p_workspace: input.workspaceId,
+      p_work_item: input.workItemId,
+      p_artifact: input.artifactId,
+      p_version: input.versionId,
+      p_reason: input.reason,
+      p_confirm: input.confirm,
+      p_request: input.requestId,
+    });
+    if (error) {
+      if (error.code === "22023") throw new Error("REQUEST_CONFLICT");
+      if (error.code === "42501") throw new Error("ACCESS_DENIED");
+      if (error.code === "23503") throw new Error("INVALID_TARGET");
+      if (error.code === "55000" || error.code === "23505") throw new Error("INVALID_STATE");
+      throw new Error("STORE_UNAVAILABLE");
+    }
+    return data;
+  }
+
+  async removeDirectionLink(input: RemoveWorkDirectionLinkInput): Promise<string> {
+    const { data, error } = await this.rpc("remove_work_direction_link", {
+      p_workspace: input.workspaceId,
+      p_link: input.linkId,
       p_reason: input.reason,
       p_confirm: input.confirm,
       p_request: input.requestId,
