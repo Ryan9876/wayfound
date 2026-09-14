@@ -158,6 +158,10 @@ jobs:
         run: |
           WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
           npm run test:work-completion
+      - name: Validate durable AI work review
+        run: |
+          WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
+          npm run test:ai-review
       - name: Validate technical decision authority
         run: |
           WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
