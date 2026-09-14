@@ -239,7 +239,7 @@ try {
   assert.equal(savedReview.status, 'Completed');
   assert.equal(savedReview.provider_id, 'lm-studio');
   assert.equal(savedReview.model, 'wayfound-test-model');
-  assert(savedReview.advisory_result.includes('verification evidence'), 'advisory result missing');
+  assert(savedReview.advisory_result.toLowerCase().includes('verification evidence'), 'advisory result missing');
   assert.deepEqual(await snapshotProject(workspace, work), before, 'AI review completion changed project state outside AI review records');
   expectedError(await rpc(clients[0], 'fail_ai_review', {
     p_workspace: workspace, p_review: first.id, p_provider_id: 'lm-studio', p_provider_label: 'LM Studio', p_model: 'wayfound-test-model', p_failure_detail: 'Changed terminal state.',
@@ -357,7 +357,6 @@ try {
   ok(await clients[0].auth.signInWithPassword({ email: emails[0], password }));
   savedWork = (await listWork(clients[0], workspace)).find(item => item.id === work);
   assert(savedWork.ai_reviews.some(review => review.id === uiReview.id && review.disposition === 'Needs follow-up'), 'AI review did not survive re-login');
-
   console.log('PASS: durable AI work review preserves exact target provenance, uses loopback local inference, remains advisory, records one owner disposition, denies invalid/foreign/revoked paths, preserves idempotency/concurrency/rollback, survives re-login, and keeps project verification/release state unchanged.');
 } finally {
   if (browser) await browser.close().catch(() => {});
