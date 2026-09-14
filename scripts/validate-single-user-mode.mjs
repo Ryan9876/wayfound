@@ -5,7 +5,7 @@ const requireText = (source, text, label) => {
   if (!source.includes(text)) throw new Error(`${label}: expected ${JSON.stringify(text)}`);
 };
 
-const [envExample, frame, layout, css, proxy, charter, requirements, delivery] = await Promise.all([
+const [envExample, frame, layout, css, proxy, charter, requirements, delivery, packageJson, singleUserSeed, localBackend, localDevelopment] = await Promise.all([
   read('.env.example'),
   read('components/workspace-frame.tsx'),
   read('app/layout.tsx'),
@@ -14,6 +14,10 @@ const [envExample, frame, layout, css, proxy, charter, requirements, delivery] =
   read('docs/PROJECT_CHARTER.md'),
   read('docs/PRODUCT_REQUIREMENTS.md'),
   read('docs/DELIVERY_PLAN.md'),
+  read('package.json'),
+  read('scripts/seed-single-user-local.mjs'),
+  read('scripts/local-backend.mjs'),
+  read('docs/LOCAL_DEVELOPMENT.md'),
 ]);
 
 requireText(envExample, 'WAYFOUND_SINGLE_USER_MODE=false', 'environment contract');
@@ -32,5 +36,12 @@ requireText(charter, 'one authenticated product owner', 'single-human charter');
 requireText(charter, 'AI is a system capability, not a second human participant and not an independent authority', 'AI authority boundary');
 requireText(requirements, 'WF-AI-002', 'AI self-approval prohibition');
 requireText(delivery, 'collaborator membership/administration', 'removed collaboration scope record');
+requireText(packageJson, '"seed:single-user-local": "WAYFOUND_LOCAL_TEST=1 node scripts/seed-single-user-local.mjs"', 'single-user seed command');
+requireText(singleUserSeed, 'backend.admin.auth.admin.deleteUser(user.id)', 'single-user seed removes other local users');
+requireText(singleUserSeed, 'backend.admin.auth.admin.updateUserById(retained.id', 'single-user seed refreshes retained owner');
+requireText(singleUserSeed, 'backend.admin.auth.admin.createUser', 'single-user seed creates owner when absent');
+requireText(localBackend, "process.env.WAYFOUND_LOCAL_TEST !== '1'", 'explicit local-test guard');
+requireText(localBackend, "['127.0.0.1','localhost']", 'loopback-only guard');
+requireText(localDevelopment, 'seed:single-user-local', 'single-user local-development instructions');
 
-console.log('PASS: ADR-0005 single-user mode exposes one human-owner product direction, hides in-app human reviewer/handoff entry points, preserves explicit AI advisory boundaries, and records multi-human collaboration as deferred scope.');
+console.log('PASS: ADR-0005 single-user mode exposes one human-owner product direction, hides in-app human reviewer/handoff entry points, preserves explicit AI advisory boundaries, records multi-human collaboration as deferred scope, and provides a loopback-only one-account local seed path.');
