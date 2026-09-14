@@ -1,10 +1,14 @@
 # Increment 2 — Work implementation completion
 
-**Status:** In progress
+**Status:** Validated
 
 **Parent:** Increment 2 — Durable single-owner workspace record
 
 **Architecture basis:** Accepted ADR-0002 and ADR-0005
+
+**Validated application head:** `b28e1718174d84e66c7e97fe203de12034d3b2ba` through CI run 308
+
+**Validation evidence:** [validation/increment-2-work-completion.md](validation/increment-2-work-completion.md)
 
 ## Outcome
 
@@ -100,6 +104,8 @@ Ambiguous save failures continue to offer an identical retry without claiming th
 
 ## Acceptance criteria
 
+All acceptance criteria below passed at application head `b28e1718174d84e66c7e97fe203de12034d3b2ba` through CI run [308](https://github.com/Ryan9876/wayfound/actions/runs/34849736796). See the [validation record](validation/increment-2-work-completion.md) for executed evidence, rendered inspection, and limits.
+
 1. An authenticated current owner can transition their exact `In progress` work revision to `Implemented` with a reason and explicit confirmation.
 2. The UI offers both `Mark implemented` and `Block work` while work is `In progress`, and offers no further lifecycle mutation after `Implemented`.
 3. The durable record retains the `In progress` → `Implemented` transition with stable transition ID, actor, timestamp, reason, old/new revision, and audit history after restart and re-login.
@@ -109,7 +115,7 @@ Ambiguous save failures continue to offer an identical retry without claiming th
 7. Audit failure rolls back the full completion mutation. Database interruption and recovery preserve the last committed state.
 8. Overview guidance excludes implemented work from unfinished current-stage recommendations.
 9. TypeScript, production build, security advisor, applicable durable regression suites, keyboard checks, responsive screenshots, and active single-user UI validation pass on the identified build.
-10. A validation record identifies the application commit, CI run, executed evidence, screenshots, limits, and remaining work. No `Validated` or `Released` claim is made until those checks pass.
+10. A validation record identifies the application commit, CI run, executed evidence, screenshots, limits, and remaining work. No `Released` claim is made by this validation.
 
 ## Migration and recovery
 
