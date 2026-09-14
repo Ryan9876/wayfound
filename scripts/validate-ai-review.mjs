@@ -351,7 +351,7 @@ try {
   await page.reload();
   await page.getByText(/Start a supported local AI model in LM Studio or Ollama/).waitFor({ timeout: 10000 });
   assert.equal(await page.getByText('Ask local AI to review', { exact: true }).count(), 0, 'AI-review action remained available with local AI offline');
-  assert(await page.getByText('Owner disposition · Needs follow-up', { exact: true }).isVisible(), 'saved AI review disappeared while local provider was offline');
+  assert(await uiCard.getByText('Owner disposition · Needs follow-up', { exact: true }).isVisible(), 'saved AI review disappeared while local provider was offline');
 
   ok(await clients[0].auth.signOut({ scope: 'local' }));
   ok(await clients[0].auth.signInWithPassword({ email: emails[0], password }));
