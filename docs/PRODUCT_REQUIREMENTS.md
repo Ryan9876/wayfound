@@ -10,6 +10,7 @@
 - `MAY` defines optional behavior.
 - Acceptance criteria define observable behavior. They do not claim that a test has executed.
 - Test evidence and review evidence remain separate from acceptance criteria.
+- AI-generated analysis is advisory unless a later requirement explicitly defines a durable AI-review record and its authority boundary.
 
 ## 2. Orientation and guidance
 
@@ -44,7 +45,7 @@
 
 **Requirement:** The Wayfound system MUST record unanswered material questions as assumptions or open questions instead of presenting them as facts or accepted requirements.
 
-## 3. Journey and ownership
+## 3. Journey, ownership, and AI boundary
 
 ### WF-JNY-001 — Fifteen-stage journey
 
@@ -71,12 +72,33 @@ The canonical stages are:
 14. Launch and establish ownership
 15. Monitor and improve
 
-### WF-OWN-001 — Decision and review ownership
+### WF-OWN-001 — Human decision authority
 
 **Priority:** P0  
 **Status:** Approved
 
-**Requirement:** The Wayfound system MUST distinguish product-owner decisions from work that requires qualified specialist review.
+**Requirement:** The Wayfound system MUST distinguish product-owner decisions from AI-generated recommendations, analysis, and review output.
+
+**Acceptance criteria:**
+
+- Given AI proposes or reviews project work, when that output is shown or stored, then the interface does not present it as owner-approved project direction unless the owner performs the required acceptance action.
+- Given AI analysis exists, when the owner reviews project status, then AI analysis is distinguishable from objective verification evidence.
+
+### WF-AI-001 — AI provenance
+
+**Priority:** P0  
+**Status:** Approved
+
+**Requirement:** When AI-generated analysis becomes a durable project record, Wayfound MUST retain enough provenance to identify the AI source or tool, the target record or revision, the review purpose, and the generated result.
+
+This requirement defines the product obligation. The durable AI-review implementation remains future Increment 2 scope until a bounded slice is specified and validated.
+
+### WF-AI-002 — AI does not self-approve
+
+**Priority:** P0  
+**Status:** Approved
+
+**Requirement:** AI output MUST NOT automatically approve a requirement, accept a decision or artifact, verify a criterion, declare a release ready, or authorize a production-changing action.
 
 ## 4. Durable records and status
 
@@ -92,7 +114,7 @@ The canonical stages are:
 **Priority:** P0  
 **Status:** Approved
 
-**Requirement:** The Wayfound system MUST NOT present implemented or reviewed work as verified unless the required verification evidence exists and is current.
+**Requirement:** The Wayfound system MUST NOT present implemented, AI-reviewed, or otherwise reviewed work as verified unless the required verification evidence exists and is current.
 
 ### WF-REC-003 — Change impact
 
@@ -101,7 +123,7 @@ The canonical stages are:
 
 **Requirement:** When an accepted decision or artifact changes, the Wayfound system MUST identify known dependent work that needs review and MUST preserve unaffected accepted work.
 
-If the impact is unknown, the system MUST show the impact as unknown until a responsible reviewer confirms it.
+If the impact is unknown, the system MUST show the impact as unknown until the owner or an approved verification process resolves it.
 
 ## 5. Artifact versioning and import
 
@@ -143,21 +165,23 @@ If the impact is unknown, the system MUST show the impact as unknown until a res
 
 If this summary is omitted, the project record must contain a reason and an alternative comparison method.
 
-## 6. Specialist handoff and reconciliation
+## 6. External human review
 
-### WF-HND-001 — Manual handoff package
+Multi-human collaboration inside Wayfound is deferred under ADR-0005.
 
-**Priority:** P0  
-**Status:** Approved
+### WF-HND-001 — External review package
 
-**Requirement:** When the owner prepares a specialist handoff, the Wayfound system MUST produce a bounded package that identifies relevant context, accepted scope, exclusions, decisions, assumptions, constraints, requested outputs, and return instructions.
+**Priority:** P2  
+**Status:** Deferred
 
-### WF-HND-002 — Returned work remains proposed
+**Requirement:** If a future approved scope adds an external human-review package, Wayfound SHOULD produce a bounded package that identifies relevant context, accepted scope, exclusions, decisions, assumptions, constraints, requested outputs, and return instructions without requiring workspace membership.
 
-**Priority:** P0  
-**Status:** Approved
+### WF-HND-002 — Returned external work remains proposed
 
-**Requirement:** When specialist work returns to Wayfound, the Wayfound system MUST preserve the original return and MUST keep returned changes proposed until they are reconciled with accepted scope and decisions.
+**Priority:** P2  
+**Status:** Deferred
+
+**Requirement:** If external human work is imported in a future approved scope, Wayfound MUST preserve the original return and MUST keep returned changes proposed until the owner reconciles them with accepted scope and decisions.
 
 ## 7. Release and care
 
@@ -166,7 +190,7 @@ If this summary is omitted, the project record must contain a reason and an alte
 **Priority:** P1  
 **Status:** Approved
 
-**Requirement:** Before a release action is authorized, the Wayfound system MUST identify the exact release version, target, material data effects, known interruption, recovery method, responsible executor, and applicable unresolved findings.
+**Requirement:** Before a release action is authorized, the Wayfound system MUST identify the exact release version, target, material data effects, known interruption, recovery method, responsible executor when applicable, and unresolved findings that affect the release decision.
 
 ### WF-REL-002 — Scoped authorization
 
@@ -180,7 +204,9 @@ If this summary is omitted, the project record must contain a reason and an alte
 **Priority:** P1  
 **Status:** Approved
 
-**Requirement:** A released project MUST identify an operations owner and MUST retain maintenance, incident, recovery, and improvement records in the project workspace.
+**Requirement:** A released project MUST identify operating responsibility and MUST retain maintenance, incident, recovery, and improvement records in the project workspace.
+
+For the single-user first version, the product owner is the default operations owner unless a later approved scope introduces another accountable human role.
 
 ## 8. First-version interface requirements
 
@@ -196,9 +222,11 @@ If this summary is omitted, the project record must contain a reason and an alte
 **Priority:** P0  
 **Status:** Approved
 
-**Requirement:** The desktop workspace MUST provide direct navigation to Overview, Journey, Work, Handoffs, Records, and Release & Care.
+**Requirement:** The single-user desktop workspace MUST provide direct navigation to Overview, Journey, Work, Records, and Release & Care.
 
 The compact mobile workspace MUST provide direct access to Overview, Journey, Work, and a More destination for the remaining workspace areas.
+
+A Handoffs destination is not required in the active single-user first-version interface.
 
 ### WF-UI-003 — Status is not color-only
 
@@ -211,6 +239,10 @@ The compact mobile workspace MUST provide direct access to Overview, Journey, Wo
 
 The following capabilities are outside the active first-version commitment unless a later approved change moves them into scope:
 
+- collaborator accounts, invitations, membership administration, and ownership transfer;
+- human work assignment inside Wayfound;
+- specialist reviewer accounts, reviewer-code exchange, and assignment-scoped human review;
+- manual human handoff/return workflows as a core project surface;
 - verified direct specialist-tool connectors;
 - automatic CI/CD evidence ingestion;
 - automatic repository change analysis;
@@ -223,6 +255,6 @@ A future requirement retains its normative strength only after its feature enter
 
 ## 10. Validation state
 
-The requirements above define expected behavior. They do not claim that the behavior is implemented, reviewed, verified, or released.
+The requirements above define expected behavior. They do not claim that all behavior is implemented, reviewed, verified, or released.
 
-The current prototype slice covers only the orientation, navigation, journey presentation, and representative record/readiness states needed for product-learning work.
+Existing validation records for authenticated human specialist-review slices remain valid evidence of those historical implementations. ADR-0005 removes those multi-human workflows from active first-version product scope; it does not rewrite their past validation state.
