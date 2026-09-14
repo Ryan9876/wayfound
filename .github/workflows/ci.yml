@@ -34,6 +34,9 @@ jobs:
       - name: Check single-user product mode
         run: npm run test:single-user-mode
 
+      - name: Check local AI connection contract
+        run: npm run test:local-ai-connection
+
       - name: Check TypeScript
         run: npm run lint
 
