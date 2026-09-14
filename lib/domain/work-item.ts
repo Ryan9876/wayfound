@@ -1,4 +1,9 @@
 import type { AiReviewRecord } from "@/lib/domain/ai-review";
+import type {
+  WorkDirectionArtifactCandidate,
+  WorkDirectionDecisionCandidate,
+  WorkDirectionLinkRecord,
+} from "@/lib/domain/work-direction-link";
 
 export type WorkItemRecord = {
   id: string;
@@ -16,6 +21,9 @@ export type WorkItemRecord = {
   dependencies: WorkItemDependencyRecord[];
   dependents: WorkItemDependencyRecord[];
   dependency_candidates: WorkItemDependencyCandidate[];
+  direction_links: WorkDirectionLinkRecord[];
+  direction_decision_candidates: WorkDirectionDecisionCandidate[];
+  direction_artifact_candidates: WorkDirectionArtifactCandidate[];
   revision: number;
   created_at: string;
   updated_at: string;
