@@ -22,6 +22,23 @@ npm run dev -- --hostname 127.0.0.1
 
 Open `http://127.0.0.1:3000/sign-in`. The seed command refuses non-loopback endpoints, preserves existing users, and inserts no fixture project records. Public signup is disabled for this slice. Passwords are not committed or printed by the tooling.
 
+## Single-user local test mode
+
+Use the active first-version single-user experience when one human owner is testing Wayfound without another human collaborator or specialist account.
+
+Set `WAYFOUND_SINGLE_USER_MODE=true` in `.env.local`, then seed exactly one local owner identity:
+
+```bash
+export WAYFOUND_SEED_EMAIL='owner@example.test'
+# Set WAYFOUND_SEED_PASSWORD to the local test password, at least 12 characters.
+npm run seed:single-user-local
+npm run dev -- --hostname 127.0.0.1
+```
+
+`seed:single-user-local` is intentionally destructive only inside the isolated loopback Supabase stack. It removes other local Auth users, creates or retains the requested owner identity, refreshes that local owner's password, and inserts no project records. The command inherits the loopback-only guard from `scripts/local-backend.mjs` and cannot target a hosted Supabase endpoint.
+
+In single-user mode, normal workspace navigation hides human specialist review and handoff entry points. Existing validated specialist-review database structures and regression tests remain in the repository as historical capability; they are not part of the active first-version user flow. AI guidance remains advisory and cannot independently approve, verify, validate, release, or authorize production actions.
+
 Run `npm run build` and `npm run test:workspace` for the full isolated acceptance test. The test provisions disposable identities, exercises real PostgreSQL and Supabase Auth, starts/restarts the built app on port 3100, and briefly pauses the local database container. Use a disposable local stack without other development activity. Screenshots are written under `artifacts/workspace`. CI runs this in a fresh runner.
 
 ## Failure and recovery
