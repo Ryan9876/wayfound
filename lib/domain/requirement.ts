@@ -16,8 +16,8 @@ export type RequirementRecord = {
   title: string;
   obligation: "MUST" | "SHOULD" | "MAY";
   requirement: string;
-  kind: "product";
-  authority: "owner";
+  kind: "product" | "technical";
+  authority: "owner" | "owner-after-specialist-review";
   status: "Approved";
   approving_actor_id: string;
   revision: number;
