@@ -89,11 +89,17 @@ jobs:
 
       - name: Smoke-test single-user route boundary
         run: |
+          rm -rf .next
+          WAYFOUND_SINGLE_USER_MODE=true npm run build
           WAYFOUND_SINGLE_USER_MODE=true npm run start -- --hostname 127.0.0.1 --port 3001 > /tmp/wayfound-single-user.log 2>&1 &
           echo $! > /tmp/wayfound-single-user.pid
           npx --yes wait-on@8.0.1 http://127.0.0.1:3001
-          curl -sSI http://127.0.0.1:3001/specialist-reviews | tr -d '\r' | grep -E '^location: http://127.0.0.1:3001/workspaces$'
-          curl -sSI http://127.0.0.1:3001/handoffs | tr -d '\r' | grep -E '^location: http://127.0.0.1:3001/records$'
+          specialist_headers="$(curl -sSI http://127.0.0.1:3001/specialist-reviews | tr -d '\r')"
+          printf '%s\n' "$specialist_headers"
+          printf '%s\n' "$specialist_headers" | grep -Ei '^location: https?://127\.0\.0\.1:3001/workspaces$'
+          handoff_headers="$(curl -sSI http://127.0.0.1:3001/handoffs | tr -d '\r')"
+          printf '%s\n' "$handoff_headers"
+          printf '%s\n' "$handoff_headers" | grep -Ei '^location: https?://127\.0\.0\.1:3001/records$'
 
       - name: Stop single-user application
         if: always()
