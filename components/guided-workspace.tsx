@@ -103,10 +103,7 @@ export function GuidedWorkspace({
       (item) =>
         item.stage_number === current.number && item.status === "Approved",
     ) ??
-    workItems.find(
-      (item) =>
-        item.stage_number === current.number && item.status === "Proposed",
-    );
+    workItems.find((item) => item.stage_number === current.number);
   const next = blocked[0] ?? currentWork;
   const changes = [
     ...decisions.map((item) => ({
@@ -555,7 +552,7 @@ export function GuidedWorkspace({
                         </p>
                       </Details>
                     </article>
-                  ))}
+                  ))
                 ) : (
                   <Empty>
                     No requirements yet. Add one before linking evidence to its
