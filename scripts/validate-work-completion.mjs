@@ -109,6 +109,21 @@ try {
     p_request: randomUUID(),
   }));
 
+  const proposedGuard = await createWork(clients[0], workspace, 'Proposed completion guard');
+  expectedError(
+    await rpc(clients[0], 'transition_work_item', transitionArgs(workspace, proposedGuard, 1, 'Implemented', 'Attempt completion before approval.')),
+    'proposed work was marked implemented',
+    '22023',
+  );
+
+  const approvedGuard = await createWork(clients[0], workspace, 'Approved completion guard');
+  ok(await rpc(clients[0], 'transition_work_item', transitionArgs(workspace, approvedGuard, 1, 'Approved', 'Owner approves the guarded work.')));
+  expectedError(
+    await rpc(clients[0], 'transition_work_item', transitionArgs(workspace, approvedGuard, 2, 'Implemented', 'Attempt completion before start.')),
+    'approved work was marked implemented',
+    '22023',
+  );
+
   const work = await createWork(clients[0], workspace, 'Complete the bounded implementation');
   const foreignWork = await createWork(clients[1], foreignWorkspace, 'Foreign work');
   await advanceToInProgress(clients[0], workspace, work);
@@ -164,6 +179,24 @@ try {
   ok(await rpc(clients[0], 'transition_work_item', transitionArgs(workspace, blockedWork, 3, 'Blocked', 'A dependency blocks progress.')));
   expectedError(await rpc(clients[0], 'transition_work_item', transitionArgs(workspace, blockedWork, 4, 'Implemented', 'Attempt completion while blocked.')), 'blocked work was marked implemented', '22023');
 
+  const concurrentWork = await createWork(clients[0], workspace, 'Concurrent completion guard');
+  await advanceToInProgress(clients[0], workspace, concurrentWork);
+  const concurrent = await Promise.all([
+    rpc(clients[0], 'transition_work_item', transitionArgs(workspace, concurrentWork, 3, 'Implemented', 'Concurrent completion A.')),
+    rpc(clients[0], 'transition_work_item', transitionArgs(workspace, concurrentWork, 3, 'Implemented', 'Concurrent completion B.')),
+  ]);
+  assert.equal(concurrent.filter(result => !result.error).length, 1, 'distinct completion requests did not produce exactly one winner');
+  const concurrentFailure = concurrent.find(result => result.error);
+  expectedError(concurrentFailure, 'distinct completion loser unexpectedly succeeded');
+  const concurrentSaved = (await list(clients[0], workspace)).find(item => item.id === concurrentWork);
+  assert.equal(concurrentSaved.status, 'Implemented');
+  assert.equal(concurrentSaved.revision, 4);
+  assert.equal(
+    concurrentSaved.transitions.filter(transition => transition.from_status === 'In progress' && transition.to_status === 'Implemented').length,
+    1,
+    'concurrent completion wrote more than one implementation transition',
+  );
+
   const rollbackWork = await createWork(clients[0], workspace, 'Completion rollback');
   await advanceToInProgress(clients[0], workspace, rollbackWork);
   const rollbackArgs = transitionArgs(workspace, rollbackWork, 3, 'Implemented', 'Completion should roll back with audit failure.');
@@ -201,7 +234,7 @@ try {
   assert.equal(saved.status, 'Implemented');
   assert.equal(saved.transitions.at(-1).id, completionId);
 
-  console.log('PASS: owner work completion records Implemented without verification; idempotency, concurrency, authority, target isolation, rollback, revocation, direct-write denial, durable history, and non-collateral release/evidence state passed.');
+  console.log('PASS: owner work completion records Implemented without verification; invalid pre-start completion, idempotency, distinct-request concurrency, authority, target isolation, rollback, revocation, direct-write denial, durable history, and non-collateral release/evidence state passed.');
 } finally {
   await sql.end();
 }
