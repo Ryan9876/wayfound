@@ -470,6 +470,7 @@ export function GuidedWorkspace({
                           id={`criterion-${criterion.id}`}
                           key={criterion.id}
                         >
+                          <span className="status-chip">{criterion.lifecycle}</span>
                           <strong>How will we know it works?</strong>
                           <p>{criterion.statement}</p>
                           <p className="form-help">
@@ -525,13 +526,20 @@ export function GuidedWorkspace({
                                 result.acceptance_criterion_id === criterion.id,
                             ) && <Empty>No evidence yet.</Empty>}
                           </details>
-                          <Add label="Add evidence">
-                            <CreateEvidenceForm
-                              workspaceId={workspace.id}
-                              acceptanceCriterionId={criterion.id}
-                              requestId={randomUUID()}
-                            />
-                          </Add>
+                          {criterion.lifecycle === "Active" ? (
+                            <Add label="Add evidence">
+                              <CreateEvidenceForm
+                                workspaceId={workspace.id}
+                                acceptanceCriterionId={criterion.id}
+                                requestId={randomUUID()}
+                              />
+                            </Add>
+                          ) : (
+                            <p className="form-help">
+                              This condition is withdrawn. Existing evidence remains
+                              historical; new evidence cannot be recorded for it.
+                            </p>
+                          )}
                           <Details>
                             <p>
                               Acceptance criterion · Revision{" "}
