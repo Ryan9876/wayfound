@@ -15,10 +15,10 @@ export function CreateTechnicalRequirementForm({ workspaceId, requestId }: { wor
   return <form action={action} className="durable-form specialist-review-form">
     <input type="hidden" name="workspaceId" value={workspaceId} />
     <input type="hidden" name="requestId" value={requestId} />
-    <label htmlFor="technical-requirement-title">Requirement title
+    <label htmlFor="technical-requirement-title">Technical requirement title
       <input id="technical-requirement-title" name="title" required maxLength={160} placeholder="For example: Isolate tenant data at the database boundary" />
     </label>
-    <label htmlFor="technical-requirement-obligation">Obligation
+    <label htmlFor="technical-requirement-obligation">Technical requirement obligation
       <select id="technical-requirement-obligation" name="obligation" defaultValue="MUST" required>
         <option value="MUST">MUST</option>
         <option value="SHOULD">SHOULD</option>
@@ -57,10 +57,10 @@ export function ReviseTechnicalRequirementForm({ proposal, requestId }: { propos
       <input type="hidden" name="proposalId" value={proposal.id} />
       <input type="hidden" name="expectedRevision" value={proposal.revision} />
       <input type="hidden" name="requestId" value={requestId} />
-      <label htmlFor={`technical-requirement-revise-title-${suffix}`}>Requirement title
+      <label htmlFor={`technical-requirement-revise-title-${suffix}`}>Technical requirement title
         <input id={`technical-requirement-revise-title-${suffix}`} name="title" required maxLength={160} defaultValue={proposal.title} />
       </label>
-      <label htmlFor={`technical-requirement-revise-obligation-${suffix}`}>Obligation
+      <label htmlFor={`technical-requirement-revise-obligation-${suffix}`}>Technical requirement obligation
         <select id={`technical-requirement-revise-obligation-${suffix}`} name="obligation" defaultValue={proposal.obligation} required>
           <option value="MUST">MUST</option><option value="SHOULD">SHOULD</option><option value="MAY">MAY</option>
         </select>
