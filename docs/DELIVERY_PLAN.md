@@ -44,7 +44,7 @@ The active first-version product model is defined by ADR-0005: one authenticated
 
 The active single-user scope now prioritizes:
 
-1. multiple acceptance-criterion lifecycle;
+1. multiple acceptance-criterion lifecycle — [additional product criteria slice](INCREMENT_2_MULTIPLE_CRITERIA.md) In progress; technical multi-criterion proposals and criterion change/withdrawal remain later scope;
 2. evidence freshness/outdated-state handling and explicit verification decisions;
 3. maintenance records and later lifecycle behavior;
 4. change-impact handling, including dependency/project-direction impact behavior;

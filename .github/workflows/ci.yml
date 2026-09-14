@@ -178,6 +178,10 @@ jobs:
         run: |
           WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
           npm run test:technical-requirements
+      - name: Validate additional product criteria
+        run: |
+          WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
+          npm run test:multiple-criteria
       - name: Validate automatic single-user owner session
         env:
           WAYFOUND_SEED_EMAIL: owner-auto@wayfound.local

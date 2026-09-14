@@ -1,3 +1,4 @@
+import { AddCriterion } from "@/components/add-criterion";
 import Link from "next/link";
 import { randomUUID } from "node:crypto";
 import { WorkspaceFrame } from "./workspace-frame";
@@ -445,6 +446,7 @@ export function GuidedWorkspace({
                   requirements.map((item) => (
                     <article
                       className="durable-card requirement-card"
+                      id={`requirement-${item.id}`}
                       key={item.id}
                     >
                       <span className="status-chip">{item.status}</span>
@@ -536,9 +538,11 @@ export function GuidedWorkspace({
                               {criterion.revision}
                             </p>
                             <code>Criterion ID: {criterion.id}</code>
+                            {criterion.addition && <><p>Added because: {criterion.addition.reason}</p><p>Requirement revision {criterion.addition.from_revision} → {criterion.addition.to_revision}</p></>}
                           </Details>
                         </div>
                       ))}
+                      {item.kind === "product" && item.authority === "owner" && <AddCriterion requirement={item} requestId={randomUUID()} />}
                       <Details>
                         <p>
                           Requirement · {item.obligation} · Kind: {item.kind} ·

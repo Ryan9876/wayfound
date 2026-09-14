@@ -123,3 +123,7 @@ Future change-impact work must use the durable link as input and preserve unknow
 ## Validation conclusion
 
 The bounded work-to-project-direction link slice is **Validated** at application/test head `ccf138887980c9bc7c53a3a9817c9c75572278c3` through CI run 367 and direct rendered-evidence review. Increment 2 as a whole remains **In progress**.
+
+## Exact reconciliation-head confirmation
+
+Documentation head `8b1425240e030524588adb4652b19e52892967ee` passed CI run **372**, run ID `34898691874`. Both `validate` and `durable-workspace` succeeded, including the focused direction-link gate and prior regressions. This closes reconciliation of the application evidence at `ccf138887980c9bc7c53a3a9817c9c75572278c3`, run 367. PR #1 was updated and remains Draft. Increment 2 remains In progress; no release is claimed.

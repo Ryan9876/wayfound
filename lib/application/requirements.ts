@@ -2,7 +2,7 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { identityClient } from "@/lib/auth/server";
 import { RequirementStore } from "@/lib/persistence/requirements";
-import { validateCreateRequirement, type CreateRequirementInput } from "@/lib/domain/requirement";
+import { validateAddCriterion, type AddCriterionInput, validateCreateRequirement, type CreateRequirementInput } from "@/lib/domain/requirement";
 
 export async function requirementService() {
   const client = await identityClient();
@@ -14,6 +14,7 @@ export async function requirementService() {
   const store = new RequirementStore(client);
   return {
     list: (workspaceId: string) => /^[0-9a-f-]{36}$/i.test(workspaceId) ? store.list(workspaceId) : Promise.resolve([]),
+    addCriterion: (input: AddCriterionInput) => store.addCriterion(validateAddCriterion(input)),
     create: (input: CreateRequirementInput) => store.create(validateCreateRequirement(input)),
   };
 }

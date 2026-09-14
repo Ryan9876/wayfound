@@ -1,4 +1,5 @@
 export type AcceptanceCriterionRecord = {
+  addition?: { reason: string; from_revision: number; to_revision: number; actor_id: string; created_at: string } | null;
   id: string;
   workspace_id: string;
   requirement_id: string;
@@ -55,6 +56,26 @@ export function validateCreateRequirement(input: CreateRequirementInput): Create
     !result.requirement || result.requirement.length > 4000 ||
     !result.acceptanceCriterion || result.acceptanceCriterion.length > 4000
   ) {
+    throw new Error("INVALID_INPUT");
+  }
+  return result;
+}
+
+export type AddCriterionInput = {
+  workspaceId: string;
+  requirementId: string;
+  expectedRevision: number;
+  statement: string;
+  reason: string;
+  confirm: boolean;
+  requestId: string;
+};
+
+export function validateAddCriterion(input: AddCriterionInput): AddCriterionInput {
+  const result = { ...input, statement: input.statement.trim(), reason: input.reason.trim() };
+  if (!UUID.test(result.workspaceId) || !UUID.test(result.requirementId) || !UUID.test(result.requestId) ||
+      !Number.isSafeInteger(result.expectedRevision) || result.expectedRevision < 1 || !result.confirm ||
+      !result.statement || result.statement.length > 4000 || !result.reason || result.reason.length > 2000) {
     throw new Error("INVALID_INPUT");
   }
   return result;

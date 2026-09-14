@@ -352,3 +352,11 @@ Creation resolves target eligibility and revisions from authoritative database s
 The Work view exposes **Project direction** separately from **Dependencies**, showing target type/title, accepted context, saved reliance reason, and revision/version snapshots. Removal requires a reason and confirmation, preserves the original link and creation metadata, and records removal metadata. Active and removed history survives re-login.
 
 A direction link records known reliance only. It does not claim that the direction changed, that impact exists or is known, that work is affected/unaffected/stale/blocked/safe, or that review is resolved. It does not change work, accepted direction, evidence, verification, stage, release, or production authority. Later change-impact behavior must preserve unknown impact as unknown until an authorized process resolves it.
+
+## 19. Additional product acceptance criteria
+
+**Status:** In progress; application validation pending. See [bounded specification](INCREMENT_2_MULTIPLE_CRITERIA.md).
+
+The owner can add a condition to an existing Approved product requirement using the existing criterion collection and exact-criterion evidence model. Creation still creates one initial criterion. The new command locks live owner membership and the requirement, requires an expected revision, reason and confirmation, and atomically adds one immutable condition, increments requirement revision, and saves addition/audit/idempotency history. Exact replay succeeds only after live authorization; stale distinct requests and duplicate conditions fail.
+
+Existing criteria and evidence snapshots remain unchanged. The read model includes optional addition metadata per criterion. The active guided product view exposes the add control and keeps each criterion's evidence separate. Technical requirements deny this owner-only action and retain their exact specialist-reviewed condition. Multiple technical criteria, criterion revision/withdrawal, evidence freshness and verification remain future scope. The additive migration requires no backfill; rollback disables the new mutation while preserving records.

@@ -168,6 +168,9 @@ try {
   assert(canonical,'approved technical requirement missing from canonical requirements');
   assert.equal(canonical.kind,'technical'); assert.equal(canonical.authority,'owner-after-specialist-review'); assert.equal(canonical.status,'Approved'); assert.equal(canonical.obligation,'MUST'); assert.equal(canonical.acceptance_criteria.length,1); assert.equal(canonical.acceptance_criteria[0].statement,primaryArgs.p_acceptance_criterion);
   assert.equal(canonical.acceptance_criteria[0].id,saved.approval.criterion_id);
+  expectedError(await rpc(clients[0],'add_owner_criterion',{p_workspace:workspace,p_requirement:requirementId,p_expected_revision:canonical.revision,p_statement:'Unreviewed additional technical condition',p_reason:'Must not bypass exact specialist review',p_confirm:true,p_request:randomUUID()}),'owner-only criterion addition changed technical requirement','42501');
+  assert.deepEqual((await requirements(clients[0],workspace)).find(x=>x.id===requirementId),canonical,'technical requirement changed after denied criterion addition');
+
 
   for (const conclusion of ['Advisory','Changes required']) {
     const proposal=await createProposal(clients[0],workspace,`${conclusion} gate`);
