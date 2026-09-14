@@ -334,7 +334,7 @@ try {
   await uiCard.getByLabel('Why?').fill('Collect objective evidence before making any verification claim.');
   await uiCard.getByRole('checkbox', { name: /records my treatment of AI advice only/i }).check();
   await uiCard.getByRole('button', { name: 'Save disposition', exact: true }).click();
-  await page.getByText('Owner disposition · Needs follow-up', { exact: true }).waitFor({ timeout: 30000 });
+  await uiCard.getByText('Owner disposition · Needs follow-up', { exact: true }).waitFor({ timeout: 30000 });
 
   const afterUi = (await listWork(clients[0], workspace)).find(item => item.id === work).ai_reviews.find(review => review.id === uiReview.id);
   assert.equal(afterUi.disposition, 'Needs follow-up');
