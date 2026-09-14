@@ -68,12 +68,10 @@ function RemoveDependencyForm({
 
 export function WorkItemDependencies({
   item,
-  allWorkItems,
   addRequestId,
   removeRequestId,
 }: {
   item: WorkItemRecord;
-  allWorkItems: WorkItemRecord[];
   addRequestId: string;
   removeRequestId: string;
 }) {
@@ -82,10 +80,12 @@ export function WorkItemDependencies({
   });
   const [reason, setReason] = useState("");
   const [confirmed, setConfirmed] = useState(false);
-  const activePrerequisites = new Set(item.dependencies.map((dependency) => dependency.prerequisite_work_item_id));
-  const candidates = allWorkItems
-    .filter((candidate) => candidate.id !== item.id && !activePrerequisites.has(candidate.id))
-    .sort((a, b) => a.title.localeCompare(b.title));
+  const activePrerequisites = new Set(
+    item.dependencies.map((dependency) => dependency.prerequisite_work_item_id),
+  );
+  const candidates = item.dependency_candidates.filter(
+    (candidate) => !activePrerequisites.has(candidate.id),
+  );
 
   return (
     <section className="work-dependencies" aria-labelledby={`dependencies-title-${item.id}`}>
