@@ -2,7 +2,16 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { identityClient } from "@/lib/auth/server";
 import { WorkItemStore } from "@/lib/persistence/work-items";
-import { validateCreateWorkItem, validateTransitionWorkItem, type TransitionWorkItemInput, type CreateWorkItemInput } from "@/lib/domain/work-item";
+import {
+  validateAddWorkItemDependency,
+  validateCreateWorkItem,
+  validateRemoveWorkItemDependency,
+  validateTransitionWorkItem,
+  type AddWorkItemDependencyInput,
+  type CreateWorkItemInput,
+  type RemoveWorkItemDependencyInput,
+  type TransitionWorkItemInput,
+} from "@/lib/domain/work-item";
 
 export async function workItemService() {
   const client = await identityClient();
@@ -16,5 +25,7 @@ export async function workItemService() {
     list: (workspaceId: string) => /^[0-9a-f-]{36}$/i.test(workspaceId) ? store.list(workspaceId) : Promise.resolve([]),
     transition: (input: TransitionWorkItemInput) => store.transition(validateTransitionWorkItem(input)),
     create: (input: CreateWorkItemInput) => store.create(validateCreateWorkItem(input)),
+    addDependency: (input: AddWorkItemDependencyInput) => store.addDependency(validateAddWorkItemDependency(input)),
+    removeDependency: (input: RemoveWorkItemDependencyInput) => store.removeDependency(validateRemoveWorkItemDependency(input)),
   };
 }
