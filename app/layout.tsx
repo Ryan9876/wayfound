@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Mono, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 import "./durable-workspace.css";
+import "./single-user-mode.css";
 import "./typography.css";
 import "./desktop-polish.css";
 import "./overview-polish.css";
@@ -41,9 +42,11 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const singleUserMode = process.env.WAYFOUND_SINGLE_USER_MODE === "true";
+
   return (
     <html lang="en" className={`${sourceSans.variable} ${plexMono.variable}`}>
-      <body>{children}</body>
+      <body className={singleUserMode ? "single-user-mode" : undefined}>{children}</body>
     </html>
   );
 }
