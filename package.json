@@ -16,6 +16,7 @@
     "test:artifacts": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-artifacts.mjs",
     "test:artifact-acceptance": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-artifact-acceptance.mjs",
     "test:work-lifecycle": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-work-lifecycle.mjs",
+    "test:work-completion": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-work-completion.mjs",
     "test:specialist-review": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-specialist-review.mjs",
     "test:technical-decisions": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-technical-decisions.mjs",
     "test:technical-requirements": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-technical-requirements.mjs",
