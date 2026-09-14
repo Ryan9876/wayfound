@@ -3,6 +3,7 @@ import { IBM_Plex_Mono, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 import "./durable-workspace.css";
 import "./single-user-mode.css";
+import "./local-ai-status.css";
 import "./typography.css";
 import "./desktop-polish.css";
 import "./overview-polish.css";
