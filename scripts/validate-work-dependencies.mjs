@@ -349,7 +349,7 @@ try {
   await page.goto(`${base}/workspaces/${workspace}?view=work#work-item-${uiDependent}`);
   const dependentCard = page.locator(`#work-item-${uiDependent}`);
   const prerequisiteCard = page.locator(`#work-item-${uiPrerequisite}`);
-  await dependentCard.getByText('Add dependency', { exact: true }).click();
+  await dependentCard.locator('details.dependency-add > summary').click();
   await dependentCard.getByLabel('What work must this depend on?').selectOption(uiPrerequisite);
   await dependentCard.getByLabel('Why is this dependency needed?').fill('The UI dependent work needs the UI prerequisite result first.');
   await dependentCard.getByRole('checkbox', { name: /I confirm that this work depends on the selected work/i }).check();
@@ -362,7 +362,7 @@ try {
   assert.equal(uiWork.find(item => item.id === uiDependent).status, 'Proposed', 'UI dependency changed dependent status');
   assert.equal(uiWork.find(item => item.id === uiPrerequisite).status, 'Proposed', 'UI dependency changed prerequisite status');
 
-  const removeSummary = dependentCard.getByText('Remove dependency', { exact: true });
+  const removeSummary = dependentCard.locator('details.dependency-remove > summary');
   await removeSummary.focus();
   assert(await removeSummary.evaluate(element => element === document.activeElement), 'dependency removal disclosure is not keyboard focusable');
   assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'dependency desktop view overflow');
