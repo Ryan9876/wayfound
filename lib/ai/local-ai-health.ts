@@ -1,9 +1,5 @@
 import "server-only";
-import {
-  detectLocalAi,
-  type LocalAiConnectionState,
-  type LocalAiProviderId,
-} from "@/lib/ai/local-ai";
+import { detectLocalAi, type LocalAiConnectionState, type LocalAiProviderId } from "@/lib/ai/local-ai";
 
 export type LocalAiDiagnosticAttempt = {
   name: string;
@@ -41,7 +37,7 @@ export type LocalAiHealthResult = {
   diagnostics: LocalAiHealthDiagnostics;
 };
 
-type LmStudioNativeChatResponse = {
+type NativeBody = {
   model_instance_id?: string;
   output?: Array<{ type?: string; content?: string | null }>;
   stats?: {
@@ -53,7 +49,7 @@ type LmStudioNativeChatResponse = {
   };
 };
 
-type OpenAiCompatibleChatResponse = {
+type CompatBody = {
   model?: string;
   choices?: Array<{ message?: { content?: string | null } }>;
   usage?: {
@@ -64,7 +60,7 @@ type OpenAiCompatibleChatResponse = {
   };
 };
 
-type OllamaChatResponse = {
+type OllamaBody = {
   model?: string;
   message?: { content?: string | null };
   prompt_eval_count?: number;
@@ -88,11 +84,11 @@ const TEST_MARKER = "WAYFOUND_LOCAL_AI_OK";
 const TEST_MAX_OUTPUT_TOKENS = 128;
 const DIAGNOSTIC_PREVIEW_LIMIT = 1800;
 
-function finiteNumber(value: unknown): number | null {
+function n(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
-function normalizeResponse(value: unknown): string {
+function text(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
@@ -107,25 +103,24 @@ function emptyMetrics() {
   };
 }
 
-function preview(text: string): string | null {
-  const trimmed = text.trim();
+function preview(value: string): string | null {
+  const trimmed = value.trim();
   if (!trimmed) return null;
-  return trimmed.length > DIAGNOSTIC_PREVIEW_LIMIT
-    ? `${trimmed.slice(0, DIAGNOSTIC_PREVIEW_LIMIT)}…`
-    : trimmed;
+  return trimmed.length > DIAGNOSTIC_PREVIEW_LIMIT ? `${trimmed.slice(0, DIAGNOSTIC_PREVIEW_LIMIT)}…` : trimmed;
 }
 
 function providerMessage(body: unknown): string | null {
   if (!body || typeof body !== "object") return null;
   const record = body as Record<string, unknown>;
-  if (typeof record.message === "string") return record.message;
-  if (typeof record.detail === "string") return record.detail;
-  if (typeof record.error === "string") return record.error;
-  if (record.error && typeof record.error === "object") {
-    const nested = record.error as Record<string, unknown>;
-    if (typeof nested.message === "string") return nested.message;
-    if (typeof nested.detail === "string") return nested.detail;
-    if (typeof nested.type === "string") return nested.type;
+  for (const key of ["message", "detail", "error"]) {
+    const value = record[key];
+    if (typeof value === "string") return value;
+    if (value && typeof value === "object") {
+      const nested = value as Record<string, unknown>;
+      if (typeof nested.message === "string") return nested.message;
+      if (typeof nested.detail === "string") return nested.detail;
+      if (typeof nested.type === "string") return nested.type;
+    }
   }
   return null;
 }
@@ -140,25 +135,21 @@ async function postJson(url: string, body: unknown): Promise<PostResult> {
     body: JSON.stringify(body),
   });
   const rawBody = await response.text().catch(() => "");
-  let responseBody: unknown = null;
+  let parsed: unknown = null;
   if (rawBody) {
-    try {
-      responseBody = JSON.parse(rawBody);
-    } catch {
-      responseBody = null;
-    }
+    try { parsed = JSON.parse(rawBody); } catch { parsed = null; }
   }
   return {
     ok: response.ok,
     status: response.status,
-    body: responseBody,
+    body: parsed,
     rawBody,
     contentType: response.headers.get("content-type"),
     elapsedMs: Math.round(performance.now() - started),
   };
 }
 
-function attemptRecord(
+function attempt(
   name: string,
   endpoint: string,
   result: PostResult,
@@ -178,7 +169,7 @@ function attemptRecord(
   };
 }
 
-function baseDiagnostics(
+function diagnostics(
   status: Awaited<ReturnType<typeof detectLocalAi>>,
   attempts: LocalAiDiagnosticAttempt[],
 ): LocalAiHealthDiagnostics {
@@ -190,55 +181,49 @@ function baseDiagnostics(
   };
 }
 
-function nativeMetrics(body: LmStudioNativeChatResponse) {
-  const response = normalizeResponse(
-    Array.isArray(body.output)
-      ? body.output.find(item => item.type === "message")?.content
-      : null,
-  );
-  const promptTokens = finiteNumber(body.stats?.input_tokens);
-  const completionTokens = finiteNumber(body.stats?.total_output_tokens);
-  const reasoningTokens = finiteNumber(body.stats?.reasoning_output_tokens);
+function nativeValues(body: NativeBody) {
+  const response = text(Array.isArray(body.output) ? body.output.find(item => item.type === "message")?.content : null);
+  const promptTokens = n(body.stats?.input_tokens);
+  const completionTokens = n(body.stats?.total_output_tokens);
+  const reasoningTokens = n(body.stats?.reasoning_output_tokens);
   const totalTokens = promptTokens !== null && completionTokens !== null ? promptTokens + completionTokens : null;
-  const tokensPerSecond = finiteNumber(body.stats?.tokens_per_second);
-  const timeToFirstTokenSeconds = finiteNumber(body.stats?.time_to_first_token_seconds);
-  const timeToFirstTokenMs = timeToFirstTokenSeconds === null ? null : Math.round(timeToFirstTokenSeconds * 1000);
+  const tokensPerSecond = n(body.stats?.tokens_per_second);
+  const seconds = n(body.stats?.time_to_first_token_seconds);
   return {
     response,
-    promptTokens,
-    completionTokens,
-    reasoningTokens,
-    totalTokens,
-    tokensPerSecond,
-    timeToFirstTokenMs,
+    metrics: {
+      promptTokens,
+      completionTokens,
+      reasoningTokens,
+      totalTokens,
+      tokensPerSecond,
+      timeToFirstTokenMs: seconds === null ? null : Math.round(seconds * 1000),
+    },
   };
 }
 
-function compatibleMetrics(body: OpenAiCompatibleChatResponse) {
-  const response = normalizeResponse(body.choices?.[0]?.message?.content);
-  const promptTokens = finiteNumber(body.usage?.prompt_tokens);
-  const completionTokens = finiteNumber(body.usage?.completion_tokens);
-  const reportedTotal = finiteNumber(body.usage?.total_tokens);
-  const reasoningTokens = finiteNumber(body.usage?.completion_tokens_details?.reasoning_tokens);
-  const totalTokens = reportedTotal ?? (promptTokens !== null && completionTokens !== null ? promptTokens + completionTokens : null);
+function compatValues(body: CompatBody) {
+  const response = text(body.choices?.[0]?.message?.content);
+  const promptTokens = n(body.usage?.prompt_tokens);
+  const completionTokens = n(body.usage?.completion_tokens);
+  const reportedTotal = n(body.usage?.total_tokens);
+  const reasoningTokens = n(body.usage?.completion_tokens_details?.reasoning_tokens);
   return {
     response,
-    promptTokens,
-    completionTokens,
-    reasoningTokens,
-    totalTokens,
-    tokensPerSecond: null,
-    timeToFirstTokenMs: null,
+    metrics: {
+      promptTokens,
+      completionTokens,
+      reasoningTokens,
+      totalTokens: reportedTotal ?? (promptTokens !== null && completionTokens !== null ? promptTokens + completionTokens : null),
+      tokensPerSecond: null,
+      timeToFirstTokenMs: null,
+    },
   };
 }
 
-function failureDetail(response: string, completionTokens: number | null, reasoningTokens: number | null) {
-  if (!response && reasoningTokens !== null && reasoningTokens > 0) {
-    return "The model produced reasoning output but no final health-check response.";
-  }
-  if (!response && completionTokens !== null && completionTokens >= TEST_MAX_OUTPUT_TOKENS) {
-    return "The model reached the health-check output limit before returning a final response.";
-  }
+function noMarker(response: string, completionTokens: number | null, reasoningTokens: number | null) {
+  if (!response && reasoningTokens !== null && reasoningTokens > 0) return "The model produced reasoning output but no final health-check response.";
+  if (!response && completionTokens !== null && completionTokens >= TEST_MAX_OUTPUT_TOKENS) return "The model reached the health-check output limit before returning a final response.";
   return "The model responded, but did not return the expected health-check marker.";
 }
 
@@ -248,48 +233,35 @@ async function testLmStudio(
 ): Promise<LocalAiHealthResult> {
   const attempts: LocalAiDiagnosticAttempt[] = [];
   const nativeEndpoint = `${LM_STUDIO_URL}/api/v1/chat`;
-  const configuredRequest = {
+  const configured = await postJson(nativeEndpoint, {
     model,
     input: `Reply with exactly ${TEST_MARKER} and nothing else.`,
     system_prompt: "This is a local connectivity health check. Follow the requested output exactly and do not explain.",
     temperature: 0,
     max_output_tokens: TEST_MAX_OUTPUT_TOKENS,
     ...(model.toLowerCase().includes("glimmer") ? { reasoning: "off" } : {}),
-  };
+  });
 
-  const configured = await postJson(nativeEndpoint, configuredRequest);
   if (configured.ok && configured.body && typeof configured.body === "object") {
-    const body = configured.body as LmStudioNativeChatResponse;
-    const metrics = nativeMetrics(body);
-    const ok = metrics.response.includes(TEST_MARKER);
-    attempts.push(attemptRecord(
-      "LM Studio native configured",
-      nativeEndpoint,
-      configured,
-      `model=${model}; reasoning=${model.toLowerCase().includes("glimmer") ? "off" : "default"}; max_output_tokens=${TEST_MAX_OUTPUT_TOKENS}; system_prompt=yes`,
-      ok,
-    ));
+    const body = configured.body as NativeBody;
+    const parsed = nativeValues(body);
+    const ok = parsed.response.includes(TEST_MARKER);
+    attempts.push(attempt("LM Studio native configured", nativeEndpoint, configured, `model=${model}; reasoning=${model.toLowerCase().includes("glimmer") ? "off" : "default"}; max_output_tokens=${TEST_MAX_OUTPUT_TOKENS}; system_prompt=yes`, ok));
     if (ok) {
       return {
         ok: true,
         provider: "lm-studio",
         providerLabel: "LM Studio",
         model: body.model_instance_id || model,
-        response: metrics.response || null,
+        response: parsed.response || null,
         responseTimeMs: configured.elapsedMs,
-        ...metrics,
+        ...parsed.metrics,
         detail: "Basic local inference completed through LM Studio's native API.",
-        diagnostics: baseDiagnostics(status, attempts),
+        diagnostics: diagnostics(status, attempts),
       };
     }
   } else {
-    attempts.push(attemptRecord(
-      "LM Studio native configured",
-      nativeEndpoint,
-      configured,
-      `model=${model}; reasoning=${model.toLowerCase().includes("glimmer") ? "off" : "default"}; max_output_tokens=${TEST_MAX_OUTPUT_TOKENS}; system_prompt=yes`,
-      null,
-    ));
+    attempts.push(attempt("LM Studio native configured", nativeEndpoint, configured, `model=${model}; reasoning=${model.toLowerCase().includes("glimmer") ? "off" : "default"}; max_output_tokens=${TEST_MAX_OUTPUT_TOKENS}; system_prompt=yes`, null));
   }
 
   const minimal = await postJson(nativeEndpoint, {
@@ -297,37 +269,25 @@ async function testLmStudio(
     input: `Reply with exactly ${TEST_MARKER} and nothing else.`,
   });
   if (minimal.ok && minimal.body && typeof minimal.body === "object") {
-    const body = minimal.body as LmStudioNativeChatResponse;
-    const metrics = nativeMetrics(body);
-    const ok = metrics.response.includes(TEST_MARKER);
-    attempts.push(attemptRecord(
-      "LM Studio native minimal",
-      nativeEndpoint,
-      minimal,
-      `model=${model}; optional inference controls omitted`,
-      ok,
-    ));
+    const body = minimal.body as NativeBody;
+    const parsed = nativeValues(body);
+    const ok = parsed.response.includes(TEST_MARKER);
+    attempts.push(attempt("LM Studio native minimal", nativeEndpoint, minimal, `model=${model}; optional inference controls omitted`, ok));
     if (ok) {
       return {
         ok: true,
         provider: "lm-studio",
         providerLabel: "LM Studio",
         model: body.model_instance_id || model,
-        response: metrics.response || null,
+        response: parsed.response || null,
         responseTimeMs: minimal.elapsedMs,
-        ...metrics,
+        ...parsed.metrics,
         detail: "Local inference passed with a minimal LM Studio native request. The configured native request failed; diagnostics identify the incompatible option or payload.",
-        diagnostics: baseDiagnostics(status, attempts),
+        diagnostics: diagnostics(status, attempts),
       };
     }
   } else {
-    attempts.push(attemptRecord(
-      "LM Studio native minimal",
-      nativeEndpoint,
-      minimal,
-      `model=${model}; optional inference controls omitted`,
-      null,
-    ));
+    attempts.push(attempt("LM Studio native minimal", nativeEndpoint, minimal, `model=${model}; optional inference controls omitted`, null));
   }
 
   const compatibleEndpoint = `${LM_STUDIO_URL}/v1/chat/completions`;
@@ -338,52 +298,29 @@ async function testLmStudio(
     max_tokens: TEST_MAX_OUTPUT_TOKENS,
     stream: false,
   });
-  if (compatible.ok && compatible.body && typeof compatible.body === "object") {
-    const body = compatible.body as OpenAiCompatibleChatResponse;
-    const metrics = compatibleMetrics(body);
-    const ok = metrics.response.includes(TEST_MARKER);
-    attempts.push(attemptRecord(
-      "LM Studio OpenAI compatibility",
-      compatibleEndpoint,
-      compatible,
-      `model=${model}; temperature=0; max_tokens=${TEST_MAX_OUTPUT_TOKENS}; stream=false`,
-      ok,
-    ));
-    if (ok) {
-      return {
-        ok: true,
-        provider: "lm-studio",
-        providerLabel: "LM Studio",
-        model: body.model || model,
-        response: metrics.response || null,
-        responseTimeMs: compatible.elapsedMs,
-        ...metrics,
-        detail: "Local inference passed through LM Studio's OpenAI-compatible endpoint. The native API attempts failed; see diagnostics for the provider error payloads.",
-        diagnostics: baseDiagnostics(status, attempts),
-      };
-    }
 
+  if (compatible.ok && compatible.body && typeof compatible.body === "object") {
+    const body = compatible.body as CompatBody;
+    const parsed = compatValues(body);
+    const ok = parsed.response.includes(TEST_MARKER);
+    attempts.push(attempt("LM Studio OpenAI compatibility", compatibleEndpoint, compatible, `model=${model}; temperature=0; max_tokens=${TEST_MAX_OUTPUT_TOKENS}; stream=false`, ok));
     return {
-      ok: false,
+      ok,
       provider: "lm-studio",
       providerLabel: "LM Studio",
       model: body.model || model,
-      response: metrics.response || null,
+      response: parsed.response || null,
       responseTimeMs: compatible.elapsedMs,
-      ...metrics,
-      detail: failureDetail(metrics.response, metrics.completionTokens, metrics.reasoningTokens),
-      diagnostics: baseDiagnostics(status, attempts),
+      ...parsed.metrics,
+      detail: ok
+        ? "Local inference passed through LM Studio's OpenAI-compatible endpoint. The native API attempts failed; see diagnostics for the provider error payloads."
+        : noMarker(parsed.response, parsed.metrics.completionTokens, parsed.metrics.reasoningTokens),
+      diagnostics: diagnostics(status, attempts),
     };
   }
 
-  attempts.push(attemptRecord(
-    "LM Studio OpenAI compatibility",
-    compatibleEndpoint,
-    compatible,
-    `model=${model}; temperature=0; max_tokens=${TEST_MAX_OUTPUT_TOKENS}; stream=false`,
-    null,
-  ));
-  const finalMessage = attempts.map(attempt => attempt.providerMessage).find(Boolean);
+  attempts.push(attempt("LM Studio OpenAI compatibility", compatibleEndpoint, compatible, `model=${model}; temperature=0; max_tokens=${TEST_MAX_OUTPUT_TOKENS}; stream=false`, null));
+  const message = attempts.map(item => item.providerMessage).find(Boolean);
   return {
     ok: false,
     provider: "lm-studio",
@@ -392,10 +329,8 @@ async function testLmStudio(
     response: null,
     responseTimeMs: compatible.elapsedMs,
     ...emptyMetrics(),
-    detail: finalMessage
-      ? `LM Studio rejected the health test: ${finalMessage}`
-      : `LM Studio health-test attempts failed. The last HTTP status was ${compatible.status}.`,
-    diagnostics: baseDiagnostics(status, attempts),
+    detail: message ? `LM Studio rejected the health test: ${message}` : `LM Studio health-test attempts failed. The last HTTP status was ${compatible.status}.`,
+    diagnostics: diagnostics(status, attempts),
   };
 }
 
@@ -419,7 +354,7 @@ async function testOllama(
       responseTimeMs: null,
       ...emptyMetrics(),
       detail: "Wayfound will not invoke an Ollama model identified as cloud-backed.",
-      diagnostics: baseDiagnostics(status, attempts),
+      diagnostics: diagnostics(status, attempts),
     };
   }
 
@@ -432,13 +367,7 @@ async function testOllama(
   });
 
   if (!result.ok || !result.body || typeof result.body !== "object") {
-    attempts.push(attemptRecord(
-      "Ollama local chat",
-      endpoint,
-      result,
-      `model=${model}; think=false; num_predict=${TEST_MAX_OUTPUT_TOKENS}; stream=false`,
-      null,
-    ));
+    attempts.push(attempt("Ollama local chat", endpoint, result, `model=${model}; think=false; num_predict=${TEST_MAX_OUTPUT_TOKENS}; stream=false`, null));
     const message = providerMessage(result.body);
     return {
       ok: false,
@@ -449,28 +378,21 @@ async function testOllama(
       responseTimeMs: result.elapsedMs,
       ...emptyMetrics(),
       detail: message ? `Ollama rejected the health test: ${message}` : `Ollama returned HTTP ${result.status}.`,
-      diagnostics: baseDiagnostics(status, attempts),
+      diagnostics: diagnostics(status, attempts),
     };
   }
 
-  const body = result.body as OllamaChatResponse;
-  const response = normalizeResponse(body.message?.content);
-  const promptTokens = finiteNumber(body.prompt_eval_count);
-  const completionTokens = finiteNumber(body.eval_count);
+  const body = result.body as OllamaBody;
+  const response = text(body.message?.content);
+  const promptTokens = n(body.prompt_eval_count);
+  const completionTokens = n(body.eval_count);
   const totalTokens = promptTokens !== null && completionTokens !== null ? promptTokens + completionTokens : null;
-  const evalDurationNs = finiteNumber(body.eval_duration);
+  const evalDurationNs = n(body.eval_duration);
   const tokensPerSecond = completionTokens !== null && evalDurationNs && evalDurationNs > 0
     ? Math.round((completionTokens / (evalDurationNs / 1_000_000_000)) * 10) / 10
     : null;
   const ok = response.includes(TEST_MARKER);
-  attempts.push(attemptRecord(
-    "Ollama local chat",
-    endpoint,
-    result,
-    `model=${model}; think=false; num_predict=${TEST_MAX_OUTPUT_TOKENS}; stream=false`,
-    ok,
-  ));
-
+  attempts.push(attempt("Ollama local chat", endpoint, result, `model=${model}; think=false; num_predict=${TEST_MAX_OUTPUT_TOKENS}; stream=false`, ok));
   return {
     ok,
     provider: "ollama",
@@ -484,10 +406,8 @@ async function testOllama(
     totalTokens,
     tokensPerSecond,
     timeToFirstTokenMs: null,
-    detail: ok
-      ? "Basic local inference completed through Ollama."
-      : failureDetail(response, completionTokens, null),
-    diagnostics: baseDiagnostics(status, attempts),
+    detail: ok ? "Basic local inference completed through Ollama." : noMarker(response, completionTokens, null),
+    diagnostics: diagnostics(status, attempts),
   };
 }
 
@@ -503,14 +423,12 @@ export async function runLocalAiHealthTest(): Promise<LocalAiHealthResult> {
       responseTimeMs: null,
       ...emptyMetrics(),
       detail: status.detail,
-      diagnostics: baseDiagnostics(status, []),
+      diagnostics: diagnostics(status, []),
     };
   }
 
   try {
-    return status.provider === "lm-studio"
-      ? await testLmStudio(status.model, status)
-      : await testOllama(status.model, status);
+    return status.provider === "lm-studio" ? await testLmStudio(status.model, status) : await testOllama(status.model, status);
   } catch (error) {
     const detail = error instanceof Error && error.name === "TimeoutError"
       ? "The local AI test timed out before inference completed."
@@ -526,7 +444,7 @@ export async function runLocalAiHealthTest(): Promise<LocalAiHealthResult> {
       responseTimeMs: null,
       ...emptyMetrics(),
       detail,
-      diagnostics: baseDiagnostics(status, []),
+      diagnostics: diagnostics(status, []),
     };
   }
 }
