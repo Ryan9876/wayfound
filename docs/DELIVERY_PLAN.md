@@ -37,16 +37,17 @@ The active first-version product model is defined by ADR-0005: one authenticated
 11. **Consequential technical requirement review and approval** — Validated at application head `ec9612e2e87c05780558471a9ab9d76246be417b`, CI run 220, with documentation reconciled at `272abdf56da913b23de47721919f329fa68863da`, CI run 221. See [slice](INCREMENT_2_TECHNICAL_REQUIREMENTS.md) and [validation](validation/increment-2-technical-requirements.md). The authenticated human-review mechanism is retained but hidden from active single-user test mode under ADR-0005.
 12. **Owner-recorded work implementation completion** — Validated at application head `b28e1718174d84e66c7e97fe203de12034d3b2ba`, CI run 308. See [slice](INCREMENT_2_WORK_COMPLETION.md) and [validation](validation/increment-2-work-completion.md). `Implemented` records owner-reported completion of bounded work and does not establish verification, validation, stage completion, release readiness, or release.
 13. **Durable advisory AI review of exact implemented work** — Validated at application head `dc819b65d42a1bc57e4eb7115ce5ed53bafcbca4`, CI run 329. See [slice](INCREMENT_2_AI_REVIEW.md) and [validation](validation/increment-2-ai-review.md). The review snapshots one exact `Implemented` work revision, uses only supported loopback local AI, records provider/model provenance and advisory result or failure, and requires explicit owner disposition without altering verification or project authority.
+14. **Durable work-item dependencies** — Validated at application/test head `a3484c37199e0072b05eaf5f9979eff6406774b0`, CI run 346. See [slice](INCREMENT_2_WORK_DEPENDENCIES.md) and [validation](validation/increment-2-work-dependencies.md). The owner can create and remove acyclic same-workspace work dependencies with durable history and revision snapshots; dependency state does not automatically change work status or establish readiness, verification, or impact propagation.
 
 ### Active remaining Increment 2 scope
 
 The active single-user scope now prioritizes:
 
-1. work dependencies and broader durable links;
+1. broader durable links beyond work-item dependencies;
 2. multiple acceptance-criterion lifecycle;
 3. evidence freshness/outdated-state handling and explicit verification decisions;
 4. maintenance records and later lifecycle behavior;
-5. change-impact handling;
+5. change-impact handling, including dependency-impact behavior;
 6. supporting audit, recovery, and seed behavior.
 
 Accepted technical-decision replacement/supersession, approved technical-requirement replacement/withdrawal/supersession/deprecation, and dependency-impact behavior remain future scope. Later artifact-version, accepted-version replacement/supersession, and file-import behavior are assigned to Increment 3.
@@ -87,7 +88,7 @@ Optional external human-review packaging remains deferred unless the product own
 
 **Outcome:** Changes expose affected evidence, and the owner can review a concrete release packet, record the release decision, and retain operating responsibility.
 
-**Expected scope:** dependency and impact records, outdated-evidence handling, requirement-to-criterion-to-evidence traceability, readiness view, release packet and scoped authorization, deployment outcome record, and maintenance due items.
+**Expected scope:** dependency and impact records beyond the validated work-to-work dependency primitive, outdated-evidence handling, requirement-to-criterion-to-evidence traceability, readiness view, release packet and scoped authorization, deployment outcome record, and maintenance due items.
 
 ## 7. Deferred roadmap
 
