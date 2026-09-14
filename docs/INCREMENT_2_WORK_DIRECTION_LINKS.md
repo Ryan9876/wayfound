@@ -1,6 +1,6 @@
 # Increment 2 — Durable work-to-project-direction links
 
-**Status:** Approved for implementation
+**Status:** Validated at application/test head `ccf138887980c9bc7c53a3a9817c9c75572278c3`, CI run 367. See [validation evidence](validation/increment-2-work-direction-links.md).
 
 **Parent:** Increment 2 — Durable single-owner workspace record
 
@@ -168,6 +168,12 @@ Creation forms remain behind progressive disclosure. The UI must remain usable a
 16. The active Work UI separates work-to-work dependencies from project-direction reliance and does not label a link as affected, stale, blocked, safe, verified, or resolved.
 17. Keyboard checks, unique DOM IDs, no horizontal overflow, desktop/390 px screenshots, TypeScript, production build, security advisor, prior durable regressions, and a focused direction-link acceptance suite pass on the identified build.
 18. A validation record identifies the application commit, CI run, executed evidence, screenshots, limits, and remaining change-impact scope before the slice is marked `Validated`.
+
+## Validation evidence
+
+Application/test head `ccf138887980c9bc7c53a3a9817c9c75572278c3` passed CI run 367, including the complete prior durable regression chain, focused work-direction-link persistence/security/browser coverage, consequential technical-authority regressions, and the automatic single-user owner-session UI validation.
+
+The run's `workspace-screenshots` artifact is ID `10368683554`, size `34,620,315` bytes, SHA-256 `3be8352a76c986bc10b7d30ae62c63e659732d02b078821f3129f469ea12813b`. Direct inspection of `work-direction-links-desktop.png` and `work-direction-links-mobile.png` confirmed the Work view keeps work dependencies and project-direction reliance separate, exposes accepted decision/document context and saved snapshots, supports explicit removal, and does not invent impact or verification state. See the full [validation record](validation/increment-2-work-direction-links.md).
 
 ## Migration and recovery
 
