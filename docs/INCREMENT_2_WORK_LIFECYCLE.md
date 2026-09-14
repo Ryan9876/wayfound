@@ -61,3 +61,7 @@ The additive migration preserves existing Proposed records, expands only the all
 ## Exclusions
 
 Assignment, collaborator administration, editing work content, deletion, cancellation, dependencies, broader record links, completion/Implemented/Validated/Released transitions, technical-decision acceptance, evidence review, freshness calculations, artifact import/versioning, and production actions remain later scope. The slice does not establish that a specialist accepted or completed work.
+
+## Later extension
+
+This historical lifecycle slice remains validated at its identified build and does not retroactively include completion behavior. [Work implementation completion](INCREMENT_2_WORK_COMPLETION.md) separately extends the same durable state machine with `In progress` → `Implemented` and is validated at application head `b28e1718174d84e66c7e97fe203de12034d3b2ba`, CI run 308. That later state remains separate from verification, validation, stage completion, and release.

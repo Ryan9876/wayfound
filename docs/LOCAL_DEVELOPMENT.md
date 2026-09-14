@@ -66,6 +66,24 @@ Application rollback means deploying the previous application version while reta
 
 After building, run `npm run test:work-lifecycle` on the same isolated disposable stack. CI runs this after the complete prior durable regression chain. It exercises owner approval, start, block, resume, concurrency, separation of duties, transactional rollback, live-session/revocation denial, browser stale-state errors, restart/re-login, and database interruption/recovery. Screenshots include focused Work sections at desktop and 390 px mobile widths.
 
+## Work implementation completion regression
+
+After building, run `npm run test:work-completion` on the same isolated disposable stack. CI runs this after the historical owner work-lifecycle suite.
+
+The focused suite exercises:
+
+- explicit `In progress` → `Implemented` completion with owner confirmation and a recorded completion reason;
+- rejection of `Proposed`, `Approved`, and `Blocked` → `Implemented` attempts;
+- terminal `Implemented` behavior for this bounded state machine;
+- exact idempotent replay and changed-payload conflict handling;
+- two distinct completion requests against one revision producing exactly one winner;
+- tenant, target, current-owner, revoked-membership, and direct-table denial;
+- transactional audit-failure rollback and retry;
+- durable transition history after sign-out/re-login;
+- preservation of requirement, criterion, evidence, stage, and release state so `Implemented` is not treated as verification.
+
+The automatic single-user owner-session test separately exercises the rendered Work flow through `Proposed → Approved → In progress → Implemented`, confirms no further lifecycle action is offered after completion, verifies Overview no longer recommends the implemented item as unfinished work, and captures desktop/390 px responsive screenshots. `Implemented` remains an owner-reported work state, not objective verification.
+
 ## Consequential technical-decision regression
 
 After building, run `npm run test:technical-decisions` on the same isolated disposable stack. CI runs this after the prior durable regression chain.

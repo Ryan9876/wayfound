@@ -77,9 +77,16 @@ The first slice uses private `wayfound` tables with RLS and no direct client tab
 
 This is an implementation of the approved boundary, not an unrestricted service-key path. No service key is used by the application. Local seed/test tooling alone uses local admin credentials and rejects non-loopback endpoints. The provider adapter calls these commands; direct calls enforce the same invariants.
 
-
 ## Implementation detail — owner work transitions
 
 The owner work lifecycle extension uses the same approved identity and transaction boundary. It does not add a role or broaden membership. It requires explicit current owner membership and ownership of the exact work item. A row lock and expected revision serialize state changes; a membership row lock orders concurrent owner revocation against a mutation. Immutable transition rows preserve old/new states and revisions, reason, authenticated actor, and time. The transition, audit event, and idempotent request result commit together.
 
 See [INCREMENT_2_WORK_LIFECYCLE.md](../INCREMENT_2_WORK_LIFECYCLE.md) for the bounded state machine and recovery limits. ADR-0003 remains unchanged. Work approval does not approve technical choices, and work status does not establish specialist review or verification.
+
+## Implementation detail — owner work implementation completion
+
+[INCREMENT_2_WORK_COMPLETION.md](../INCREMENT_2_WORK_COMPLETION.md) extends the same transaction with one additional state change: exact `In progress` work can become `Implemented` after explicit owner confirmation and a recorded completion reason. The command continues to derive the actor from the live session, require current owner membership and stored work ownership, lock the target row, check the expected revision, and atomically record state/revision, immutable transition history, the existing `work_item.transitioned` audit event, and the idempotent request result.
+
+The idempotent request lookup occurs after live authorization and target locking but before terminal-state rejection so an exact retry of a committed completion returns its original transition ID. Changed replay payloads fail. Distinct completion requests against the same revision serialize and produce one durable winner. `Implemented` is terminal for this bounded state machine.
+
+This extension does not create a verification decision or modify requirement, criterion, evidence, stage, artifact, or release state. An older application reader may not understand `Implemented`; after the additive migration, prefer a forward fix and disable incompatible lifecycle mutations until a compatible reader is restored rather than destructively reverting durable state.
