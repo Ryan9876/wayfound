@@ -1,6 +1,6 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { AddCriterionInput, CreateRequirementInput, RequirementRecord } from "@/lib/domain/requirement";
+import type { AddCriterionInput, CreateRequirementInput, RequirementRecord, WithdrawCriterionInput } from "@/lib/domain/requirement";
 
 const JWT_FUTURE_RETRY_DELAYS_MS = [150, 350, 750] as const;
 
@@ -39,6 +39,27 @@ export class RequirementStore {
       p_workspace: input.workspaceId, p_requirement: input.requirementId,
       p_expected_revision: input.expectedRevision, p_statement: input.statement,
       p_reason: input.reason, p_confirm: input.confirm, p_request: input.requestId,
+    });
+    if (error) {
+      if (error.code === "22023") throw new Error("REQUEST_CONFLICT");
+      if (error.code === "42501") throw new Error("ACCESS_DENIED");
+      if (error.code === "23503") throw new Error("INVALID_TARGET");
+      if (error.code === "55000") throw new Error("INVALID_STATE");
+      throw new Error("STORE_UNAVAILABLE");
+    }
+    return data;
+  }
+
+  async withdrawCriterion(input: WithdrawCriterionInput): Promise<string> {
+    const { data, error } = await this.rpc("withdraw_owner_criterion", {
+      p_workspace: input.workspaceId,
+      p_requirement: input.requirementId,
+      p_criterion: input.criterionId,
+      p_expected_requirement_revision: input.expectedRequirementRevision,
+      p_expected_criterion_revision: input.expectedCriterionRevision,
+      p_reason: input.reason,
+      p_confirm: input.confirm,
+      p_request: input.requestId,
     });
     if (error) {
       if (error.code === "22023") throw new Error("REQUEST_CONFLICT");

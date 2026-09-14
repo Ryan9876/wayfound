@@ -1,9 +1,19 @@
 export type AcceptanceCriterionRecord = {
   addition?: { reason: string; from_revision: number; to_revision: number; actor_id: string; created_at: string } | null;
+  withdrawal?: {
+    reason: string;
+    from_requirement_revision: number;
+    to_requirement_revision: number;
+    from_criterion_revision: number;
+    to_criterion_revision: number;
+    actor_id: string;
+    created_at: string;
+  } | null;
   id: string;
   workspace_id: string;
   requirement_id: string;
   statement: string;
+  lifecycle: "Active" | "Withdrawn";
   revision: number;
   created_at: string;
   updated_at: string;
@@ -76,6 +86,28 @@ export function validateAddCriterion(input: AddCriterionInput): AddCriterionInpu
   if (!UUID.test(result.workspaceId) || !UUID.test(result.requirementId) || !UUID.test(result.requestId) ||
       !Number.isSafeInteger(result.expectedRevision) || result.expectedRevision < 1 || !result.confirm ||
       !result.statement || result.statement.length > 4000 || !result.reason || result.reason.length > 2000) {
+    throw new Error("INVALID_INPUT");
+  }
+  return result;
+}
+
+export type WithdrawCriterionInput = {
+  workspaceId: string;
+  requirementId: string;
+  criterionId: string;
+  expectedRequirementRevision: number;
+  expectedCriterionRevision: number;
+  reason: string;
+  confirm: boolean;
+  requestId: string;
+};
+
+export function validateWithdrawCriterion(input: WithdrawCriterionInput): WithdrawCriterionInput {
+  const result = { ...input, reason: input.reason.trim() };
+  if (!UUID.test(result.workspaceId) || !UUID.test(result.requirementId) || !UUID.test(result.criterionId) ||
+      !UUID.test(result.requestId) || !Number.isSafeInteger(result.expectedRequirementRevision) ||
+      result.expectedRequirementRevision < 1 || !Number.isSafeInteger(result.expectedCriterionRevision) ||
+      result.expectedCriterionRevision < 1 || !result.confirm || !result.reason || result.reason.length > 2000) {
     throw new Error("INVALID_INPUT");
   }
   return result;
