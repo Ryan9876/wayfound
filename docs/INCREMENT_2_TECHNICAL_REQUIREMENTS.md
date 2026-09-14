@@ -1,17 +1,17 @@
 # Increment 2 — Consequential technical requirement review and approval
 
-**Status:** In progress  
+**Status:** Validated  
 **Parent increment:** Increment 2 — Durable workspace record  
 **Architecture basis:** ADR-0002, ADR-0003, and accepted ADR-0004  
-**Implementation state:** Specification defined; implementation next
+**Implementation state:** Implemented and validated at application head `ec9612e2e87c05780558471a9ab9d76246be417b`, CI run 220
 
 ## 1. Outcome
 
-Wayfound will let a current workspace owner record a consequential technical requirement proposal with one acceptance criterion, obtain qualified specialist review of the exact proposal revision, and separately approve that reviewed proposal as an approved technical requirement only when the required review conclusion is `No blocking finding`.
+Wayfound lets a current workspace owner record a consequential technical requirement proposal with one acceptance criterion, obtain qualified specialist review of the exact proposal revision, and separately approve that reviewed proposal as an approved technical requirement only when the required review conclusion is `No blocking finding`.
 
-The specialist review will not automatically approve the requirement. The owner approval action will not claim independent technical verification.
+The specialist review does not automatically approve the requirement. The owner approval action does not claim independent technical verification.
 
-The approved result will enter the canonical durable requirement record so later criterion evidence and traceability can use the same requirement-to-criterion model as owner-approved product requirements.
+The approved result enters the canonical durable requirement record so later criterion evidence and traceability use the same requirement-to-criterion model as owner-approved product requirements.
 
 ## 2. Requirement coverage
 
@@ -41,7 +41,7 @@ For technical requirements, the final owner action is called **approval** becaus
 
 Only an authenticated current workspace owner may create or revise a technical requirement proposal in this bounded slice.
 
-A proposal must contain:
+A proposal contains:
 
 - immutable proposal identifier;
 - workspace identifier;
@@ -57,7 +57,7 @@ A proposal must contain:
 - proposing owner actor derived from the live session;
 - created and updated timestamps.
 
-The proposal action must require explicit confirmation that the owner is proposing consequential technical behavior for qualified review and is not approving it as a requirement.
+The proposal action requires explicit confirmation that the owner is proposing consequential technical behavior for qualified review and is not approving it as a requirement.
 
 ### Specialist review authority
 
@@ -109,7 +109,7 @@ Approval creates one canonical durable requirement with:
 
 The approval transaction also creates durable governance linkage from the approved requirement to the exact proposal, assignment, review, reviewer, proposal revision, approving owner, and approval time.
 
-`No blocking finding` must not itself create the approved requirement.
+`No blocking finding` does not itself create the approved requirement.
 
 ## 4. Blocking and stale-review rules
 
@@ -119,13 +119,13 @@ The approval transaction also creates durable governance linkage from the approv
 
 The bounded owner action provides no override for either result.
 
-Any material change to the title, obligation, technical requirement statement, acceptance criterion, requested competence, or bounded review question increments the proposal revision. An earlier review then becomes ineligible for approval. The changed revision requires a new specialist review.
+Any material change to the title, obligation, technical requirement statement, acceptance criterion, requested competence, or bounded review question increments the proposal revision. An earlier review then becomes ineligible for approval. The changed revision requires a new specialist review. Earlier review history remains durable and visible as history rather than being treated as current authority.
 
 A material change to an already approved technical requirement must not overwrite that approved requirement in this slice. The change must enter as a new technical requirement proposal and repeat qualified review and owner approval. Requirement replacement, supersession, deprecation, and impact analysis remain future scope.
 
 ## 5. Canonical requirement integration
 
-Approved technical requirements must use the existing `wayfound.requirements` and `wayfound.acceptance_criteria` records so downstream requirement listing and evidence linkage do not fork into a separate requirement model.
+Approved technical requirements use the existing `wayfound.requirements` and `wayfound.acceptance_criteria` records so downstream requirement listing and evidence linkage do not fork into a separate requirement model.
 
 The current owner-only creation command remains restricted to:
 
@@ -133,7 +133,7 @@ The current owner-only creation command remains restricted to:
 - authority `owner`;
 - status `Approved`.
 
-It must not gain a caller-controlled kind or authority parameter.
+It does not gain a caller-controlled kind or authority parameter.
 
 The technical requirement approval transaction is a separate protected command. It is the only new path in this slice that may create:
 
@@ -145,7 +145,7 @@ Existing product requirements remain unchanged.
 
 ## 6. Persistence and security boundary
 
-Preserve the current security architecture:
+The implementation preserves the current security architecture:
 
 - private `wayfound` PostgreSQL schema;
 - row-level security as defense in depth;
@@ -158,13 +158,13 @@ Preserve the current security architecture:
 - no caller-supplied actor, owner, reviewer, release, stage, kind, authority, or approval identity used as trusted authority;
 - bounded retry only for exact `PGRST303` with message `JWT issued at future`.
 
-Do not add specialists to the existing workspace membership table in this slice. Reuse the established stable reviewer-code identity and assignment-scoped authorization model.
+Specialists are not added to the existing workspace membership table in this slice. The implementation reuses the established stable reviewer-code identity and assignment-scoped authorization model.
 
-The bounded implementation may use separate technical-requirement proposal, assignment, review, approval-link, and idempotent-request tables rather than generalizing the existing technical-choice tables. This keeps the change explicit and avoids a polymorphic authorization refactor inside this slice.
+The bounded implementation uses separate technical-requirement proposal, assignment, review, approval-link, and idempotent-request records rather than generalizing the existing technical-choice tables. This keeps the change explicit and avoids a polymorphic authorization refactor inside this slice.
 
 ## 7. Transaction and idempotency rules
 
-Proposal creation, proposal revision, specialist assignment, specialist review submission, and owner approval must each be transactional and idempotent by authenticated actor plus request UUID.
+Proposal creation, proposal revision, specialist assignment, specialist review submission, and owner approval are each transactional and idempotent by authenticated actor plus request UUID.
 
 For every protected mutation:
 
@@ -174,15 +174,15 @@ For every protected mutation:
 - injected audit failure rolls back the mutation and request-result record;
 - a database interruption produces a recoverable error and does not substitute fixture state.
 
-Owner approval must lock the proposal and qualifying review context before checking eligibility. Concurrent distinct approval requests against the same proposal state must produce one durable approved requirement.
+Owner approval locks the proposal and qualifying review context before checking eligibility. Concurrent distinct approval requests against the same proposal state produce one durable approved requirement.
 
-The approved requirement, initial acceptance criterion, technical approval linkage, proposal status change, audit event, and request result must commit atomically.
+The approved requirement, initial acceptance criterion, technical approval linkage, proposal status change, audit event, and request result commit atomically.
 
 ## 8. Presentation
 
-The owner workspace must keep technical requirement proposals separate from already approved requirements until owner approval occurs.
+The owner workspace keeps technical requirement proposals separate from already approved requirements until owner approval occurs.
 
-The technical requirement proposal view must show in text:
+The technical requirement proposal view shows in text:
 
 - `Proposed` state;
 - obligation;
@@ -197,7 +197,7 @@ The technical requirement proposal view must show in text:
 
 The owner approval control appears only when the exact current revision has `No blocking finding`.
 
-After approval, the canonical Requirements section must show the approved record as:
+After approval, the canonical Requirements section shows the approved record as:
 
 - kind `technical`;
 - authority `owner-after-specialist-review`;
@@ -205,13 +205,13 @@ After approval, the canonical Requirements section must show the approved record
 - linked acceptance criterion;
 - clear text that approval does not establish verification.
 
-The specialist workspace exposes only the assigned bounded technical requirement proposal context required for review. It must not expose general workspace membership or unrelated durable records.
+The specialist workspace exposes only the assigned bounded technical requirement proposal context required for review. It does not expose general workspace membership or unrelated durable records.
 
-Important state and conclusion must appear in text and must not rely on color alone. Controls must be keyboard reachable and usable at desktop and 390 px mobile widths.
+Important state and conclusion appear in text and do not rely on color alone. Controls are keyboard reachable and usable at desktop and 390 px mobile widths.
 
 ## 9. Failure behavior
 
-The UI must show a recoverable error when:
+The UI shows a recoverable error when:
 
 - the database is unavailable;
 - the proposal revision is stale;
@@ -221,11 +221,13 @@ The UI must show a recoverable error when:
 - the review result does not permit approval;
 - another concurrent request already changed the eligible state.
 
-A failed proposal, review, or approval operation must not partially create an approved requirement, acceptance criterion, approval linkage, audit event, or request result.
+A failed proposal, review, or approval operation does not partially create an approved requirement, acceptance criterion, approval linkage, audit event, or request result.
 
 ## 10. Acceptance criteria
 
-The slice is Validated only when executed evidence proves all applicable criteria below.
+The slice is **Validated** by executed evidence in [the technical-requirement validation record](validation/increment-2-technical-requirements.md). CI run 220 passed the complete prior durable regression chain and the focused technical-requirement suite at application head `ec9612e2e87c05780558471a9ab9d76246be417b`.
+
+The validated criteria are:
 
 1. Owner A can create one technical requirement proposal and see it remain `Proposed` after restart and re-login.
 2. Proposal creation alone creates no approved requirement or acceptance criterion and does not alter existing product requirements, technical decisions, work, evidence, artifacts, release state, verification, validation, or release authorization.
@@ -276,7 +278,7 @@ This bounded slice does not implement:
 
 ## 12. Implementation sequence
 
-Implement in this order:
+The bounded implementation sequence is complete:
 
 1. domain contracts and validation;
 2. private PostgreSQL proposal/review/approval model plus safe extension of canonical requirement constraints;
@@ -287,4 +289,4 @@ Implement in this order:
 7. focused technical-requirement regression suite and CI integration;
 8. rendered inspection and repository reconciliation.
 
-No new ADR is required for this bounded slice because accepted ADR-0004 already establishes the trust and authority rule. Create a new ADR only if implementation requires a different final authority, broader membership, multiple mandatory reviewers, an override path, or another material trust-boundary change.
+No new ADR was required for this bounded slice because accepted ADR-0004 already establishes the trust and authority rule. Create a new ADR only if later implementation requires a different final authority, broader membership, multiple mandatory reviewers, an override path, or another material trust-boundary change.

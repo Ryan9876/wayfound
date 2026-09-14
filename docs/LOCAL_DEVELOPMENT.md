@@ -54,4 +54,27 @@ The focused suite exercises:
 - database interruption/recovery without fixture substitution;
 - keyboard access and desktop/390 px responsive rendering.
 
-The suite does not establish verification, validation, release readiness, or production authorization from the owner acceptance action. Technical requirements remain future scope.
+The technical-decision suite does not establish verification, validation, release readiness, or production authorization from the owner acceptance action.
+
+## Consequential technical-requirement regression
+
+After building, run `npm run test:technical-requirements` on the same isolated disposable stack. CI runs this after the technical-decision authority suite and the complete prior durable regression chain.
+
+The focused suite exercises:
+
+- owner proposal without automatic requirement approval or canonical criterion creation;
+- exact-revision specialist assignment that snapshots the requirement statement and proposed acceptance criterion;
+- reviewer-code addressing without workspace membership and owner self-review denial;
+- all three specialist conclusions;
+- separate owner approval only after `No blocking finding`;
+- canonical approved requirement creation as kind `technical`, authority `owner-after-specialist-review`, status `Approved`, with exactly one reviewed acceptance criterion;
+- preservation of the existing owner-only product requirement command as kind `product` and authority `owner`;
+- stale-review invalidation after a material requirement or criterion revision and fresh-review recovery;
+- concurrent one-winner approval and idempotent replay/conflict handling;
+- direct-table, tenant, session, membership, and assignment denial;
+- transactional audit-failure rollback and retry;
+- restart/re-login persistence and visible prior review history;
+- database interruption/recovery without fixture substitution;
+- keyboard access and desktop/390 px responsive rendering.
+
+A technical-requirement specialist review is qualified judgment only. `No blocking finding` gates a separate owner approval action; it is not approval or verification. Owner approval records required technical project direction and does not establish verification, validation, release readiness, release authorization, or production authorization.

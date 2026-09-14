@@ -62,7 +62,7 @@ The slice passed real-backend and rendered acceptance tests at application commi
 
 Validated scope includes transactional requirement-and-criterion creation, explicit owner-authority confirmation, obligation validation, audit record, idempotent retries, direct-table denial, tenant/session/revocation isolation, injected-failure rollback, restart/resume, database interruption/recovery, stable identifiers, honest evidence language, and mobile/desktop rendered review.
 
-Consequential technical implementation requirements remain outside this action and still require qualified specialist review.
+Consequential technical implementation requirements remain outside this owner-only action and use the separate qualified-review path described in Slice 11.
 
 ### Slice 5 — Durable criterion evidence
 
@@ -130,11 +130,23 @@ Validated scope includes proposal-only initial state, exact-revision assignment 
 
 Acceptance records project direction after qualified review. It does not establish verification, validation, release readiness, or production authorization.
 
+### Slice 11 — Consequential technical requirement review and approval
+
+**Status:** Validated
+
+The accepted ADR-0004 split-authority rule is reused for consequential technical requirements. A current owner records a technical requirement proposal containing one proposed acceptance criterion and assigns an authenticated specialist by reviewer code to the exact proposal revision. The specialist reviews the exact requirement and criterion together. Only `No blocking finding` makes that revision eligible; review does not approve the requirement. The current owner then performs a separate explicit approval action.
+
+The slice passed the complete prior durable regression chain and focused technical-requirement authority tests at application head `ec9612e2e87c05780558471a9ab9d76246be417b`, [CI run 220](https://github.com/Ryan9876/wayfound/actions/runs/34793249123). Desktop and 390 px proposal, specialist-review, approved/canonical requirement, stale-review-history, and outage states were inspected. See the [slice specification](INCREMENT_2_TECHNICAL_REQUIREMENTS.md) and [validation record](validation/increment-2-technical-requirements.md).
+
+Validated scope includes proposal-only initial state, exact-revision review of the requirement and proposed criterion, reviewer-code assignment without workspace membership, owner self-review denial, all three specialist conclusions, separate owner approval, canonical requirement/criterion creation as `technical` / `owner-after-specialist-review` / `Approved`, preservation of the owner-only product-requirement command, stale-review invalidation after material requirement or criterion revision, visible earlier review history, one-winner concurrent approval, idempotent replay/conflict handling, direct-table denial, tenant/session/membership/assignment isolation, injected-audit rollback and retry, restart/re-login persistence, database interruption/recovery, keyboard access, and desktop/390 px rendered review.
+
+Approval records required technical project direction after qualified review. It does not establish verification, validation, release readiness, or production authorization.
+
 ### Remaining Increment 2 scope
 
-Specialist-review/acceptance flow for consequential technical requirements; work completion transitions, collaborator membership/administration and work assignment, work dependencies and broader durable links; multiple acceptance-criterion lifecycle; evidence freshness/outdated-state handling, specialist evidence review and explicit verification decisions; maintenance records; later lifecycle behavior; change-impact handling; and supporting audit/seed behavior remain In progress or unimplemented. No hosted project has been provisioned.
+Work completion transitions, collaborator membership/administration and work assignment, work dependencies and broader durable links; multiple acceptance-criterion lifecycle; evidence freshness/outdated-state handling, specialist evidence review and explicit verification decisions; maintenance records; later lifecycle behavior; change-impact handling; and supporting audit/seed behavior remain In progress or unimplemented. No hosted project has been provisioned.
 
-Accepted technical-decision replacement/supersession and dependency-impact behavior remain future scope. Later artifact-version, accepted-version replacement/supersession, and file-import behavior are assigned to Increment 3 rather than duplicated in the remaining Increment 2 scope.
+Accepted technical-decision replacement/supersession, approved technical-requirement replacement/withdrawal/supersession/deprecation, and dependency-impact behavior remain future scope. Later artifact-version, accepted-version replacement/supersession, and file-import behavior are assigned to Increment 3 rather than duplicated in the remaining Increment 2 scope.
 
 ## 4. Increment 3 — Versioned artifact import
 
