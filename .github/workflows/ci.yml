@@ -200,7 +200,7 @@ jobs:
           npm run start -- --hostname 127.0.0.1 --port 3200 > /tmp/wayfound-auto-session.log 2>&1 &
           APP_PID=$!
           trap 'kill "$APP_PID" >/dev/null 2>&1 || true' EXIT
-          npx --yes wait-on@8.0.0 http://127.0.0.1:3200/workspaces
+          npx --yes wait-on@8.0.1 http://127.0.0.1:3200/workspaces
           rm -f /tmp/wayfound-auto-cookies.txt
           curl -fsS -c /tmp/wayfound-auto-cookies.txt http://127.0.0.1:3200/workspaces -o /tmp/wayfound-auto-workspaces.html
           grep -F 'Your projects' /tmp/wayfound-auto-workspaces.html
