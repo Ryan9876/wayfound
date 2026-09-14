@@ -5,7 +5,8 @@ import { chromium } from 'playwright';
 const base = process.env.WAYFOUND_UI_TEST_URL;
 if (!base || !['127.0.0.1', 'localhost'].includes(new URL(base).hostname)) throw new Error('Set WAYFOUND_UI_TEST_URL to the isolated automatic-owner test app.');
 const browser = await chromium.launch({ headless: true });
-const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+const page = await context.newPage();
 const errors = [];
 page.on('pageerror', error => errors.push(error.message));
 const visible = async locator => { await locator.waitFor({ state: 'visible' }); };
@@ -121,7 +122,7 @@ try {
     await visible(page.getByRole('navigation', { name: 'Mobile project navigation', exact: true }));
     await hidden(page.getByRole('navigation', { name: 'Project navigation', exact: true }));
   }
-  const backPage = await page.context().newPage();
+  const backPage = await context.newPage();
   backPage.on('pageerror', error => errors.push(error.message));
   await backPage.setViewportSize({ width: 390, height: 844 });
   await backPage.goto(`${workspaceUrl}?view=more`);
