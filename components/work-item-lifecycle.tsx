@@ -1,6 +1,7 @@
 "use client";
 import { useActionState, useState } from "react";
 import { transitionWorkItem } from "@/app/workspaces/actions";
+import { AiWorkReview } from "@/components/ai-work-review";
 import type { WorkItemRecord } from "@/lib/domain/work-item";
 
 type WorkAction = {
@@ -83,11 +84,7 @@ function WorkTransitionAction({
         <input type="hidden" name="workspaceId" value={item.workspace_id} />
         <input type="hidden" name="workItemId" value={item.id} />
         <input type="hidden" name="expectedRevision" value={item.revision} />
-        <input
-          type="hidden"
-          name="targetStatus"
-          value={definition.targetStatus}
-        />
+        <input type="hidden" name="targetStatus" value={definition.targetStatus} />
         <input type="hidden" name="requestId" value={requestId} />
         <label htmlFor={`work-reason-${suffix}-${item.id}`}>
           {definition.reason}
@@ -101,10 +98,7 @@ function WorkTransitionAction({
             maxLength={2000}
           />
         </label>
-        <label
-          className="owner-confirm"
-          htmlFor={`work-confirm-${suffix}-${item.id}`}
-        >
+        <label className="owner-confirm" htmlFor={`work-confirm-${suffix}-${item.id}`}>
           <input
             id={`work-confirm-${suffix}-${item.id}`}
             name="confirm"
@@ -120,11 +114,7 @@ function WorkTransitionAction({
             ? "This records implementation only. It does not verify the result, complete the stage, or make the release ready."
             : "This updates work progress only. It does not verify the result, validate the project, or release anything."}
         </p>
-        {state.error && (
-          <p role="alert" className="form-error">
-            {state.error}
-          </p>
-        )}
+        {state.error && <p role="alert" className="form-error">{state.error}</p>}
         <button className="button secondary" type="submit" disabled={pending}>
           {pending ? "Saving work state…" : definition.action}
         </button>
@@ -133,13 +123,7 @@ function WorkTransitionAction({
   );
 }
 
-export function WorkItemLifecycle({
-  item,
-  requestId,
-}: {
-  item: WorkItemRecord;
-  requestId: string;
-}) {
+export function WorkItemLifecycle({ item, requestId }: { item: WorkItemRecord; requestId: string }) {
   const latest = item.transitions.at(-1);
   const actions = actionsByStatus[item.status] ?? [];
 
@@ -163,16 +147,11 @@ export function WorkItemLifecycle({
           <ol>
             {item.transitions.map((transition) => (
               <li key={transition.id}>
-                <strong>
-                  {transition.from_status} → {transition.to_status}
-                </strong>
+                <strong>{transition.from_status} → {transition.to_status}</strong>
                 <p>{transition.reason}</p>
                 <small>
-                  Revision {transition.from_revision} → {transition.to_revision}{" "}
-                  ·{" "}
-                  <time dateTime={transition.created_at}>
-                    {new Date(transition.created_at).toISOString()}
-                  </time>
+                  Revision {transition.from_revision} → {transition.to_revision} ·{" "}
+                  <time dateTime={transition.created_at}>{new Date(transition.created_at).toISOString()}</time>
                 </small>
                 <code>Actor ID: {transition.actor_id}</code>
                 <code>Transition ID: {transition.id}</code>
@@ -182,18 +161,13 @@ export function WorkItemLifecycle({
         </details>
       )}
       {item.status === "Implemented" && (
-        <p className="form-help">
-          Implementation is recorded. Verification and release status remain
-          separate.
-        </p>
+        <>
+          <p className="form-help">Implementation is recorded. Verification and release status remain separate.</p>
+          <AiWorkReview item={item} requestId={requestId} />
+        </>
       )}
       {actions.map((definition) => (
-        <WorkTransitionAction
-          key={definition.targetStatus}
-          item={item}
-          requestId={requestId}
-          definition={definition}
-        />
+        <WorkTransitionAction key={definition.targetStatus} item={item} requestId={requestId} definition={definition} />
       ))}
     </div>
   );
