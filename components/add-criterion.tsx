@@ -79,7 +79,7 @@ export function AddCriterion({ requirement, requestId }: { requirement: Requirem
         <button className="button secondary" type="submit" disabled={pending}>{pending ? "Saving condition…" : "Save acceptance criterion"}</button>
       </form>
     </details>
-    <details className="work-action">
+    <details key={`manage-${requirement.revision}`} className="work-action">
       <summary>Manage acceptance criteria</summary>
       <div className="durable-form">
         <p className="form-help">Manage which product conditions are active without deleting their history. A withdrawn condition remains visible with its evidence and cannot receive new evidence.</p>
