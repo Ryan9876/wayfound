@@ -60,6 +60,6 @@ requireText(localDevelopment, 'WAYFOUND_SINGLE_USER_AUTO_SIGN_IN=true', 'no-logi
 requireText(noLoginSpec, 'without asking the sole user to enter credentials', 'no-login product outcome');
 requireText(noLoginSpec, 'must continue to use the publishable/anon key and authenticated user session', 'RLS-preserving no-login contract');
 requireText(adr6, 'will not require interactive login', 'accepted no-login decision');
-requireText(adr6, 'RLS enforcement, actor attribution, audit history', 'identity preservation decision');
+requireText(adr6, 'row-level security, actor attribution, audit history', 'identity preservation decision');
 
 console.log('PASS: single-user mode keeps one authenticated owner and explicit AI boundaries, hides deferred human collaboration, supports loopback-only one-account seeding, and can remove interactive login through a separately guarded local automatic owner session without bypassing RLS.');
