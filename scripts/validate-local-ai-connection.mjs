@@ -28,8 +28,16 @@ requireText(detector, 'AbortSignal.timeout(PROBE_TIMEOUT_MS)', 'bounded provider
 
 requireText(health, 'http://127.0.0.1:1234', 'LM Studio health endpoint boundary');
 requireText(health, '/api/v1/chat', 'LM Studio native inference health test');
+requireText(health, '/v1/chat/completions', 'LM Studio compatibility diagnostic fallback');
 requireText(health, 'reasoning: "off"', 'Glimmer reasoning suppression');
 requireText(health, 'max_output_tokens: TEST_MAX_OUTPUT_TOKENS', 'LM Studio bounded health output');
+requireText(health, 'optional inference controls omitted', 'LM Studio minimal native diagnostic attempt');
+requireText(health, 'responsePreview', 'provider response preview capture');
+requireText(health, 'providerMessage', 'provider error message capture');
+requireText(health, 'httpStatus', 'HTTP status capture');
+requireText(health, 'requestSummary', 'request-shape capture');
+requireText(health, 'detectedProviders', 'provider-discovery capture');
+requireText(health, 'testedAt', 'diagnostic timestamp capture');
 requireText(health, 'http://127.0.0.1:11434', 'Ollama health endpoint boundary');
 requireText(health, '/api/chat', 'Ollama inference health test');
 requireText(health, 'think: false', 'Ollama reasoning suppression');
@@ -55,6 +63,10 @@ requireText(indicator, 'Total tokens', 'total token metric');
 requireText(indicator, 'Reasoning tokens', 'reasoning token metric');
 requireText(indicator, 'Generation', 'generation speed metric');
 requireText(indicator, 'First token', 'time-to-first-token metric');
+requireText(indicator, 'Diagnostics (', 'visible diagnostics section');
+requireText(indicator, 'Provider message:', 'provider error detail rendering');
+requireText(indicator, 'Raw response preview', 'raw response rendering');
+requireText(indicator, 'Copy diagnostics', 'copyable diagnostic payload');
 requireText(indicator, 'fetch("/api/local-ai/test"', 'test action call');
 requireText(frame, 'await detectLocalAi()', 'signed-in discovery call');
 requireText(frame, '<LocalAiStatus status={aiStatus} />', 'visible connection indicator');
@@ -63,6 +75,7 @@ requireText(styles, '.local-ai-status-ready', 'ready visual state');
 requireText(styles, '.local-ai-status-offline', 'offline visual state');
 requireText(styles, '.local-ai-test-pass', 'test pass visual state');
 requireText(styles, '.local-ai-test-fail', 'test failure visual state');
+requireText(styles, '.local-ai-diagnostics', 'diagnostics visual state');
 requireText(route, 'client.auth.getUser()', 'authenticated test route');
 requireText(route, 'process.env.WAYFOUND_SINGLE_USER_MODE !== "true"', 'single-user test boundary');
 requireText(route, 'runLocalAiHealthTest()', 'reasoning-safe inference execution');
@@ -71,4 +84,4 @@ requireText(spec, 'Wayfound must not silently switch to a public/cloud provider'
 requireText(spec, 'Test AI', 'health-test acceptance contract');
 requireText(adr, 'local-first provider boundary', 'architecture boundary');
 
-console.log('PASS: local AI discovery and health testing are loopback-only, auto-detect LM Studio and Ollama, exclude Ollama cloud models, prefer a running LM Studio model and Glimmer, suppress reasoning for the connectivity check, expose text plus visual connection state, execute an authenticated deterministic inference check, display latency and provider-reported token/performance metrics, use bounded timeouts, and have no silent cloud fallback.');
+console.log('PASS: local AI discovery and health testing are loopback-only, auto-detect LM Studio and Ollama, exclude Ollama cloud models, prefer a running LM Studio model and Glimmer, suppress reasoning for the connectivity check, capture endpoint/status/request/provider-response diagnostics, run a local-only LM Studio diagnostic ladder when needed, expose copyable diagnostics, display provider token/performance metrics, use bounded timeouts, and have no silent cloud fallback.');
