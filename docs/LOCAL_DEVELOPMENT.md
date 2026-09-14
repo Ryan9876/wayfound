@@ -84,6 +84,26 @@ The focused suite exercises:
 
 The automatic single-user owner-session test separately exercises the rendered Work flow through `Proposed → Approved → In progress → Implemented`, confirms no further lifecycle action is offered after completion, verifies Overview no longer recommends the implemented item as unfinished work, and captures desktop/390 px responsive screenshots. `Implemented` remains an owner-reported work state, not objective verification.
 
+## Durable AI work-review regression
+
+After building, run `npm run test:ai-review` on the same isolated disposable stack. CI runs this after the work implementation-completion suite. The focused browser path starts a bounded LM Studio-compatible stub on the supported loopback port; it does not call a cloud provider.
+
+The focused suite exercises:
+
+- exact current owner-owned `Implemented` work as the only eligible review target;
+- durable target-revision snapshot, purpose, owner/release/stage context, and `Pending` state before inference;
+- local provider/model provenance, advisory output, and available token/performance metrics on completion;
+- durable `Failed` state when local inference fails, with no cloud fallback or project-state substitution;
+- rejection of proposed/stale/cross-workspace/other-owner/revoked/direct-write paths;
+- review-request idempotency and changed-payload conflicts;
+- one explicit owner disposition with required note and confirmation;
+- failed-review disposition rejection, disposition idempotency, changed-payload conflicts, and one-winner concurrency;
+- audit-failure rollback and successful retry;
+- persistence while the local provider is offline and after sign-out/re-login;
+- preservation of work, requirement, evidence, artifact, stage, release, and verification state.
+
+The generated AI result is advisory only. The regression verifies that review output and owner disposition remain separate from objective verification and project-authority records.
+
 ## Consequential technical-decision regression
 
 After building, run `npm run test:technical-decisions` on the same isolated disposable stack. CI runs this after the prior durable regression chain.

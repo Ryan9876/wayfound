@@ -1,10 +1,14 @@
 # Increment 2 — Durable AI review of implemented work
 
-**Status:** Approved for implementation
+**Status:** Validated
 
 **Parent:** Increment 2 — Durable single-owner workspace record
 
 **Architecture basis:** Accepted ADR-0002 and ADR-0005
+
+**Validated application head:** `dc819b65d42a1bc57e4eb7115ce5ed53bafcbca4` through CI run 329
+
+**Validation evidence:** [validation/increment-2-ai-review.md](validation/increment-2-ai-review.md)
 
 ## Outcome
 

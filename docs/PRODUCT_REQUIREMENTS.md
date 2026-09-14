@@ -91,7 +91,7 @@ The canonical stages are:
 
 **Requirement:** When AI-generated analysis becomes a durable project record, Wayfound MUST retain enough provenance to identify the AI source or tool, the target record or revision, the review purpose, and the generated result.
 
-This requirement defines the product obligation. The durable AI-review implementation remains future Increment 2 scope until a bounded slice is specified and validated.
+The first bounded durable implementation is **Validated** for exact `Implemented` work-item revisions at application head `dc819b65d42a1bc57e4eb7115ce5ed53bafcbca4` through CI run 329; see [INCREMENT_2_AI_REVIEW.md](INCREMENT_2_AI_REVIEW.md) and [validation/increment-2-ai-review.md](validation/increment-2-ai-review.md). Broader AI-review targets and stale-review lifecycle remain future scope.
 
 ### WF-AI-002 — AI does not self-approve
 

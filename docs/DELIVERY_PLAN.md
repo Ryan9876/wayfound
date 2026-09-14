@@ -36,18 +36,18 @@ The active first-version product model is defined by ADR-0005: one authenticated
 10. **Consequential technical decision review and acceptance** — Validated at `bb77ce1abba4ebe5a32bfbc32583e3ddbecd792b`, CI run 201. See [ADR-0004](adr/0004-technical-decision-review-and-acceptance.md), [slice](INCREMENT_2_TECHNICAL_DECISIONS.md), and [validation](validation/increment-2-technical-decisions.md). The authenticated human-review mechanism is retained but hidden from active single-user test mode under ADR-0005.
 11. **Consequential technical requirement review and approval** — Validated at application head `ec9612e2e87c05780558471a9ab9d76246be417b`, CI run 220, with documentation reconciled at `272abdf56da913b23de47721919f329fa68863da`, CI run 221. See [slice](INCREMENT_2_TECHNICAL_REQUIREMENTS.md) and [validation](validation/increment-2-technical-requirements.md). The authenticated human-review mechanism is retained but hidden from active single-user test mode under ADR-0005.
 12. **Owner-recorded work implementation completion** — Validated at application head `b28e1718174d84e66c7e97fe203de12034d3b2ba`, CI run 308. See [slice](INCREMENT_2_WORK_COMPLETION.md) and [validation](validation/increment-2-work-completion.md). `Implemented` records owner-reported completion of bounded work and does not establish verification, validation, stage completion, release readiness, or release.
+13. **Durable advisory AI review of exact implemented work** — Validated at application head `dc819b65d42a1bc57e4eb7115ce5ed53bafcbca4`, CI run 329. See [slice](INCREMENT_2_AI_REVIEW.md) and [validation](validation/increment-2-ai-review.md). The review snapshots one exact `Implemented` work revision, uses only supported loopback local AI, records provider/model provenance and advisory result or failure, and requires explicit owner disposition without altering verification or project authority.
 
 ### Active remaining Increment 2 scope
 
 The active single-user scope now prioritizes:
 
-1. durable AI-assistance provenance and AI-review records with explicit owner disposition;
-2. work dependencies and broader durable links;
-3. multiple acceptance-criterion lifecycle;
-4. evidence freshness/outdated-state handling and explicit verification decisions;
-5. maintenance records and later lifecycle behavior;
-6. change-impact handling;
-7. supporting audit, recovery, and seed behavior.
+1. work dependencies and broader durable links;
+2. multiple acceptance-criterion lifecycle;
+3. evidence freshness/outdated-state handling and explicit verification decisions;
+4. maintenance records and later lifecycle behavior;
+5. change-impact handling;
+6. supporting audit, recovery, and seed behavior.
 
 Accepted technical-decision replacement/supersession, approved technical-requirement replacement/withdrawal/supersession/deprecation, and dependency-impact behavior remain future scope. Later artifact-version, accepted-version replacement/supersession, and file-import behavior are assigned to Increment 3.
 
@@ -75,9 +75,9 @@ The existing validated specialist implementation is preserved in the repository.
 
 **Status:** Proposed
 
-**Outcome:** The owner can request bounded AI analysis against an exact project record or revision, understand the findings and provenance, and explicitly decide what becomes project direction without confusing AI output with verification.
+**Outcome:** The owner can extend bounded AI analysis beyond the validated exact-work-item path, understand findings and provenance, and explicitly reconcile broader AI input without confusing AI output with verification.
 
-**Expected scope:** bounded AI-review request, target-revision snapshot, model/tool provenance, requested review purpose, findings, uncertainty where useful, owner disposition, durable history, stale-review handling after material target change, and clear separation from objective verification evidence.
+**Expected scope:** broader AI-review targets beyond the exact `Implemented` work-item slice, stale-review handling after material target change, richer reconciliation or comparison behavior where approved, and continued clear separation from objective verification evidence. The first durable exact-work-item AI-review path, provider/model provenance, bounded result history, and owner disposition are already Validated in Increment 2.
 
 Optional external human-review packaging remains deferred unless the product owner later approves it.
 
