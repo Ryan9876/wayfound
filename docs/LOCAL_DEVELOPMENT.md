@@ -37,6 +37,21 @@ npm run dev -- --hostname 127.0.0.1
 
 `seed:single-user-local` is intentionally destructive only inside the isolated loopback Supabase stack. It removes other local Auth users, creates or retains the requested owner identity, refreshes that local owner's password, and inserts no project records. The command inherits the loopback-only guard from `scripts/local-backend.mjs` and cannot target a hosted Supabase endpoint.
 
+### Optional no-login local test experience
+
+ADR-0006 allows the local single-user test to skip interactive login while preserving the authenticated owner identity underneath the UI. Add all of the following to `.env.local` using the same owner email/password supplied to `seed:single-user-local`:
+
+```bash
+WAYFOUND_SINGLE_USER_AUTO_SIGN_IN=true
+WAYFOUND_LOCAL_TEST=1
+WAYFOUND_SINGLE_USER_OWNER_EMAIL=owner@example.test
+WAYFOUND_SINGLE_USER_OWNER_PASSWORD=<same local test password>
+```
+
+Automatic owner-session establishment activates only when single-user mode is enabled, the explicit auto-sign-in and local-test flags are set, both `APP_ORIGIN` and `SUPABASE_URL` are loopback HTTP addresses, and valid owner credentials are present. If any guard is missing, Wayfound does not auto-authenticate. The feature does not use a service-role key and does not bypass RLS.
+
+With those guards enabled, open `http://127.0.0.1:3000/workspaces`. Wayfound establishes the seeded owner session automatically. `/sign-in` is no longer part of the normal local flow and the header does not show `Sign out`. If automatic session establishment fails, `/sign-in` shows a recoverable local configuration error rather than exposing the interactive login form.
+
 In single-user mode, normal workspace navigation hides human specialist review and handoff entry points. Existing validated specialist-review database structures and regression tests remain in the repository as historical capability; they are not part of the active first-version user flow. AI guidance remains advisory and cannot independently approve, verify, validate, release, or authorize production actions.
 
 Run `npm run build` and `npm run test:workspace` for the full isolated acceptance test. The test provisions disposable identities, exercises real PostgreSQL and Supabase Auth, starts/restarts the built app on port 3100, and briefly pauses the local database container. Use a disposable local stack without other development activity. Screenshots are written under `artifacts/workspace`. CI runs this in a fresh runner.
