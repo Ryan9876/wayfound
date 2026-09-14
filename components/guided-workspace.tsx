@@ -329,8 +329,8 @@ export function GuidedWorkspace({
             </section>
           )}
           {view === "work" && (
-            <section id="work-items" aria-labelledby="work-title">
-              <h2 id="work-title">Work</h2>
+            <section id="work-items" aria-labelledby="work-section-title">
+              <h2 id="work-section-title">Work</h2>
               <p>
                 Choose a clear result, then decide what will show it worked.
               </p>
@@ -552,7 +552,7 @@ export function GuidedWorkspace({
                         </p>
                       </Details>
                     </article>
-                  ))
+                  ))}
                 ) : (
                   <Empty>
                     No requirements yet. Add one before linking evidence to its
