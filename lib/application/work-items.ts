@@ -12,6 +12,14 @@ import {
   type RemoveWorkItemDependencyInput,
   type TransitionWorkItemInput,
 } from "@/lib/domain/work-item";
+import {
+  validateAddWorkArtifactLink,
+  validateAddWorkDecisionLink,
+  validateRemoveWorkDirectionLink,
+  type AddWorkArtifactLinkInput,
+  type AddWorkDecisionLinkInput,
+  type RemoveWorkDirectionLinkInput,
+} from "@/lib/domain/work-direction-link";
 
 export async function workItemService() {
   const client = await identityClient();
@@ -27,5 +35,8 @@ export async function workItemService() {
     create: (input: CreateWorkItemInput) => store.create(validateCreateWorkItem(input)),
     addDependency: (input: AddWorkItemDependencyInput) => store.addDependency(validateAddWorkItemDependency(input)),
     removeDependency: (input: RemoveWorkItemDependencyInput) => store.removeDependency(validateRemoveWorkItemDependency(input)),
+    addDecisionLink: (input: AddWorkDecisionLinkInput) => store.addDecisionLink(validateAddWorkDecisionLink(input)),
+    addArtifactLink: (input: AddWorkArtifactLinkInput) => store.addArtifactLink(validateAddWorkArtifactLink(input)),
+    removeDirectionLink: (input: RemoveWorkDirectionLinkInput) => store.removeDirectionLink(validateRemoveWorkDirectionLink(input)),
   };
 }
