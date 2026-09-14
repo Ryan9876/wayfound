@@ -38,19 +38,21 @@ The active first-version product model is defined by ADR-0005: one authenticated
 12. **Owner-recorded work implementation completion** — Validated at application head `b28e1718174d84e66c7e97fe203de12034d3b2ba`, CI run 308. See [slice](INCREMENT_2_WORK_COMPLETION.md) and [validation](validation/increment-2-work-completion.md). `Implemented` records owner-reported completion of bounded work and does not establish verification, validation, stage completion, release readiness, or release.
 13. **Durable advisory AI review of exact implemented work** — Validated at application head `dc819b65d42a1bc57e4eb7115ce5ed53bafcbca4`, CI run 329. See [slice](INCREMENT_2_AI_REVIEW.md) and [validation](validation/increment-2-ai-review.md). The review snapshots one exact `Implemented` work revision, uses only supported loopback local AI, records provider/model provenance and advisory result or failure, and requires explicit owner disposition without altering verification or project authority.
 14. **Durable work-item dependencies** — Validated at application/test head `a3484c37199e0072b05eaf5f9979eff6406774b0`, CI run 346. See [slice](INCREMENT_2_WORK_DEPENDENCIES.md) and [validation](validation/increment-2-work-dependencies.md). The owner can create and remove acyclic same-workspace work dependencies with durable history and revision snapshots; dependency state does not automatically change work status or establish readiness, verification, or impact propagation.
+15. **Durable work-to-project-direction links** — Validated at application/test head `ccf138887980c9bc7c53a3a9817c9c75572278c3`, CI run 367. See [slice](INCREMENT_2_WORK_DIRECTION_LINKS.md) and [validation](validation/increment-2-work-direction-links.md). The owner can record that work relies on an accepted owner decision or exact current accepted artifact version with authoritative revision snapshots and reversible history. The link records reliance only and does not establish that impact exists, is known, or is resolved.
 
 ### Active remaining Increment 2 scope
 
 The active single-user scope now prioritizes:
 
-1. broader durable links beyond work-item dependencies;
-2. multiple acceptance-criterion lifecycle;
-3. evidence freshness/outdated-state handling and explicit verification decisions;
-4. maintenance records and later lifecycle behavior;
-5. change-impact handling, including dependency-impact behavior;
-6. supporting audit, recovery, and seed behavior.
+1. multiple acceptance-criterion lifecycle;
+2. evidence freshness/outdated-state handling and explicit verification decisions;
+3. maintenance records and later lifecycle behavior;
+4. change-impact handling, including dependency/project-direction impact behavior;
+5. supporting audit, recovery, and seed behavior.
 
-Accepted technical-decision replacement/supersession, approved technical-requirement replacement/withdrawal/supersession/deprecation, and dependency-impact behavior remain future scope. Later artifact-version, accepted-version replacement/supersession, and file-import behavior are assigned to Increment 3.
+The validated durable-link baseline now includes work-to-work dependencies plus work-to-accepted-owner-decision and work-to-exact-current-accepted-artifact-version relationships. Generic arbitrary-record links, requirement/evidence-to-work links, change detection, and impact-resolution lifecycle remain future scope unless a later bounded slice approves them.
+
+Accepted technical-decision replacement/supersession, approved technical-requirement replacement/withdrawal/supersession/deprecation, and dependency/project-direction impact behavior remain future scope. Later artifact-version, accepted-version replacement/supersession, and file-import behavior are assigned to Increment 3.
 
 ### Removed from active Increment 2 scope by ADR-0005
 
@@ -88,7 +90,7 @@ Optional external human-review packaging remains deferred unless the product own
 
 **Outcome:** Changes expose affected evidence, and the owner can review a concrete release packet, record the release decision, and retain operating responsibility.
 
-**Expected scope:** dependency and impact records beyond the validated work-to-work dependency primitive, outdated-evidence handling, requirement-to-criterion-to-evidence traceability, readiness view, release packet and scoped authorization, deployment outcome record, and maintenance due items.
+**Expected scope:** change detection and impact records built on the validated work-to-work and work-to-project-direction traceability primitives, outdated-evidence handling, requirement-to-criterion-to-evidence traceability, readiness view, release packet and scoped authorization, deployment outcome record, and maintenance due items.
 
 ## 7. Deferred roadmap
 
