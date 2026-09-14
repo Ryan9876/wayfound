@@ -96,6 +96,10 @@ function preferGlimmer(models: string[]): string | null {
   return models.find(model => model.toLowerCase().includes("glimmer")) ?? models[0];
 }
 
+function isLocalOllamaModel(model: string): boolean {
+  return !model.toLowerCase().includes("cloud");
+}
+
 function finiteNumber(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
@@ -118,7 +122,6 @@ async function probeLmStudio(): Promise<ProviderProbe> {
 
   const body = result.body as { models?: LmStudioModel[] };
   const llms = Array.isArray(body.models) ? body.models.filter(model => model.type === "llm") : [];
-  // The model key is the provider identifier accepted by inference endpoints. Display names are fallback only.
   const availableModels = llms.map(model => model.key || model.display_name).filter((value): value is string => Boolean(value));
   const activeModels = llms
     .filter(model => Array.isArray(model.loaded_instances) && model.loaded_instances.length > 0)
@@ -142,10 +145,16 @@ async function probeOllama(): Promise<ProviderProbe> {
   const runningBody = runningResult?.body as { models?: OllamaModel[] } | null;
   const installedBody = installedResult?.body as { models?: OllamaModel[] } | null;
   const activeModels = Array.isArray(runningBody?.models)
-    ? runningBody.models.map(model => model.name || model.model).filter((value): value is string => Boolean(value))
+    ? runningBody.models
+        .map(model => model.name || model.model)
+        .filter((value): value is string => Boolean(value))
+        .filter(isLocalOllamaModel)
     : [];
   const availableModels = Array.isArray(installedBody?.models)
-    ? installedBody.models.map(model => model.name || model.model).filter((value): value is string => Boolean(value))
+    ? installedBody.models
+        .map(model => model.name || model.model)
+        .filter((value): value is string => Boolean(value))
+        .filter(isLocalOllamaModel)
     : [];
 
   return { provider: "ollama", providerLabel: "Ollama", reachable: true, activeModels, availableModels };
@@ -183,7 +192,7 @@ export async function detectLocalAi(): Promise<LocalAiStatus> {
       ? `${ready.providerLabel} is detected but requires authentication before Wayfound can use it.`
       : model
         ? `${ready.providerLabel} is detected. The AI test can ask the provider to load ${model}.`
-        : `${ready.providerLabel} is detected. Load or install a local model to connect AI.`;
+        : `${ready.providerLabel} is detected, but no eligible local model is available.`;
     return {
       state: "ready",
       provider: ready.provider,
@@ -270,6 +279,22 @@ async function testLmStudio(model: string): Promise<LocalAiTestResult> {
 }
 
 async function testOllama(model: string): Promise<LocalAiTestResult> {
+  if (!isLocalOllamaModel(model)) {
+    return {
+      ok: false,
+      provider: "ollama",
+      providerLabel: "Ollama",
+      model,
+      response: null,
+      responseTimeMs: null,
+      promptTokens: null,
+      completionTokens: null,
+      totalTokens: null,
+      tokensPerSecond: null,
+      detail: "Wayfound will not invoke an Ollama model identified as cloud-backed.",
+    };
+  }
+
   const started = performance.now();
   const result = await postJson(`${OLLAMA_URL}/api/chat`, {
     model,
