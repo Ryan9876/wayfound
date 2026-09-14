@@ -40,17 +40,12 @@ export default async function WorkspacePage({
     (await technicalDecisionService()).listForOwner(id),
     (await technicalRequirementService()).listForOwner(id),
   ]);
-  const view = workspaceView((await searchParams).view);
-  const visibleWorkItems =
-    view === "overview"
-      ? workItems.filter((item) => item.status !== "Implemented")
-      : workItems;
   return (
     <GuidedWorkspace
       workspace={workspace}
-      view={view}
+      view={workspaceView((await searchParams).view)}
       decisions={decisions}
-      workItems={visibleWorkItems}
+      workItems={workItems}
       requirements={requirements}
       evidence={evidence}
       artifacts={artifacts}

@@ -103,7 +103,10 @@ export function GuidedWorkspace({
       (item) =>
         item.stage_number === current.number && item.status === "Approved",
     ) ??
-    workItems.find((item) => item.stage_number === current.number);
+    workItems.find(
+      (item) =>
+        item.stage_number === current.number && item.status === "Proposed",
+    );
   const next = blocked[0] ?? currentWork;
   const changes = [
     ...decisions.map((item) => ({
