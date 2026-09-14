@@ -47,7 +47,12 @@ export function validateCreateWorkItem(input: CreateWorkItemInput): CreateWorkIt
   return result;
 }
 
-export type WorkItemStatus = "Proposed" | "Approved" | "In progress" | "Blocked";
+export type WorkItemStatus =
+  | "Proposed"
+  | "Approved"
+  | "In progress"
+  | "Blocked"
+  | "Implemented";
 export type WorkItemTransition = {
   id: string;
   actor_id: string;
@@ -67,14 +72,11 @@ export type TransitionWorkItemInput = {
   confirm: boolean;
   requestId: string;
 };
-export function nextWorkState(status: WorkItemStatus): Exclude<WorkItemStatus, "Proposed"> {
-  return { Proposed: "Approved", Approved: "In progress", "In progress": "Blocked", Blocked: "In progress" }[status] as Exclude<WorkItemStatus, "Proposed">;
-}
 export function validateTransitionWorkItem(input: TransitionWorkItemInput): TransitionWorkItemInput {
   const result = { ...input, reason: input.reason.trim() };
   if (!UUID.test(result.workspaceId) || !UUID.test(result.workItemId) || !UUID.test(result.requestId) ||
       !Number.isSafeInteger(result.expectedRevision) || result.expectedRevision < 1 || result.expectedRevision > 2147483647 ||
-      !["Approved", "In progress", "Blocked"].includes(result.targetStatus) ||
+      !["Approved", "In progress", "Blocked", "Implemented"].includes(result.targetStatus) ||
       !result.reason || result.reason.length > 2000 || result.confirm !== true) throw new Error("INVALID_INPUT");
   return result;
 }
