@@ -12,11 +12,15 @@ One authenticated human product owner controls the workspace and makes project-d
 
 Multi-human collaboration is not required for the first version. Wayfound will not require collaborator membership, invitations, human work assignment, reviewer-code exchange, or specialist accounts in the active first-version experience.
 
+For the local test path, Wayfound uses a **local-first provider boundary**. It automatically probes supported loopback AI runtimes, shows the selected local provider/model state to the owner, and does not silently fall back to a public/cloud AI provider when local AI is unavailable.
+
 ## Context
 
 Earlier validated Increment 2 slices implemented assignment-scoped authenticated human specialist review for artifacts, consequential technical choices, and consequential technical requirements. Those slices proved several useful authority and record-integrity properties, including exact-revision review, separation of review from owner acceptance, audit history, tenant isolation, and stale-review handling.
 
 The product owner has now clarified that Wayfound is intended for one person working with AI. Human collaboration features would add workflow, authorization, and interface complexity that is not required for the intended use.
+
+The owner already uses local AI runtimes and wants Wayfound to discover them without repeated configuration. The active local test scope therefore recognizes LM Studio and Ollama on their normal loopback endpoints. This is discovery and connection-state behavior; it does not grant AI decision authority.
 
 ## Consequences
 
@@ -29,12 +33,27 @@ The product owner has now clarified that Wayfound is intended for one person wor
 - The active interface must not require a second human account to complete ordinary project work.
 - Human specialist assignment and reviewer-code controls are hidden from single-user test mode.
 - Handoffs that exist only to coordinate another Wayfound user are outside active first-version scope.
+- Single-user local mode automatically probes LM Studio at `127.0.0.1:1234` and Ollama at `127.0.0.1:11434`.
+- A running LM Studio model is preferred over a running Ollama model. If LM Studio has no loaded model, a running Ollama model may be selected instead.
+- The interface shows a text connection state, provider, and model when known; color may reinforce but may not be the only state signal.
+- Failure to detect local AI must not prevent the workspace from loading.
+- Failure to detect local AI must not trigger an implicit public/cloud provider request.
 
 ### Preserved implementation
 
 The existing authenticated specialist-review schema, commands, validation records, and tests remain in the repository as validated historical capability. This ADR does not rewrite past validation evidence and does not claim that AI review has replaced qualified independent human review.
 
 The preserved capability may support a future optional collaboration mode if the product owner later approves that scope.
+
+### Local AI connection state
+
+The local-provider indicator uses three user-visible states:
+
+- `Connected`: a supported local provider is reachable and has a loaded/running model.
+- `Ready`: a supported local provider is reachable but does not currently have a loaded/running model available to Wayfound.
+- `Offline`: neither supported loopback provider responded within the bounded discovery timeout.
+
+Provider discovery itself is not a durable project record and is not evidence of model quality, correctness, verification, or release readiness.
 
 ### Deferred design
 
@@ -51,6 +70,8 @@ A later slice may define durable AI-review records. That design must specify at 
 
 AI review must not be labeled as independent qualified human review unless a human actually performed that review.
 
+Cloud-provider configuration is also deferred. If cloud AI is later added, it must be explicit and visible; local-provider failure must never silently authorize a cloud fallback.
+
 ## Superseded assumptions
 
 This ADR supersedes first-version assumptions that require invited collaborators, specialist reviewer accounts, reviewer-code exchange, collaborator administration, or human work assignment.
@@ -59,4 +80,4 @@ Existing architecture and validation documents that describe those implemented s
 
 ## Reconsideration trigger
 
-Revisit this ADR only if the product owner explicitly requires another human to participate inside the Wayfound workspace rather than outside it.
+Revisit this ADR if the product owner explicitly requires another human to participate inside the Wayfound workspace, or if a public/cloud AI provider is proposed for the active first-version runtime.
