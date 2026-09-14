@@ -1,6 +1,15 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+
 export async function proxy(request: NextRequest) {
+  const singleUserMode = process.env.WAYFOUND_SINGLE_USER_MODE === "true";
+  if (singleUserMode && request.nextUrl.pathname === "/specialist-reviews") {
+    return NextResponse.redirect(new URL("/workspaces", request.url));
+  }
+  if (singleUserMode && request.nextUrl.pathname === "/handoffs") {
+    return NextResponse.redirect(new URL("/records", request.url));
+  }
+
   let response = NextResponse.next({ request });
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_PUBLISHABLE_KEY;
@@ -23,4 +32,5 @@ export async function proxy(request: NextRequest) {
   response.headers.set("Cache-Control", "private, no-store, max-age=0");
   return response;
 }
-export const config = { matcher: ["/sign-in", "/workspaces/:path*"] };
+
+export const config = { matcher: ["/sign-in", "/workspaces/:path*", "/specialist-reviews", "/handoffs"] };
