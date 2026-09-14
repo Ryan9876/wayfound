@@ -31,6 +31,9 @@ jobs:
       - name: Check accessibility baseline
         run: npm run test:accessibility
 
+      - name: Check single-user product mode
+        run: npm run test:single-user-mode
+
       - name: Check TypeScript
         run: npm run lint
 
@@ -82,6 +85,21 @@ jobs:
         run: |
           if [ -f /tmp/wayfound-next.pid ]; then
             kill "$(cat /tmp/wayfound-next.pid)" || true
+          fi
+
+      - name: Smoke-test single-user route boundary
+        run: |
+          WAYFOUND_SINGLE_USER_MODE=true npm run start -- --hostname 127.0.0.1 --port 3001 > /tmp/wayfound-single-user.log 2>&1 &
+          echo $! > /tmp/wayfound-single-user.pid
+          npx --yes wait-on@8.0.1 http://127.0.0.1:3001
+          curl -sSI http://127.0.0.1:3001/specialist-reviews | tr -d '\r' | grep -E '^location: http://127.0.0.1:3001/workspaces$'
+          curl -sSI http://127.0.0.1:3001/handoffs | tr -d '\r' | grep -E '^location: http://127.0.0.1:3001/records$'
+
+      - name: Stop single-user application
+        if: always()
+        run: |
+          if [ -f /tmp/wayfound-single-user.pid ]; then
+            kill "$(cat /tmp/wayfound-single-user.pid)" || true
           fi
 
   durable-workspace:
