@@ -14,6 +14,17 @@ const open = async label => page.locator('summary').filter({ hasText: new RegExp
 const fill = async (label, value) => page.getByLabel(label, { exact: true }).fill(value);
 const screenshot = async name => page.screenshot({ path: `artifacts/workspace/ux-${name}.png`, fullPage: true });
 const noOverflow = async () => assert(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'Horizontal overflow');
+const uniqueIds = async () => {
+  const duplicates = await page.locator('[id]').evaluateAll(elements => {
+    const counts = new Map();
+    for (const element of elements) {
+      const id = element.id;
+      counts.set(id, (counts.get(id) ?? 0) + 1);
+    }
+    return [...counts.entries()].filter(([, count]) => count > 1).map(([id]) => id);
+  });
+  assert.deepEqual(duplicates, [], `Duplicate DOM IDs: ${duplicates.join(', ')}`);
+};
 await mkdir('artifacts/workspace', { recursive: true });
 try {
   await page.goto(`${base}/workspaces`);
@@ -33,11 +44,12 @@ try {
   assert.equal(await page.locator('#technical-decisions, #technical-requirements, .specialist-review-panel').count(), 0);
   assert(!/product-owner authority|acceptance gate|exact-revision specialist review/i.test(await page.locator('.project-content').innerText()));
   assert.deepEqual(await page.getByRole('navigation', { name: 'Project navigation', exact: true }).getByRole('link').allTextContents(), ['Overview', 'Journey', 'Work', 'Records', 'Release & Care']);
-  await noOverflow(); await screenshot('overview-desktop');
+  await uniqueIds(); await noOverflow(); await screenshot('overview-desktop');
   await page.getByRole('link', { name: 'Plan this step' }).click();
   await visible(page.getByRole('heading', { name: 'Work', exact: true }));
   await hidden(page.getByLabel('Work title', { exact: true }));
   await open('Add work');
+  await uniqueIds();
   await fill('Work title', 'Observe one checkout'); await fill('What should this produce?', 'A description of the real process.');
   await fill('Done when', 'One checkout observed.'); await fill('What will show it worked?', 'Dated observation notes.');
   await page.getByRole('button', { name: 'Add work', exact: true }).click();
@@ -50,7 +62,7 @@ try {
   await page.getByLabel('I approve this work.', { exact: false }).check();
   await page.getByRole('button', { name: 'Approve work', exact: true }).click();
   await visible(page.locator('.work-item-card .status-chip').getByText('Approved', { exact: true }));
-  await screenshot('work-desktop');
+  await uniqueIds(); await screenshot('work-desktop');
   await page.goto(`${workspaceUrl}?view=records`);
   await hidden(page.getByLabel('What did you decide?', { exact: true }));
   await open('Add decision'); await fill('Decision title', 'Focus on staff'); await fill('What did you decide?', 'The first version is for staff.'); await fill('Why?', 'Staff handle checkout today.');
@@ -66,7 +78,7 @@ try {
   await open('Add evidence'); await fill('Evidence title', 'Observation result'); await fill('Result', 'The available item appeared.'); await fill('Where did this come from?', 'Manual observation of the local test, not AI analysis.');
   await page.getByRole('button', { name: 'Add evidence', exact: true }).click();
   await page.waitForURL(/view=records#criterion-/);
-  await page.locator('.evidence-disclosure summary').click();
+  await page.locator('.evidence-disclosure > summary').click();
   await visible(page.getByRole('heading', { name: 'Observation result', exact: true }));
   await visible(page.getByText('Recorded evidence. This does not mark the check as passed.', { exact: true }));
   await open('Add document'); await fill('Document title', 'Observation notes'); await fill('Document type', 'Research'); await fill('Summary', 'Notes from the checkout.'); await fill('Reference label', 'Notes'); await fill('Reference URL', 'https://example.com/notes');
@@ -76,7 +88,7 @@ try {
   await page.getByLabel('I choose this version as project direction.', { exact: false }).check();
   await page.getByRole('button', { name: 'Accept version 1', exact: true }).click();
   await visible(page.locator('.artifact-card').getByText('Accepted · Version 1', { exact: true }));
-  await noOverflow(); await screenshot('records-desktop');
+  await uniqueIds(); await noOverflow(); await screenshot('records-desktop');
   await page.reload();
   await visible(page.getByRole('heading', { name: 'Records', exact: true }));
   await hidden(page.getByLabel('What must the product do?', { exact: true }));
@@ -90,7 +102,7 @@ try {
   await page.setViewportSize({ width: 390, height: 844 });
   for (const view of ['overview', 'journey', 'work', 'records', 'release-care', 'more']) {
     await page.goto(`${workspaceUrl}?view=${view}`);
-    await noOverflow(); await screenshot(`${view}-mobile`);
+    await uniqueIds(); await noOverflow(); await screenshot(`${view}-mobile`);
     await visible(page.getByRole('navigation', { name: 'Mobile project navigation', exact: true }));
     await hidden(page.getByRole('navigation', { name: 'Project navigation', exact: true }));
   }
@@ -98,5 +110,5 @@ try {
   await visible(page.getByRole('heading', { name: 'Records', exact: true }));
   await page.goBack(); await visible(page.getByRole('heading', { name: 'More', exact: true }));
   assert.deepEqual(errors, []);
-  console.log('PASS: active single-user UI creation, required confirmations, saved statuses, navigation, disclosure, evidence distinction, desktop/mobile rendering, reload, and browser back.');
+  console.log('PASS: active single-user UI creation, required confirmations, saved statuses, navigation, disclosure, evidence distinction, unique DOM IDs, desktop/mobile rendering, reload, and browser back.');
 } finally { await browser.close(); }
