@@ -23,11 +23,14 @@ The current implementation contains (validation status is recorded per slice bel
 - durable owner-recorded evidence results linked to acceptance criteria with stable identifiers, provenance, effect, and requirement/criterion revision snapshots;
 - durable artifact identities with one stable initial artifact-version identity and an HTTP or HTTPS external reference that Wayfound records without fetching;
 - explicit product-owner acceptance of that proposed artifact version as current project direction, with an accepted-version pointer, accepting actor, acceptance time, revisions, and audit history;
-- assignment-scoped qualified specialist review of the exact currently accepted artifact version, with a stable reviewer code, bounded competence/question, authenticated reviewer identity, named findings, revision snapshots, and audit history without granting general workspace membership.
+- assignment-scoped qualified specialist review of the exact currently accepted artifact version, with a stable reviewer code, bounded competence/question, authenticated reviewer identity, named findings, revision snapshots, and audit history without granting general workspace membership;
+- consequential technical-choice proposals with exact-revision specialist assignment/review and a separate current-owner acceptance action under ADR-0004.
 
-The durable decision path does not authorize consequential technical decisions. Those require qualified specialist review and remain later scope. Proposed work items do not imply that execution started, a specialist accepted the work, implementation completed, or verification occurred. The owner requirement path approves only product or business behavior within owner authority; consequential technical implementation choices remain subject to qualified specialist review. Acceptance criteria are conditions, not evidence or verification results. Evidence effects describe a recorded result as `Supports`, `Challenges`, or `Inconclusive`; recording evidence is not a verification decision and does not change the linked requirement from `Approved`. A newly recorded artifact version remains `Proposed` until the owner explicitly accepts that exact version. Artifact acceptance records project direction only. A specialist review records qualified judgment within its declared scope only. Neither artifact acceptance nor specialist review establishes verification, validation, release readiness, or production authorization.
+The durable owner-decision path still does not authorize consequential technical decisions. Those use the separate ADR-0004 technical-choice proposal/review/acceptance path. A technical choice remains `Proposed` until an assigned specialist records `No blocking finding` on the exact current revision and the current owner separately accepts that reviewed revision as project direction. `Changes required` blocks acceptance, `Advisory` does not satisfy the gate, and specialist review never auto-accepts project direction.
 
-Work completion transitions, collaborator membership/administration, dependencies and broader links, technical-decision and technical-requirement specialist review, multiple criterion lifecycle, later artifact versions/import and supersession behavior, evidence freshness/outdated-state handling, specialist evidence review, external specialist connectors, automatic CI/CD evidence ingestion, production-changing actions, and production release authorization remain unimplemented.
+Proposed work items do not imply that execution started, a specialist accepted the work, implementation completed, or verification occurred. The owner requirement path approves only product or business behavior within owner authority; consequential technical implementation requirements remain subject to qualified specialist review and are not yet implemented. Acceptance criteria are conditions, not evidence or verification results. Evidence effects describe a recorded result as `Supports`, `Challenges`, or `Inconclusive`; recording evidence is not a verification decision and does not change the linked requirement from `Approved`. A newly recorded artifact version remains `Proposed` until the owner explicitly accepts that exact version. Artifact acceptance records project direction only. A specialist review records qualified judgment within its declared scope only. Neither artifact acceptance, specialist review, nor technical-decision acceptance establishes verification, validation, release readiness, or production authorization.
+
+Work completion transitions, collaborator membership/administration, dependencies and broader links, technical-requirement specialist review/acceptance, multiple criterion lifecycle, later artifact versions/import and supersession behavior, accepted technical-decision replacement/supersession, evidence freshness/outdated-state handling, specialist evidence review, external specialist connectors, automatic CI/CD evidence ingestion, production-changing actions, and production release authorization remain unimplemented.
 
 ## 3. Component boundaries
 
@@ -35,15 +38,19 @@ Work completion transitions, collaborator membership/administration, dependencie
 
 Next.js App Router and React render the workspace. Interactive components use client-side JavaScript only where interaction requires it.
 
-The owner sees specialist assignments and completed reviews directly under the exact accepted artifact version. The assigned specialist uses a separate `/specialist-reviews` workspace that exposes only the bounded review context authorized by the stored assignment.
+The owner sees specialist artifact assignments and completed reviews directly under the exact accepted artifact version. Technical-choice proposals appear in a separate owner section from owner-only product/business decisions and show proposal revision, requested competence, bounded review question, assignment/review state, acceptance eligibility, and accepted technical-decision linkage when present. The assigned specialist uses `/specialist-reviews`, which exposes only the bounded artifact or technical-choice context authorized by the stored assignment.
 
 ### Application logic
 
-Server-side application functions enforce implemented workspace scope, identity, authorization, input validation, decision authority boundaries, proposed-work semantics, owner-approved product-requirement semantics, criterion-evidence semantics, proposed-artifact semantics, explicit owner artifact acceptance, and assignment-scoped specialist artifact review. Later slices will add work completion transitions, collaborator membership and broader links, specialist technical-decision/requirement review, later artifact versions/import lifecycle, reconciliation, change-impact, evidence freshness, verification decisions, and release rules.
+Server-side application functions enforce implemented workspace scope, identity, authorization, input validation, decision authority boundaries, proposed-work semantics, owner-approved product-requirement semantics, criterion-evidence semantics, proposed-artifact semantics, explicit owner artifact acceptance, assignment-scoped specialist artifact review, owner work lifecycle rules, and consequential technical-choice proposal/review/acceptance rules.
+
+Later slices will add work completion transitions, collaborator membership and broader links, technical-requirement specialist review/acceptance, later artifact versions/import lifecycle, reconciliation, change-impact, evidence freshness, verification decisions, and release rules.
 
 ### Persistence
 
-PostgreSQL is authoritative for implemented durable workspace, release/stage, owner-decision, proposed-work-item, owner-approved requirement, acceptance-criterion, criterion-evidence, artifact identity, artifact-version lifecycle, accepted-version selection, specialist-review assignment, and specialist-review records. The current artifact flow stores structured metadata and external references only. Object storage may enter scope when file-backed artifact import is implemented.
+PostgreSQL is authoritative for implemented durable workspace, release/stage, owner-decision, proposed-work-item, work-transition history, owner-approved requirement, acceptance-criterion, criterion-evidence, artifact identity, artifact-version lifecycle, accepted-version selection, specialist artifact-review assignment/review, technical-choice proposal, technical-choice review assignment/review, accepted technical decision, and their request/audit records.
+
+The current artifact flow stores structured metadata and external references only. Object storage may enter scope when file-backed artifact import is implemented.
 
 ### AI guidance
 
@@ -59,7 +66,15 @@ For implemented persistent state:
 
 - the Wayfound database owns structured durable workspace state;
 - a saved owner decision is an accepted product-scope or business choice only after explicit owner-authority confirmation;
-- technical choices that require qualified specialist review are not accepted through the owner-decision action;
+- consequential technical choices are not accepted through the owner-decision action;
+- a technical choice created through the ADR-0004 path is a proposal, not an accepted decision;
+- a current owner can assign an authenticated specialist by reviewer code to one exact technical-choice proposal revision without granting workspace membership;
+- only the assigned live specialist can record the bounded technical-choice review;
+- technical-choice review conclusions are `No blocking finding`, `Changes required`, or `Advisory`; only `No blocking finding` makes that exact revision eligible for separate owner acceptance;
+- specialist technical-choice review does not itself create an accepted technical decision;
+- current-owner acceptance links the exact proposal revision, assignment, and qualifying review into a durable accepted technical decision;
+- material proposal change increments the proposal revision and makes an earlier review ineligible for acceptance;
+- accepted technical decisions are not overwritten by this slice; replacement/supersession remains future scope;
 - a newly recorded work item is planned work with status `Proposed` and does not establish execution, completion, review, or verification;
 - a requirement recorded through the owner action is an `Approved` product requirement only after explicit owner-authority confirmation;
 - a consequential technical implementation requirement is not approved through the owner requirement action;
@@ -69,11 +84,11 @@ For implemented persistent state:
 - recording evidence does not mark the criterion satisfied, passed, verified, or validated and does not change the linked requirement from `Approved`;
 - a durable artifact has a stable artifact identity and a stable version identity; the current creation action creates only version `1` with lifecycle `Proposed`;
 - the artifact external reference is stored as metadata and is not fetched by Wayfound in the current slices;
-- the owner can explicitly accept the existing proposed version as current project direction; acceptance changes that version to `Accepted` and records the artifact's `accepted_version_id`, accepting actor, acceptance time, and revisions;
+- the owner can explicitly accept the existing proposed artifact version as current project direction; acceptance changes that version to `Accepted` and records the artifact's `accepted_version_id`, accepting actor, acceptance time, and revisions;
 - artifact acceptance does not imply qualified specialist review, technical approval, verification, validation, release readiness, or production authorization;
 - an authenticated user can establish a stable specialist reviewer code without gaining workspace membership; the code addresses an actor but does not grant access;
 - a current owner can assign that reviewer to the exact currently accepted artifact version with requested competence and one bounded review question;
-- only the assigned live specialist actor can record the review, and the review snapshots the artifact/version revisions without changing the accepted artifact or release state;
+- only the assigned live specialist actor can record the artifact review, and the review snapshots the artifact/version revisions without changing the accepted artifact or release state;
 - a specialist review records named qualified judgment with conclusion `No blocking finding`, `Changes required`, or `Advisory`; those conclusions do not mean `Verified`, `Validated`, or `Released`;
 - the authenticated owner or specialist actor and durable target context are resolved from server-side/database state instead of caller-supplied authority data;
 - external tool output is input to reconciliation, not automatic project truth;
@@ -97,9 +112,11 @@ Proposed-artifact creation derives the creating actor, current release, and curr
 
 Artifact acceptance derives the accepting actor from the verified live session and current owner membership, requires explicit product-owner authority confirmation, locks and verifies the exact workspace/artifact/version target, requires lifecycle `Proposed`, changes only that version to `Accepted`, records the artifact accepted-version pointer and acceptance metadata, and records `artifact.accepted` with the accepted version as the audited entity. Direct client writes cannot set acceptance state. This action does not confer specialist review or verification.
 
-ADR-0003 deliberately keeps specialist reviewers outside the existing workspace membership table because earlier owner mutations include generic membership predicates. An authenticated reviewer can establish an actor/reviewer code without gaining workspace membership. Owner assignment derives the current owner from a live session, requires explicit bounded-scope confirmation, and targets only the exact currently accepted artifact version. Specialist submission derives the reviewer from the live session, requires a matching stored assignment and explicit competence confirmation, rejects stale/non-current accepted versions, and records `specialist_review.recorded`. The specialist cannot use that assignment to list/open the owner's workspace or execute owner mutations.
+ADR-0003 deliberately keeps specialist reviewers outside the existing workspace membership table because earlier owner mutations include generic membership predicates. An authenticated reviewer can establish an actor/reviewer code without gaining workspace membership. Owner artifact-review assignment derives the current owner from a live session, requires explicit bounded-scope confirmation, and targets only the exact currently accepted artifact version. Specialist submission derives the reviewer from the live session, requires a matching stored assignment and explicit competence confirmation, rejects stale/non-current accepted versions, and records `specialist_review.recorded`. The specialist cannot use that assignment to list/open the owner's workspace or execute owner mutations.
 
-The broader production architecture must also provide role-aware collaborator administration before broad specialist workspace membership, qualified technical-decision/requirement review records, validation at file and external-input boundaries, no committed secrets, and audit records for material acceptance and authorization events.
+ADR-0004 extends the same bounded specialist identity model to consequential technical choices without broadening workspace membership. Technical-choice proposal creation derives the current owner, release, and stage from authoritative state and records a `Proposed` choice. Assignment binds one authenticated reviewer to the exact proposal revision, competence area, and bounded question. Review submission derives the specialist from the live session, requires the matching assignment and exact revision, and records one of the three allowed conclusions. Owner acceptance derives the current owner from the live session, locks the proposal/review context, requires `No blocking finding` on the exact current proposal revision, and atomically creates the linked accepted technical decision. Owner self-review, stale review, cross-tenant targets, revoked membership/assignment/session, and direct-table writes are denied.
+
+The broader production architecture must also provide role-aware collaborator administration before broad specialist workspace membership, qualified technical-requirement review records, validation at file and external-input boundaries, no committed secrets, and audit records for material acceptance and authorization events.
 
 Security design that changes trust boundaries or introduces consequential dependencies requires an Architecture Decision Record.
 
@@ -116,10 +133,14 @@ Implemented examples:
 - criterion-evidence creation is transactional and rolls back the evidence record, audit event, and request result when audit insertion fails;
 - proposed-artifact creation is transactional and rolls back the artifact identity, artifact version, audit event, and request result when audit insertion fails;
 - artifact acceptance is transactional and rolls back version lifecycle, accepted-version pointer, acceptance metadata, revisions, audit event, and request result when audit insertion fails;
-- specialist-review assignment is transactional and rolls back the assignment, audit event, and request result when audit insertion fails;
-- specialist review submission is transactional and rolls back the review, assignment completion state, audit event, and request result when audit insertion fails;
+- specialist artifact-review assignment is transactional and rolls back the assignment, audit event, and request result when audit insertion fails;
+- specialist artifact-review submission is transactional and rolls back the review, assignment completion state, audit event, and request result when audit insertion fails;
+- owner work transitions are transactional and roll back work state, immutable transition history, audit event, and request result when audit insertion fails;
+- technical-choice proposal creation, specialist assignment, specialist review, and owner acceptance are transactional and roll back their mutation, audit event, and request result when an injected audit failure occurs;
+- concurrent distinct technical-decision acceptance requests against the same eligible state produce one durable winner;
+- a material proposal revision makes an earlier technical-choice review stale for acceptance;
 - database interruption renders a recoverable error and does not substitute fixture data;
-- successful same-route decision, work-item, requirement, evidence, artifact-create, artifact-accept, specialist-assignment, and specialist-review actions explicitly revalidate their relevant views before redirect so rendered state matches committed state.
+- successful same-route decision, work-item, requirement, evidence, artifact-create, artifact-accept, specialist-assignment/review, work-lifecycle, and technical-choice actions explicitly revalidate their relevant views before redirect so rendered state matches committed state.
 
 Future failed imports must preserve accepted artifacts; failed reconciliation must not partially accept returned work; interrupted release actions must not be reported as successful without outcome evidence; unknown dependency impact remains unresolved rather than becoming “no impact.”
 
@@ -127,7 +148,7 @@ The persistence adapters use a bounded retry only for PostgREST error `PGRST303`
 
 ## 7. Observability
 
-Important failures must be diagnosable without logging secrets or unnecessary sensitive data. Implemented durable mutations record scoped audit events and correlation/request context. Later observability work must extend this baseline to specialist technical-decision/requirement review, later artifact versions/import, work-state transition, evidence freshness and verification decisions, change-impact, and release workflows.
+Important failures must be diagnosable without logging secrets or unnecessary sensitive data. Implemented durable mutations record scoped audit events and correlation/request context. Later observability work must extend this baseline to technical-requirement specialist review, later artifact versions/import, work completion/assignment, evidence freshness and verification decisions, change-impact, and release workflows.
 
 ## 8. Deployment and rollback
 
@@ -153,7 +174,7 @@ Revisit the architecture when validated product behavior cannot be represented c
 
 ## 11. Increment 2 implementation
 
-[ADR-0002](adr/0002-durable-workspace-identity.md) defines the accepted identity and persistence boundary. [ADR-0003](adr/0003-assignment-scoped-specialist-review.md) defines the accepted bounded specialist-review authority model. `lib/application` owns use-case validation and actor checks, `lib/auth` owns Supabase identity access, `lib/persistence` owns bounded database calls, and `lib/domain` owns provider-independent contracts and the canonical journey catalog.
+[ADR-0002](adr/0002-durable-workspace-identity.md) defines the accepted identity and persistence boundary. [ADR-0003](adr/0003-assignment-scoped-specialist-review.md) defines the accepted bounded specialist-review authority model. [ADR-0004](adr/0004-technical-decision-review-and-acceptance.md) defines the accepted split-authority model for consequential technical choices. `lib/application` owns use-case validation and actor checks, `lib/auth` owns Supabase identity access, `lib/persistence` owns bounded database calls, and `lib/domain` owns provider-independent contracts and the canonical journey catalog.
 
 The private `wayfound` schema owns durable state. Privileged mutations are scoped transactions behind invoker RPC wrappers; no direct client table writes or application service keys are permitted. Reads verify the current provider session and the exact owner-membership or specialist-assignment authorization required for the resource. AI is not connected to persisted authority.
 
@@ -173,8 +194,11 @@ The owner artifact-acceptance slice is **Validated** at repository head `3ca0ea4
 
 The assignment-scoped specialist artifact-review slice is **Validated** at application head `fc91a4377e887cada269fb35b2192f5c3efad15b` through CI run 172. It gives authenticated specialists a stable reviewer code without workspace membership, lets the owner assign one specialist to one exact accepted artifact version, records named qualified judgment with revision snapshots, proves that the specialist cannot execute owner mutations, and preserves the boundary between specialist review and verification. See [validation/increment-2-specialist-review.md](validation/increment-2-specialist-review.md).
 
-No hosted project or production deployment exists. Broader Increment 2 remains In progress for work completion transitions and assignment, collaborator administration and broader durable record links, technical-decision/requirement specialist review, multiple criterion lifecycle, evidence freshness and verification lifecycle, maintenance, and later lifecycle/change-impact behavior. Later artifact-version, accepted-version replacement/supersession, and file-import behavior are assigned to Increment 3.
+The owner work lifecycle slice is **Validated** at application head `1c3d8a52a820163340b8742f3f8f3a24f7115545` through CI run 179. See [validation/increment-2-work-lifecycle.md](validation/increment-2-work-lifecycle.md).
 
+The consequential technical-decision authority slice is **Validated** at application head `bb77ce1abba4ebe5a32bfbc32583e3ddbecd792b` through CI run 201. It preserves split authority: owner proposal, exact-revision specialist review, and separate owner acceptance. See [validation/increment-2-technical-decisions.md](validation/increment-2-technical-decisions.md).
+
+No hosted project or production deployment exists. Broader Increment 2 remains In progress for work completion transitions and assignment, collaborator administration and broader durable record links, technical-requirement specialist review/acceptance, multiple criterion lifecycle, evidence freshness and verification lifecycle, maintenance, later lifecycle/change-impact behavior, and accepted technical-decision replacement/supersession. Later artifact-version, accepted-version replacement/supersession, and file-import behavior are assigned to Increment 3.
 
 ## 12. Owner work lifecycle extension
 
@@ -185,3 +209,15 @@ No hosted project or production deployment exists. Broader Increment 2 remains I
 The private transition command locks membership and the work row, checks the expected revision, and atomically records state/revision, immutable transition history, audit event, and request result. Exact duplicate replay returns its original transition ID after live authorization; changed payload or stale distinct requests fail. Owner reads include ordered history. UI controls expose only the allowed next action, require a reason/confirmation, and preserve entered details after an error.
 
 No membership role or specialist authority changes. The migration preserves existing Proposed records. Because the earlier reader described every work item as Proposed, recovery must retain a state-aware reader; do not restore the old status constraint or drop history after transitions exist. Completion, assignment, dependencies, and technical acceptance remain later scope.
+
+## 13. Consequential technical-decision authority extension
+
+**Status:** Validated at application head `bb77ce1abba4ebe5a32bfbc32583e3ddbecd792b`, CI run 201. See [validation evidence](validation/increment-2-technical-decisions.md).
+
+[Consequential technical decision review and acceptance](INCREMENT_2_TECHNICAL_DECISIONS.md) implements ADR-0004 Option A. The current workspace owner creates a technical choice proposal and assigns an authenticated specialist by stable reviewer code to the exact proposal revision, requested competence, and one bounded question. The specialist remains outside workspace membership and can review only assigned bounded context.
+
+A completed `No blocking finding` review makes only that exact proposal revision eligible for separate owner acceptance. `Changes required` blocks acceptance and `Advisory` does not satisfy the gate. Specialist review does not auto-accept. Owner acceptance links the proposal, exact revision, assignment, review, reviewer, accepting owner, and acceptance time into the accepted technical decision.
+
+Material proposal changes increment revision and invalidate older reviews for acceptance. Owner self-review is denied. Transactions preserve idempotency, exact-target authorization, one-winner concurrency, audit rollback, and live-session checks. Database interruption shows a recoverable error without fixture substitution.
+
+This extension does not implement technical requirements, accepted technical-decision replacement/supersession, verification, validation, release readiness, release authorization, or production-changing actions.

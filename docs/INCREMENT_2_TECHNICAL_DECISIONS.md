@@ -1,24 +1,22 @@
 # Increment 2 — Consequential technical decision review and acceptance
 
-**Status:** Blocked — ADR-0004 owner approval required  
+**Status:** Validated  
 **Parent increment:** Increment 2 — Durable workspace record  
-**Architecture basis:** ADR-0002 and ADR-0003; proposed ADR-0004  
-**Implementation state:** Not started
+**Architecture basis:** ADR-0002, ADR-0003, and accepted ADR-0004  
+**Implementation state:** Implemented and validated at application head `bb77ce1abba4ebe5a32bfbc32583e3ddbecd792b`, CI run 201
 
 ## 1. Outcome
 
-After ADR-0004 is accepted, Wayfound will let a current workspace owner record a consequential technical choice as a proposed record, obtain qualified specialist review of the exact proposal revision, and separately accept that reviewed choice as project direction only when the required review conclusion is `No blocking finding`.
+Wayfound lets a current workspace owner record a consequential technical choice as a proposed record, obtain qualified specialist review of the exact proposal revision, and separately accept that reviewed choice as project direction only when the required review conclusion is `No blocking finding`.
 
-The specialist review will not automatically approve project direction. The owner acceptance action will not claim independent technical verification.
-
-This slice is blocked until the project owner accepts or changes ADR-0004.
+The specialist review does not automatically approve project direction. The owner acceptance action does not claim independent technical verification.
 
 ## 2. Requirement coverage
 
-This slice is intended to advance:
+This slice advances:
 
 - `WF-OWN-001` — product-owner decisions remain distinct from work that requires qualified specialist review;
-- `WF-REC-001` — consequential technical choices and their review/acceptance history become durable project records;
+- `WF-REC-001` — consequential technical choices and their review/acceptance history are durable project records;
 - `WF-REC-002` — review, acceptance, verification, validation, and release remain separate states.
 
 It does not complete those requirements for every later lifecycle.
@@ -31,7 +29,7 @@ Only an authenticated current workspace owner may record a technical choice prop
 
 A technical choice proposal is not a `decision` under the approved glossary because it is not yet approved project direction.
 
-The proposal must record:
+The proposal records:
 
 - immutable proposal identifier;
 - workspace identifier;
@@ -48,13 +46,13 @@ The proposal must record:
 - proposing owner actor derived from the live session;
 - created and updated timestamps.
 
-The action must require explicit confirmation that the owner is proposing a consequential technical choice for qualified review and is not accepting it as project direction.
+The action requires explicit confirmation that the owner is proposing a consequential technical choice for qualified review and is not accepting it as project direction.
 
 ### Specialist review
 
-The owner must assign an authenticated specialist reviewer by stable reviewer code without granting workspace membership.
+The owner assigns an authenticated specialist reviewer by stable reviewer code without granting workspace membership.
 
-The assignment must bind to:
+The assignment binds to:
 
 - exact workspace;
 - exact technical choice proposal;
@@ -65,9 +63,9 @@ The assignment must bind to:
 
 Only the assigned live specialist may submit the review.
 
-The specialist must record reviewer display name, competence statement, conclusion, summary, findings, and explicit competence confirmation.
+The specialist records reviewer display name, competence statement, conclusion, summary, findings, and explicit competence confirmation.
 
-Allowed conclusions remain:
+Allowed conclusions are:
 
 - `No blocking finding`;
 - `Changes required`;
@@ -77,7 +75,7 @@ Allowed conclusions remain:
 
 Only an authenticated current workspace owner may accept a technical choice proposal as project direction.
 
-Acceptance must require all of these conditions:
+Acceptance requires all of these conditions:
 
 1. the proposal still exists in the same workspace and remains `Proposed`;
 2. the caller still has explicit current owner membership;
@@ -87,9 +85,9 @@ Acceptance must require all of these conditions:
 6. the completed review conclusion is `No blocking finding`;
 7. the owner explicitly confirms that they accept the reviewed technical choice as project direction and do not claim independent technical verification.
 
-The acceptance transaction must create or establish an `Accepted` technical decision that links the exact proposal and qualifying specialist review.
+The acceptance transaction establishes an `Accepted` technical decision that links the exact proposal and qualifying specialist review.
 
-The acceptance record must include:
+The acceptance record includes:
 
 - immutable accepted technical-decision identifier;
 - workspace, release, and captured stage;
@@ -102,7 +100,7 @@ The acceptance record must include:
 - accepted-decision revision;
 - audit event identifier or traceable audit entry.
 
-`No blocking finding` must not itself create the accepted technical decision.
+`No blocking finding` does not itself create the accepted technical decision.
 
 ## 4. Blocking and stale-review rules
 
@@ -110,15 +108,15 @@ The acceptance record must include:
 
 `Advisory` does not satisfy the acceptance gate.
 
-The bounded owner action must not provide an override for either result.
+The bounded owner action provides no override for either result.
 
-If any material proposal content changes after the qualifying review, the proposal revision must change and the earlier review must become ineligible for acceptance. The changed revision requires a new specialist review.
+If material proposal content changes after a qualifying review, the proposal revision changes and the earlier review becomes ineligible for acceptance. The changed revision requires a new specialist review.
 
-A material change to an already accepted technical decision must not overwrite that accepted record. It must enter a future replacement flow as a new proposed technical choice and repeat specialist review and owner acceptance. Accepted-decision replacement, supersession, and dependency impact are excluded from this slice.
+A material change to an already accepted technical decision does not overwrite that accepted record. It must enter a future replacement flow as a new proposed technical choice and repeat specialist review and owner acceptance. Accepted-decision replacement, supersession, and dependency impact remain excluded from this slice.
 
 ## 5. Data and security boundary
 
-Preserve the current security architecture:
+The implementation preserves the current security architecture:
 
 - private `wayfound` PostgreSQL schema;
 - row-level security as defense in depth;
@@ -131,11 +129,11 @@ Preserve the current security architecture:
 - no caller-supplied actor, owner, reviewer, release, stage, or acceptance authority used as trusted authority;
 - bounded retry only for exact `PGRST303` with message `JWT issued at future`.
 
-Do not add specialists to the existing workspace membership table in this slice. Existing owner mutations still require a separately approved role-aware authorization redesign before membership roles can safely widen.
+Specialists are not added to the existing workspace membership table by this slice. Existing owner mutations still require a separately approved role-aware authorization redesign before membership roles can safely widen.
 
 ## 6. Transaction and idempotency rules
 
-Proposal creation, specialist assignment, specialist review submission, and owner acceptance must each be transactional and idempotent by authenticated actor plus request UUID.
+Proposal creation, specialist assignment, specialist review submission, and owner acceptance are transactional and idempotent by authenticated actor plus request UUID.
 
 For every protected mutation:
 
@@ -145,13 +143,13 @@ For every protected mutation:
 - injected audit failure rolls back the mutation and request-result record;
 - a database interruption produces a recoverable error and does not substitute fixture state.
 
-Owner acceptance must lock the proposal and qualifying review context before checking eligibility. Concurrent distinct acceptance requests against the same proposal state must produce one durable winner.
+Owner acceptance locks the proposal and qualifying review context before checking eligibility. Concurrent distinct acceptance requests against the same proposal state produce one durable winner.
 
 ## 7. Presentation
 
-The owner workspace should show technical choice proposals separately from accepted owner-only product/business decisions until acceptance occurs.
+The owner workspace shows technical choice proposals separately from accepted owner-only product/business decisions until acceptance occurs.
 
-The proposal view must show in text:
+The proposal view shows in text:
 
 - `Proposed` state;
 - requested competence;
@@ -161,15 +159,15 @@ The proposal view must show in text:
 - whether the proposal is eligible for owner acceptance;
 - a clear explanation that specialist review is qualified judgment and owner acceptance is project-direction acceptance.
 
-The owner acceptance control must appear only when the exact current revision has `No blocking finding`.
+The owner acceptance control appears only when the exact current revision has `No blocking finding`.
 
-The specialist workspace must expose only the assigned bounded proposal context required for review. It must not expose general workspace membership or unrelated durable records.
+The specialist workspace exposes only the assigned bounded proposal context required for review. It does not expose general workspace membership or unrelated durable records.
 
-Important state and conclusion must appear in text and not rely on color alone. Controls must be keyboard reachable and usable at desktop and 390 px mobile widths.
+Important state and conclusion appear in text and do not rely on color alone. Controls are keyboard reachable and usable at desktop and 390 px mobile widths.
 
 ## 8. Failure behavior
 
-The UI must show a recoverable error when:
+The UI shows a recoverable error when:
 
 - the database is unavailable;
 - the proposal revision is stale;
@@ -179,18 +177,18 @@ The UI must show a recoverable error when:
 - the review result does not permit acceptance;
 - another concurrent request already changed the eligible state.
 
-A failed proposal, review, or acceptance operation must not partially change accepted project direction.
+A failed proposal, review, or acceptance operation does not partially change accepted project direction.
 
-The system must not fetch or execute an external reference if one is included as proposal reference data in a later implementation detail.
+The current slice does not fetch or execute external references.
 
-## 9. Proposed acceptance criteria
+## 9. Executed acceptance criteria
 
-These criteria are not validation evidence. They define the behavior that must pass after ADR-0004 approval and implementation.
+The focused acceptance suite and full prior durable regression chain executed the bounded criteria below at application head `bb77ce1abba4ebe5a32bfbc32583e3ddbecd792b` in CI run 201.
 
 1. Owner A can create one technical choice proposal and see it remain `Proposed` after restart and re-login.
 2. Proposal creation alone creates no accepted decision and does not change existing owner decisions, requirements, artifacts, specialist reviews, work state, release state, verification, validation, or release authorization.
 3. Owner A can assign Specialist S by reviewer code to the exact proposal revision without creating specialist workspace membership.
-4. Unknown reviewer, self-review if disallowed by the final ADR, cross-workspace target, unknown proposal, and stale proposal revision are rejected.
+4. Unknown reviewer, owner self-review, cross-workspace target, unknown proposal, and stale proposal revision are rejected.
 5. Only Specialist S can read the assignment and submit its review from a live authenticated session.
 6. Specialist S can record each allowed conclusion in isolated test cases; only `No blocking finding` makes the exact proposal revision eligible for owner acceptance.
 7. `Changes required` blocks acceptance. `Advisory` does not satisfy acceptance. There is no owner override in this slice.
@@ -198,7 +196,7 @@ These criteria are not validation evidence. They define the behavior that must p
 9. Only a current owner can perform the separate acceptance action after the qualifying exact-revision review.
 10. The accepted technical decision records stable proposal, assignment, review, reviewer, accepting owner, time, and revision linkage.
 11. Changing the proposal revision after review makes the older review ineligible and prevents acceptance until a new exact-revision qualifying review exists.
-12. Another workspace owner or assigned specialist cannot use the action to accept the proposal as project direction unless the final accepted authority model explicitly grants that role.
+12. Another workspace owner or assigned specialist cannot use the action to accept the proposal as project direction.
 13. Anonymous, expired, signed-out, revoked-session, revoked-assignment, and revoked-membership requests fail for the protected operations that require them.
 14. Direct private-table read/write remains denied.
 15. Identical concurrent retries return one original result; changed request reuse fails; concurrent distinct acceptance requests produce one winner.
@@ -228,12 +226,14 @@ This bounded slice does not implement:
 - artifact import or later artifact versions;
 - release authorization or production-changing actions.
 
-Technical requirement specialist review should be specified after this authority boundary is accepted because it should reuse the same split between qualified review and project-direction acceptance where applicable.
+Technical requirement specialist review should be specified next and should reuse the same split between qualified review and project-direction acceptance where applicable.
 
-## 11. Approval needed
+## 11. Validation evidence
 
-Implementation is blocked on one owner decision:
+The application behavior is **Validated** at `bb77ce1abba4ebe5a32bfbc32583e3ddbecd792b` through [CI run 201](https://github.com/Ryan9876/wayfound/actions/runs/34790448518).
 
-**Approve ADR-0004 Option A: an assigned specialist must record `No blocking finding` on the exact technical choice proposal revision, and the current workspace owner must then perform a separate explicit acceptance action before the choice becomes accepted project direction.**
+Run 201 passed TypeScript, production build, prototype/accessibility/keyboard checks, the full durable regression chain, Supabase security advisor (`No issues found`), and the focused technical-decision authority suite.
 
-If the owner does not approve this rule, ADR-0004 must be revised before implementation begins.
+The final `workspace-screenshots` artifact is ID `10328410866`, digest `sha256:4cee0ee67f15a6e51b9d587ff3c4795e5633c3ca49e863aa613e07bb519c845b`, size 21,499,822 bytes. The downloaded ZIP digest matched GitHub. Proposal, specialist-review, owner-acceptance, and database-unavailable screenshots were inspected at desktop and 390 px mobile widths.
+
+See [validation/increment-2-technical-decisions.md](validation/increment-2-technical-decisions.md) for the executed evidence and limits. Increment 2 remains **In progress**. PR #1 remains open, draft, unmerged, and not Released.

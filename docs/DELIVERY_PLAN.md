@@ -36,7 +36,7 @@ Validated scope includes Supabase authentication, workspace membership, PostgreS
 
 **Status:** Validated
 
-An authenticated workspace owner can record an accepted product-scope or business decision after explicitly confirming product-owner authority. The decision persists with its rationale, stage, `Accepted` status, and `owner` authority. Consequential technical decisions remain outside this action and require qualified specialist review.
+An authenticated workspace owner can record an accepted product-scope or business decision after explicitly confirming product-owner authority. The decision persists with its rationale, stage, `Accepted` status, and `owner` authority. Consequential technical decisions remain outside this action.
 
 The slice passed real-backend and rendered acceptance tests at application commit `548f1bbb4264ca412bc808a94a60593bca2c3602` through CI run 92. See the [decision slice](INCREMENT_2_DECISIONS.md) and [validation record](validation/increment-2-decisions.md).
 
@@ -118,11 +118,23 @@ The current owner can record state changes for work they own, with a required re
 
 The slice passed the complete durable regression chain and focused lifecycle tests at application head `1c3d8a52a820163340b8742f3f8f3a24f7115545`, CI run 179. Desktop and 390 px mobile screenshots were inspected. See the [slice specification](INCREMENT_2_WORK_LIFECYCLE.md) and [validation record](validation/increment-2-work-lifecycle.md).
 
+### Slice 10 — Consequential technical decision review and acceptance
+
+**Status:** Validated
+
+[ADR-0004](adr/0004-technical-decision-review-and-acceptance.md) defines split authority for consequential technical choices. A current owner records a proposal and assigns an authenticated specialist by reviewer code to the exact proposal revision. Only `No blocking finding` makes that exact revision eligible; the specialist review does not auto-accept. The current owner then performs a separate explicit acceptance action to establish project direction.
+
+The slice passed the complete prior durable regression chain and focused technical-decision authority tests at application head `bb77ce1abba4ebe5a32bfbc32583e3ddbecd792b`, [CI run 201](https://github.com/Ryan9876/wayfound/actions/runs/34790448518). Desktop and 390 px mobile proposal, specialist-review, owner-acceptance, and outage states were inspected. See the [slice specification](INCREMENT_2_TECHNICAL_DECISIONS.md) and [validation record](validation/increment-2-technical-decisions.md).
+
+Validated scope includes proposal-only initial state, exact-revision assignment and review snapshots, owner self-review denial, all three specialist conclusions, separate owner acceptance, stale-review invalidation after revision change, one-winner concurrent acceptance, idempotent replay/conflict handling, direct-table denial, tenant/session/membership/assignment isolation, injected-audit rollback and retry, restart/re-login persistence, database interruption/recovery, keyboard access, and desktop/390 px rendered review.
+
+Acceptance records project direction after qualified review. It does not establish verification, validation, release readiness, or production authorization.
+
 ### Remaining Increment 2 scope
 
-Specialist-review flow for consequential technical decisions and technical requirements; work completion transitions, collaborator membership/administration and work assignment, work dependencies and broader durable links; multiple acceptance-criterion lifecycle; evidence freshness/outdated-state handling, specialist evidence review and explicit verification decisions; maintenance records; later lifecycle behavior; change-impact handling; and supporting audit/seed behavior remain In progress or unimplemented. No hosted project has been provisioned.
+Specialist-review/acceptance flow for consequential technical requirements; work completion transitions, collaborator membership/administration and work assignment, work dependencies and broader durable links; multiple acceptance-criterion lifecycle; evidence freshness/outdated-state handling, specialist evidence review and explicit verification decisions; maintenance records; later lifecycle behavior; change-impact handling; and supporting audit/seed behavior remain In progress or unimplemented. No hosted project has been provisioned.
 
-Later artifact-version, accepted-version replacement/supersession, and file-import behavior are assigned to Increment 3 rather than duplicated in the remaining Increment 2 scope.
+Accepted technical-decision replacement/supersession and dependency-impact behavior remain future scope. Later artifact-version, accepted-version replacement/supersession, and file-import behavior are assigned to Increment 3 rather than duplicated in the remaining Increment 2 scope.
 
 ## 4. Increment 3 — Versioned artifact import
 
