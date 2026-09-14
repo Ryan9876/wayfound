@@ -3,6 +3,7 @@ import { useActionState, useState } from "react";
 import { transitionWorkItem } from "@/app/workspaces/actions";
 import { AiWorkReview } from "@/components/ai-work-review";
 import { WorkItemDependencies } from "@/components/work-item-dependencies";
+import { WorkDirectionLinks } from "@/components/work-direction-links";
 import type { WorkItemRecord } from "@/lib/domain/work-item";
 
 type WorkAction = {
@@ -162,6 +163,11 @@ export function WorkItemLifecycle({ item, requestId }: { item: WorkItemRecord; r
         </details>
       )}
       <WorkItemDependencies
+        item={item}
+        addRequestId={requestId}
+        removeRequestId={requestId}
+      />
+      <WorkDirectionLinks
         item={item}
         addRequestId={requestId}
         removeRequestId={requestId}
