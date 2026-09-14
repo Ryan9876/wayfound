@@ -178,6 +178,10 @@ try {
   const reviewer = ok(await rpc(clients[1], 'ensure_specialist_reviewer_identity'));
   const assignment = ok(await rpc(clients[0], 'assign_specialist_review', { p_workspace: workspace, p_artifact: artifact, p_version: version, p_reviewer: reviewer, p_requested_competence: 'Operations', p_review_question: 'Is the observation bounded?', p_scope_confirm: true, p_request: randomUUID() }));
   assert(assignment);
+  const beforeInvalidAttempts = (await list(clients[0], workspace))[0];
+  assert.equal(beforeInvalidAttempts.status, initial.status);
+  assert.equal(beforeInvalidAttempts.revision, initial.revision);
+  assert.deepEqual(beforeInvalidAttempts.transitions, initial.transitions);
   const snapshot = async () => {
     const result = {};
     for (const table of ['decisions','requirements','acceptance_criteria','evidence_records','artifacts','artifact_versions','specialist_review_assignments','specialist_reviews','releases','release_stages']) {
@@ -203,7 +207,7 @@ try {
   await sql.query("insert into wayfound.memberships(workspace_id,actor_id,role) values($1,$2,'owner')", [workspace, otherActor]);
   try { expectedError(await mutate(clients[1], approval), 'another owner changed responsible actor work', '42501'); }
   finally { await sql.query('delete from wayfound.memberships where workspace_id=$1 and actor_id=$2', [workspace, otherActor]); }
-  assert.deepEqual((await list(clients[0], workspace))[0], initial);
+  assert.deepEqual((await list(clients[0], workspace))[0], beforeInvalidAttempts);
 
   const duplicates = await Promise.all([mutate(clients[0], approval), mutate(clients[0], approval)]);
   const transition = ok(duplicates[0]);
