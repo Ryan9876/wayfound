@@ -19,7 +19,9 @@ const apiKey = `wayfound-openai-test-${randomUUID()}`;
 const client = backend.client();
 const retryDelays = [150, 350, 750];
 const openAiRequests = [];
+const localRequests = [];
 let openAiServer = null;
+let lmServer = null;
 let appServer = null;
 let browser = null;
 
@@ -54,7 +56,7 @@ async function createImplementedWork() {
     p_title: 'Exercise configured OpenAI development connection',
     p_outcome: 'OpenAI can be tested explicitly while durable project review remains local-only.',
     p_completion_condition: 'Configured OpenAI discovery and connection testing work without leaking the key or receiving durable project review.',
-    p_evidence_expectation: 'Browser state, loopback provider stub, trace data, and durable review failure agree.',
+    p_evidence_expectation: 'Browser state, provider stubs, trace data, and durable review failure agree.',
     p_request: randomUUID(),
   }));
   const transition = async (revision, status, reason) => ok(await rpc('transition_work_item', {
@@ -114,6 +116,33 @@ async function startOpenAiStub() {
   });
   openAiServer.listen(4545, '127.0.0.1');
   await once(openAiServer, 'listening');
+}
+
+async function startLocalReviewStub() {
+  lmServer = createServer(async (req, res) => {
+    if (req.method === 'GET' && req.url === '/api/v1/models') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        models: [{ type: 'llm', key: 'local-boundary-model', display_name: 'Local Boundary Model', loaded_instances: [{}] }],
+      }));
+      return;
+    }
+    if (req.method === 'POST') {
+      const body = await readJsonRequest(req);
+      localRequests.push({ url: req.url, body });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        model_instance_id: 'local-boundary-model',
+        output: [{ type: 'message', content: 'This response must never be used while OpenAI is explicitly selected.' }],
+        stats: { input_tokens: 1, total_output_tokens: 1, reasoning_output_tokens: 0, tokens_per_second: 1 },
+      }));
+      return;
+    }
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'not found' }));
+  });
+  lmServer.listen(1234, '127.0.0.1');
+  await once(lmServer, 'listening');
 }
 
 async function closeServer(server) {
@@ -179,11 +208,15 @@ try {
   const { workspace, work } = await createImplementedWork();
 
   await startOpenAiStub();
+  await startLocalReviewStub();
   await startApp();
   browser = await chromium.launch({ headless: true });
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   await login(page);
   await page.goto(`${base}/workspaces/${workspace}?view=work#work-item-${work}`);
+
+  const reviewDisclosure = page.getByText('Ask local AI to review', { exact: true });
+  await reviewDisclosure.waitFor({ timeout: 30_000 });
 
   const consoleButton = page.getByRole('button', { name: /AI Console/ });
   await consoleButton.waitFor({ timeout: 30_000 });
@@ -223,7 +256,7 @@ try {
   assert(!(await page.content()).includes(apiKey), 'OpenAI API key leaked into rendered browser content');
 
   await dialog.getByRole('button', { name: 'Close', exact: true }).click();
-  await page.getByText('Ask local AI to review', { exact: true }).click();
+  await reviewDisclosure.click();
   const purpose = 'Confirm configured OpenAI remains connection-test only for durable project review.';
   await page.getByLabel('What should AI review about this implemented work?').fill(purpose);
   await page.getByRole('checkbox', { name: /only this saved work record is sent to local AI/i }).check();
@@ -232,6 +265,7 @@ try {
   const failedCard = page.locator('.ai-review-card').filter({ hasText: purpose }).first();
   await failedCard.getByText('Failed', { exact: true }).waitFor({ timeout: 30_000 });
   assert.equal(openAiRequests.filter(request => request.kind === 'responses').length, 1, 'durable project review was sent to OpenAI after the explicit boundary should have blocked it');
+  assert.equal(localRequests.length, 0, 'durable project review silently fell back to local inference after OpenAI was explicitly selected');
 
   const savedWork = ok(await rpc('list_work_items', { p_workspace: workspace })).find(item => item.id === work);
   const savedReview = savedWork.ai_reviews.find(review => review.purpose === purpose);
@@ -239,10 +273,11 @@ try {
   assert.equal(savedReview.status, 'Failed');
   assert((savedReview.failure_detail || '').includes('durable project AI review remains local-only'), 'blocked durable OpenAI review did not retain the explicit local-only failure reason');
 
-  console.log('PASS: configured OpenAI development discovery and connection testing execute through the fixed public-provider path with server-side authorization, supported model filtering, transient sanitized trace and reported token metrics; the key is absent from browser/trace data, and durable project review fails visibly before any OpenAI inference request.');
+  console.log('PASS: configured OpenAI development discovery and connection testing execute through the fixed public-provider path with server-side authorization, supported model filtering, transient sanitized trace and reported token metrics; the key is absent from browser/trace data, and durable project review fails visibly before OpenAI inference or local fallback.');
 } finally {
   if (browser) await browser.close().catch(() => {});
   await stopApp().catch(() => {});
   await closeServer(openAiServer).catch(() => {});
+  await closeServer(lmServer).catch(() => {});
   await sql.end();
 }
