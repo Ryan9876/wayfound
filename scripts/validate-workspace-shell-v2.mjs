@@ -74,8 +74,13 @@ try {
   assert.equal(headerStyles.position, "fixed", "Project top bar must float independently of the page canvas");
   assert(headerStyles.radius >= 30, `Expected pill-like project top bar; found ${headerStyles.radius}px radius`);
 
-  const contentLeft = await page.locator(".project-content").evaluate((element) => element.getBoundingClientRect().left);
-  assert(contentLeft > 248, `Workspace content must sit beside the project rail; left edge was ${contentLeft}px`);
+  const visibleContentLeft = await page.locator(".project-heading h1").evaluate(
+    (element) => element.getBoundingClientRect().left,
+  );
+  assert(
+    visibleContentLeft >= railStyles.width + 24,
+    `Visible workspace content must be inset from the project rail; left edge was ${visibleContentLeft}px`,
+  );
   await noOverflow();
   await page.screenshot({ path: "artifacts/workspace/shell-v3-overview-desktop.png", fullPage: true });
 
