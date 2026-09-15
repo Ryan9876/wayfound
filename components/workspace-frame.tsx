@@ -27,7 +27,12 @@ export async function WorkspaceFrame({
         <WayfoundLogo />
         <div className="durable-header-actions">
           {aiStatus ? <LocalAiStatus status={aiStatus} /> : null}
-          {showAiDevelopmentConsole ? <AiDevelopmentConsole initialProvider={aiStatus?.provider ?? "lm-studio"} initialModel={aiStatus?.model ?? null} /> : null}
+          {showAiDevelopmentConsole ? (
+            <AiDevelopmentConsole
+              initialProvider="lm-studio"
+              initialModel={aiStatus?.provider === "lm-studio" ? aiStatus.model : null}
+            />
+          ) : null}
           <nav aria-label="Workspace navigation">
             {signedIn && (
               <>
