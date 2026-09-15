@@ -35,7 +35,7 @@
     "test:technical-requirements": "WAYFOUND_LOCAL_TEST=1 node scripts/validate-technical-requirements.mjs",
     "seed:local": "WAYFOUND_LOCAL_TEST=1 node scripts/seed-local.mjs",
     "seed:single-user-local": "WAYFOUND_LOCAL_TEST=1 node scripts/seed-single-user-local.mjs",
-    "test:workspace-ui": "node scripts/validate-workspace-ui.mjs",
+    "test:workspace-ui": "node scripts/validate-workspace-ui.mjs && node scripts/validate-workspace-shell-v2.mjs",
     "test:workspace-guidance": "node scripts/validate-workspace-guidance.mjs"
   },
   "dependencies": {
