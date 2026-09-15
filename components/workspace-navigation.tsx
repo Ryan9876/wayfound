@@ -9,6 +9,9 @@ import {
   PackageCheck,
   Ellipsis,
 } from "lucide-react";
+import { WayfoundLogo } from "./wayfound-logo";
+import { workspaceService } from "@/lib/application/workspaces";
+import { stageCatalog } from "@/lib/domain/journey";
 import type { WorkspaceView } from "@/lib/workspace-guidance";
 
 export type WorkspaceDestination = WorkspaceView | "interview" | "project-files";
@@ -30,13 +33,24 @@ function hrefFor(id: string, view: WorkspaceDestination) {
   return `/workspaces/${id}?view=${view}`;
 }
 
-export function WorkspaceNavigation({
+export async function WorkspaceNavigation({
   id,
   active,
 }: {
   id: string;
   active: WorkspaceDestination;
 }) {
+  const workspace = await (await workspaceService()).open(id);
+  const currentStage = workspace
+    ? stageCatalog[workspace.release.current_stage - 1]
+    : undefined;
+  const projectName = workspace?.name ?? "Project workspace";
+  const projectContext = workspace
+    ? `${workspace.release.label} · Stage ${workspace.release.current_stage}${
+        currentStage ? ` · ${currentStage.name}` : ""
+      }`
+    : "Open project";
+
   const mobile = [
     destinations[0],
     destinations[1],
@@ -50,18 +64,40 @@ export function WorkspaceNavigation({
 
   return (
     <>
-      <nav className="project-sidebar" aria-label="Project navigation">
-        {destinations.map(({ view, label, icon: Icon }) => (
-          <Link
-            key={view}
-            href={hrefFor(id, view)}
-            aria-current={active === view ? "page" : undefined}
-          >
-            <Icon size={18} aria-hidden="true" />
-            <span>{label}</span>
+      <aside className="wf-project-rail" aria-label="Wayfound project navigation">
+        <Link className="wf-project-rail-brand" href="/workspaces" aria-label="Wayfound projects">
+          <WayfoundLogo />
+        </Link>
+
+        <Link className="wf-rail-project" href="/workspaces">
+          <span className="wf-rail-project-label">Current project</span>
+          <strong>{projectName}</strong>
+          <small>{projectContext}</small>
+        </Link>
+
+        <nav className="project-sidebar" aria-label="Project navigation">
+          {destinations.map(({ view, label, icon: Icon }) => (
+            <Link
+              key={view}
+              href={hrefFor(id, view)}
+              aria-current={active === view ? "page" : undefined}
+            >
+              <Icon size={18} aria-hidden="true" />
+              <span>{label}</span>
+            </Link>
+          ))}
+        </nav>
+
+        <div className="wf-project-rail-bottom">
+          <Link className="wf-rail-file-shortcut" href={`/workspaces/${id}/project-files`}>
+            <strong>Project files</strong>
+            <span>Add evidence, specifications, notes, and source material.</span>
+            <b>Add files</b>
           </Link>
-        ))}
-      </nav>
+          <span className="wf-rail-status">Workspace · Local single-user</span>
+        </div>
+      </aside>
+
       <nav className="project-mobile-nav" aria-label="Mobile project navigation">
         {mobile.map(({ view, label, icon: Icon }) => {
           const href =
