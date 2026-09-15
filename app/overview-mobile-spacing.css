@@ -1,0 +1,200 @@
+/* Mobile Overview card and section spacing refinement.
+   Keeps typography and content unchanged while reducing vertical drag. */
+
+@media (max-width: 820px) {
+  .overview {
+    --mobile-section-gap: 24px;
+    --mobile-card-gap: 12px;
+    --mobile-card-pad: 18px;
+    --mobile-inner-gap: 14px;
+  }
+
+  .overview .release-heading {
+    gap: 16px;
+    margin-bottom: 18px;
+    padding-bottom: 18px;
+  }
+
+  .overview .release-title-block h1 {
+    margin-top: 6px;
+    margin-bottom: 8px;
+  }
+
+  .overview .stage-block {
+    gap: 8px;
+  }
+
+  .overview .phase-track {
+    padding-top: 8px;
+    padding-bottom: 6px;
+  }
+
+  .overview-primary-grid {
+    gap: var(--mobile-card-gap);
+  }
+
+  .overview .next-action-card {
+    padding: var(--mobile-card-pad);
+  }
+
+  .overview .next-action-card::before {
+    left: var(--mobile-card-pad);
+    right: var(--mobile-card-pad);
+  }
+
+  .overview .card-topline {
+    min-height: 26px;
+  }
+
+  .overview .action-intro {
+    gap: 14px;
+    padding: 20px 0 18px;
+  }
+
+  .overview .why-panel {
+    padding: 14px;
+  }
+
+  .overview .minto-line {
+    margin-top: 10px;
+  }
+
+  .overview .action-buttons {
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .overview-context-card {
+    padding: var(--mobile-card-pad);
+  }
+
+  .overview .context-evidence {
+    margin-top: 12px;
+    padding: 12px 13px 12px 15px;
+  }
+
+  .overview-context-card .context-list {
+    margin-top: 6px;
+  }
+
+  .overview-context-card .context-list > div {
+    padding: 13px 0;
+  }
+
+  .overview-context-card .context-footer {
+    gap: 12px;
+    padding-top: 13px;
+  }
+
+  .overview-section-heading {
+    margin: var(--mobile-section-gap) 0 11px;
+  }
+
+  .overview-section-heading h2 {
+    margin-top: 4px;
+  }
+
+  .overview-summary-grid {
+    gap: 10px;
+  }
+
+  .overview-summary-card {
+    padding: 16px;
+  }
+
+  .overview-summary-card .clean-list {
+    margin-top: 10px;
+    gap: 8px;
+  }
+
+  .overview-summary-card .release-stat {
+    margin-top: 9px;
+  }
+
+  .overview-summary-card .mini-progress {
+    margin: 9px 0 8px;
+  }
+
+  .overview-records-strip {
+    gap: 12px;
+    margin-top: 10px;
+    padding: 16px;
+  }
+
+  .overview-records-strip .record-items > span {
+    min-height: 42px;
+    padding: 8px 0;
+  }
+
+  .overview-records-strip > .text-link {
+    min-height: 40px;
+  }
+}
+
+@media (max-width: 520px) {
+  .overview {
+    --mobile-section-gap: 22px;
+    --mobile-card-gap: 10px;
+    --mobile-card-pad: 16px;
+  }
+
+  .overview .release-heading {
+    gap: 14px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+  }
+
+  .overview .phase-track {
+    margin-top: -2px;
+  }
+
+  .overview .next-action-card,
+  .overview-context-card {
+    padding: var(--mobile-card-pad);
+  }
+
+  .overview .next-action-card::before {
+    left: var(--mobile-card-pad);
+    right: var(--mobile-card-pad);
+  }
+
+  .overview .action-intro {
+    gap: 13px;
+    padding: 18px 0 16px;
+  }
+
+  .overview .why-panel {
+    padding: 13px;
+  }
+
+  .overview .action-buttons {
+    margin-top: 14px;
+  }
+
+  .overview .context-evidence {
+    padding: 11px 12px 11px 14px;
+  }
+
+  .overview-context-card .context-list > div {
+    padding: 12px 0;
+  }
+
+  .overview-section-heading {
+    margin-top: var(--mobile-section-gap);
+    margin-bottom: 10px;
+  }
+
+  .overview-summary-card {
+    padding: 15px;
+  }
+
+  .overview-records-strip {
+    gap: 10px;
+    padding: 15px;
+  }
+
+  .overview-records-strip .record-items > span {
+    min-height: 40px;
+    padding: 7px 0;
+  }
+}

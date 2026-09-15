@@ -1,0 +1,492 @@
+/* Wayfound workspace shell v3
+   Structural visual translation of the approved Antigravity-inspired prototype.
+   This layer is presentation-only and is loaded after earlier workspace styles. */
+
+:root{
+  --wf3-page:#ffffff;
+  --wf3-ink:#121317;
+  --wf3-muted:#5f6368;
+  --wf3-muted-2:#8b9097;
+  --wf3-soft:#f7f8fa;
+  --wf3-soft-2:#f1f3f4;
+  --wf3-line:#e3e6ea;
+  --wf3-line-strong:#d4d8de;
+  --wf3-dark:#121317;
+  --wf3-sidebar:248px;
+  --wf3-radius:16px;
+  --wf3-radius-lg:24px;
+  --wf3-radius-xl:36px;
+  --wf3-shadow:0 1px 2px rgba(60,64,67,.10),0 10px 30px rgba(18,19,23,.055);
+}
+
+.single-user-mode{background:var(--wf3-page)}
+.single-user-mode .durable-frame{background:var(--wf3-page)}
+
+/* Full project rail: this replaces the previous floating navigation card. */
+.wf-project-rail{
+  position:fixed;
+  inset:0 auto 0 0;
+  z-index:55;
+  width:var(--wf3-sidebar);
+  padding:22px 16px 18px;
+  background:rgba(255,255,255,.98);
+  border-right:1px solid #eceef1;
+  display:flex;
+  flex-direction:column;
+  gap:22px;
+}
+.wf-project-rail-brand{padding:4px 8px}
+.wf-project-rail-brand .brand-lockup{gap:10px}
+.wf-project-rail-brand .brand-mark{width:30px;height:30px;color:var(--wf3-ink)}
+.wf-project-rail-brand .brand-copy strong{font-size:19px;font-weight:600;letter-spacing:-.025em;color:var(--wf3-ink)}
+.wf-project-rail-brand .brand-copy small{display:none}
+.wf-rail-project{
+  display:block;
+  margin:0 2px;
+  padding:14px;
+  background:var(--wf3-soft);
+  border:1px solid #eceef1;
+  border-radius:18px;
+  transition:background-color .16s ease,border-color .16s ease,transform .16s ease;
+}
+.wf-rail-project:hover{background:#f2f4f6;border-color:var(--wf3-line-strong);transform:translateY(-1px)}
+.wf-rail-project-label{
+  display:block;
+  font-family:var(--font-plex-mono),ui-monospace,monospace;
+  font-size:10px;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+  color:#8a8f96;
+}
+.wf-rail-project strong{display:block;margin-top:5px;font-size:15px;font-weight:550;color:var(--wf3-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wf-rail-project small{display:block;margin-top:3px;color:#747980;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.wf-project-rail .project-sidebar{
+  position:static;
+  top:auto;
+  display:grid;
+  gap:4px;
+  padding:0;
+  border:0;
+  background:transparent;
+  box-shadow:none;
+  border-radius:0;
+}
+.wf-project-rail .project-sidebar a{
+  min-height:42px;
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border-radius:12px;
+  background:transparent;
+  color:#666a71;
+  font-size:14px;
+  font-weight:450;
+  box-shadow:none;
+  transition:background-color .16s ease,color .16s ease,transform .16s ease;
+}
+.wf-project-rail .project-sidebar a svg{width:17px;height:17px;stroke-width:1.7;color:#8b9097}
+.wf-project-rail .project-sidebar a:hover{background:#f6f7f8;color:#202124;transform:translateY(-1px)}
+.wf-project-rail .project-sidebar a[aria-current]{background:#eff1f3;color:var(--wf3-ink);font-weight:600;box-shadow:none}
+.wf-project-rail .project-sidebar a[aria-current] svg{color:var(--pine)}
+
+.wf-project-rail-bottom{margin-top:auto;display:grid;gap:10px}
+.wf-rail-file-shortcut{
+  display:block;
+  padding:14px;
+  border:1px solid var(--wf3-line);
+  border-radius:18px;
+  background:#fff;
+  transition:border-color .16s ease,transform .16s ease;
+}
+.wf-rail-file-shortcut:hover{border-color:var(--wf3-line-strong);transform:translateY(-1px)}
+.wf-rail-file-shortcut strong{display:block;font-size:14px;font-weight:550;color:var(--wf3-ink)}
+.wf-rail-file-shortcut span{display:block;margin:3px 0 10px;color:var(--wf3-muted);font-size:12px;line-height:1.4}
+.wf-rail-file-shortcut b{display:block;width:100%;padding:8px 10px;border-radius:999px;background:var(--wf3-dark);color:#fff;text-align:center;font-size:12px;font-weight:650}
+.wf-rail-status{padding:0 4px;color:#9a9ea4;font-family:var(--font-plex-mono),ui-monospace,monospace;font-size:10px;letter-spacing:.02em}
+
+/* Project pages become a workspace beside the persistent rail. */
+.single-user-mode .wf-app-frame:has(.wf-project-rail) .wf-app-main{
+  max-width:none;
+  margin-left:var(--wf3-sidebar);
+  padding:0;
+  min-height:100vh;
+  background:var(--wf3-page);
+}
+.single-user-mode .wf-app-frame:has(.wf-project-rail) .guided-workspace,
+.single-user-mode .wf-app-frame:has(.wf-project-rail) .wf-workspace-experience{
+  display:block;
+  min-height:100vh;
+}
+.single-user-mode .wf-app-frame:has(.wf-project-rail) .project-content{
+  width:min(100%,1500px);
+  max-width:none;
+  margin:0 auto;
+  padding:118px 48px 96px;
+}
+
+/* Lightweight floating top bar from the approved prototype. */
+.single-user-mode .wf-app-frame:has(.wf-project-rail) .wf-app-header{
+  position:fixed;
+  z-index:50;
+  top:16px;
+  left:calc(var(--wf3-sidebar) + 24px);
+  right:24px;
+  min-height:64px;
+  padding:8px 10px 8px 20px;
+  border:1px solid rgba(212,216,222,.82);
+  border-radius:999px;
+  background:rgba(255,255,255,.88);
+  backdrop-filter:blur(22px) saturate(140%);
+  -webkit-backdrop-filter:blur(22px) saturate(140%);
+  box-shadow:0 10px 30px rgba(18,19,23,.07);
+}
+.single-user-mode .wf-app-frame:has(.wf-project-rail) .wf-app-header .brand-lockup{display:none}
+.single-user-mode .wf-app-frame:has(.wf-project-rail) .wf-app-brand{display:flex;align-items:center}
+.single-user-mode .wf-app-frame:has(.wf-project-rail) .wf-app-context{
+  display:inline-flex;
+  color:#555a61;
+  font-size:13px;
+  font-weight:550;
+  letter-spacing:-.005em;
+}
+.single-user-mode .wf-app-frame:has(.wf-project-rail) .wf-app-context::before{
+  content:"Workspace";
+  margin-right:11px;
+  padding-right:11px;
+  border-right:1px solid #dde1e6;
+  color:var(--wf3-ink);
+  font-weight:650;
+}
+.single-user-mode .wf-app-frame:has(.wf-project-rail) .wf-app-header-actions{gap:8px}
+.single-user-mode .wf-app-frame:has(.wf-project-rail) .wf-app-utility-nav{gap:8px}
+.single-user-mode .wf-app-frame:has(.wf-project-rail) .wf-app-utility-nav>a,
+.single-user-mode .wf-app-frame:has(.wf-project-rail) .workspace-help>summary{
+  min-height:38px;
+  display:inline-flex;
+  align-items:center;
+  padding:0 13px;
+  border:1px solid var(--wf3-line);
+  border-radius:999px;
+  background:#fff;
+  color:#45474d;
+  font-size:12px;
+  font-weight:550;
+}
+
+/* Remove duplicate project identity from Interview/Project Files; the rail owns it. */
+.single-user-mode .wf-app-frame:has(.wf-project-rail) .wf-workspace-heading{display:none}
+
+/* Overview and ordinary workspace views. */
+.single-user-mode .project-heading{
+  max-width:960px;
+  margin:0 0 52px;
+  padding:0;
+  border:0;
+}
+.single-user-mode .project-heading .eyebrow{
+  font-family:var(--font-plex-mono),ui-monospace,monospace;
+  font-size:11px;
+  letter-spacing:.08em;
+  color:#7b8087;
+}
+.single-user-mode .project-heading h1{
+  margin:14px 0 12px;
+  font-size:clamp(54px,5.2vw,78px);
+  line-height:.98;
+  letter-spacing:-.05em;
+  font-weight:520;
+  color:var(--wf3-ink);
+}
+.single-user-mode .project-heading p{margin:0;color:var(--wf3-muted);font-size:18px}
+.single-user-mode .durable-content .project-orientation{
+  margin:0 0 22px;
+  font-size:clamp(34px,3.3vw,48px);
+  line-height:1.04;
+  letter-spacing:-.04em;
+  font-weight:520;
+  color:var(--wf3-ink);
+}
+.single-user-mode .guided-workspace .durable-card{
+  border:1px solid #eef0f2;
+  border-radius:28px;
+  background:var(--wf3-soft);
+  box-shadow:none;
+}
+.single-user-mode .guided-workspace .guided-next{
+  padding:48px;
+  border:1px solid #eef0f2;
+  border-top:1px solid #eef0f2;
+  border-radius:36px;
+  background:var(--wf3-soft);
+}
+.single-user-mode .guided-workspace .guided-next h2{
+  max-width:780px;
+  margin:14px 0 16px;
+  font-size:clamp(40px,4vw,60px);
+  line-height:1.02;
+  letter-spacing:-.045em;
+  font-weight:520;
+}
+.single-user-mode .guided-next>p{max-width:700px;font-size:17px;line-height:1.55;color:#55585f}
+.single-user-mode .guided-next .button.primary,
+.single-user-mode .wf-primary-button{
+  min-height:44px;
+  padding:0 18px;
+  border-radius:999px;
+  border-color:var(--wf3-dark);
+  background:var(--wf3-dark);
+  color:#fff;
+}
+.single-user-mode .guided-next .button.primary:hover,
+.single-user-mode .wf-primary-button:hover{background:#2d2e31;border-color:#2d2e31}
+.single-user-mode .overview-knowledge{gap:16px;margin:16px 0}
+.single-user-mode .overview-knowledge .durable-card,
+.single-user-mode .recent-changes{padding:30px;background:#fff;border-color:var(--wf3-line);border-radius:28px}
+
+/* Interview: direct translation of prototype hierarchy and proportions. */
+.single-user-mode .wf-interview{max-width:1420px;margin:0 auto}
+.single-user-mode .wf-interview-heading{
+  max-width:940px;
+  margin:0 0 36px;
+  display:block;
+}
+.single-user-mode .wf-interview-heading>div{max-width:940px}
+.single-user-mode .wf-interview-heading .wf-text-action{
+  position:absolute;
+  right:48px;
+  top:116px;
+}
+.single-user-mode .wf-kicker{
+  font-family:var(--font-plex-mono),ui-monospace,monospace;
+  font-size:11px;
+  letter-spacing:.08em;
+  color:#777c83;
+}
+.single-user-mode .wf-interview-heading h1{
+  max-width:920px;
+  margin:16px 0 0;
+  font-size:clamp(50px,6vw,80px);
+  line-height:.98;
+  letter-spacing:-.05em;
+  font-weight:520;
+  color:var(--wf3-ink);
+}
+.single-user-mode .wf-interview-heading p{
+  max-width:760px;
+  margin:22px 0 0;
+  color:var(--wf3-muted);
+  font-size:19px;
+  line-height:1.55;
+}
+.single-user-mode .wf-interview-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1.16fr) minmax(330px,.84fr);
+  gap:16px;
+  align-items:start;
+}
+.single-user-mode .wf-progress{margin:0 0 16px;padding:0}
+.single-user-mode .wf-progress>div:first-child{
+  font-family:var(--font-plex-mono),ui-monospace,monospace;
+  font-size:10px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:#777c83;
+}
+.single-user-mode .wf-progress-track{height:5px;background:#e2e5e9}
+.single-user-mode .wf-progress-track span{background:var(--wf3-dark)}
+.single-user-mode .wf-question-card{
+  min-height:670px;
+  padding:34px;
+  border:1px solid #eef0f2;
+  border-radius:32px;
+  background:var(--wf3-soft);
+  box-shadow:none;
+}
+.single-user-mode .wf-question-card h2{
+  max-width:780px;
+  margin:12px 0 14px;
+  font-size:clamp(38px,4vw,56px);
+  line-height:1.04;
+  letter-spacing:-.045em;
+  font-weight:520;
+  color:var(--wf3-ink);
+}
+.single-user-mode .wf-question-card>p{max-width:720px;font-size:16px;line-height:1.55;color:#62666d}
+.single-user-mode .wf-idea-card textarea{
+  min-height:230px;
+  border-color:#d9dde2;
+  border-radius:18px;
+  background:#fff;
+  box-shadow:none;
+}
+.single-user-mode .wf-choice-list{gap:8px}
+.single-user-mode .wf-choice-card{
+  padding:16px;
+  border:1px solid #dfe3e7;
+  border-radius:18px;
+  background:#fff;
+  box-shadow:none;
+  transform:none;
+}
+.single-user-mode .wf-choice-card:hover{border-color:#b6bec8;background:#fdfdfd;box-shadow:none;transform:none}
+.single-user-mode .wf-choice-card.selected{border-color:#aeb5bd;box-shadow:inset 0 0 0 1px var(--wf3-dark)}
+.single-user-mode .wf-choice-card.recommended:not(.selected){border-color:#cbd0d6}
+.single-user-mode .wf-radio{border-color:#a8adb4}
+.single-user-mode .wf-choice-card.selected .wf-radio{background:#fff;border-color:var(--wf3-dark);color:var(--wf3-dark)}
+.single-user-mode .wf-choice-title-row>strong{font-size:16px;font-weight:550;color:var(--wf3-ink)}
+.single-user-mode .wf-recommended-badge{
+  border:1px solid #d4d8de;
+  background:#fff;
+  color:#62676f;
+  font-family:var(--font-plex-mono),ui-monospace,monospace;
+}
+.single-user-mode .wf-recommendation{
+  margin-bottom:18px;
+  padding:18px 20px;
+  border:1px solid #e0e3e7;
+  border-radius:18px;
+  background:#fff;
+  color:var(--wf3-ink);
+}
+.single-user-mode .wf-recommendation>span{color:#6f747b}
+.single-user-mode .wf-recommendation>p{color:#62666d}
+.single-user-mode .wf-question-actions{border-color:#e0e3e7}
+.single-user-mode .wf-secondary-button{border-color:#dde1e6;border-radius:999px;background:#fff}
+.single-user-mode .wf-brief-panel{
+  position:sticky;
+  top:100px;
+  min-height:670px;
+  max-height:calc(100vh - 118px);
+  padding:30px;
+  border-radius:32px;
+  background:var(--wf3-dark);
+  color:#fff;
+  box-shadow:none;
+}
+.single-user-mode .wf-brief-panel h2{font-size:30px;font-weight:520;letter-spacing:-.03em}
+.single-user-mode .wf-brief-fields>div{grid-template-columns:128px 1fr}
+
+/* Project files use the same light/black split as the prototype. */
+.single-user-mode .wf-files-heading{max-width:980px;margin:0 0 36px}
+.single-user-mode .wf-files-heading h1{
+  margin:16px 0 0;
+  font-size:clamp(50px,6vw,78px);
+  line-height:.98;
+  letter-spacing:-.05em;
+  font-weight:520;
+}
+.single-user-mode .wf-files-heading p{margin-top:22px;font-size:18px}
+.single-user-mode .wf-file-summary-layout{grid-template-columns:minmax(0,1.16fr) minmax(330px,.84fr);gap:16px}
+.single-user-mode .wf-dropzone{
+  min-height:430px;
+  padding:44px;
+  border:1px dashed #c5cad0;
+  border-radius:32px;
+  background:var(--wf3-soft);
+}
+.single-user-mode .wf-dropzone h2{font-size:36px;font-weight:520;letter-spacing:-.04em}
+.single-user-mode .wf-files-context{
+  border-color:#2d2f34;
+  border-radius:32px;
+  background:var(--wf3-dark);
+  color:#fff;
+}
+.single-user-mode .wf-files-context h2{color:#fff;font-weight:520}
+.single-user-mode .wf-files-context dt,
+.single-user-mode .wf-files-context .wf-boundary-note p{color:#aeb3ba}
+.single-user-mode .wf-files-context dl>div{border-color:#2d2f34}
+.single-user-mode .wf-files-context .wf-boundary-note{background:#1d1f23}
+.single-user-mode .wf-files-context .wf-boundary-note strong{color:#fff}
+
+/* Projects landing gets the same system rather than the old dashboard card look. */
+.single-user-mode .wf-app-frame:not(:has(.wf-project-rail)) .wf-app-header{
+  position:sticky;
+  top:16px;
+  z-index:40;
+  width:calc(100% - 48px);
+  max-width:1320px;
+  min-height:66px;
+  margin:16px auto 0;
+  padding:8px 10px 8px 20px;
+  border:1px solid rgba(212,216,222,.82);
+  border-radius:999px;
+  background:rgba(255,255,255,.88);
+  backdrop-filter:blur(22px) saturate(140%);
+  -webkit-backdrop-filter:blur(22px) saturate(140%);
+  box-shadow:0 10px 30px rgba(18,19,23,.07);
+}
+.single-user-mode .wf-app-frame:not(:has(.wf-project-rail)) .wf-app-main{max-width:1420px;padding:90px 48px 96px}
+.single-user-mode .wf-projects-hero{align-items:flex-end;margin-bottom:48px}
+.single-user-mode .wf-projects-heading{max-width:960px}
+.single-user-mode .wf-projects-heading h1{
+  margin:14px 0 18px;
+  font-size:clamp(56px,7vw,88px);
+  line-height:.98;
+  letter-spacing:-.055em;
+  font-weight:520;
+}
+.single-user-mode .wf-projects-heading p{max-width:720px;font-size:19px;line-height:1.55}
+.single-user-mode .wf-projects-summary{border:1px solid var(--wf3-line);border-radius:24px;background:var(--wf3-soft);box-shadow:none}
+.single-user-mode .wf-project-card{
+  min-height:320px;
+  padding:30px;
+  border:1px solid transparent;
+  border-radius:30px;
+  background:var(--wf3-soft);
+  box-shadow:none;
+}
+.single-user-mode .wf-project-card:hover{border-color:var(--wf3-line);background:#f3f5f7;transform:translateY(-1px);box-shadow:none}
+.single-user-mode .wf-project-card h2{font-size:32px;font-weight:520;letter-spacing:-.035em}
+.single-user-mode .wf-projects-create>summary{border-radius:999px;background:var(--wf3-dark);color:#fff;border-color:var(--wf3-dark)}
+.single-user-mode .wf-project-create-card{border-radius:32px;background:var(--wf3-soft)}
+
+@media(max-width:1100px){
+  :root{--wf3-sidebar:214px}
+  .single-user-mode .wf-app-frame:has(.wf-project-rail) .project-content{padding-left:28px;padding-right:28px}
+  .single-user-mode .wf-interview-layout,.single-user-mode .wf-file-summary-layout{grid-template-columns:1fr}
+  .single-user-mode .wf-brief-panel{position:static;min-height:auto;max-height:none}
+  .single-user-mode .wf-interview-heading .wf-text-action{right:28px}
+}
+
+@media(max-width:760px){
+  .wf-project-rail{display:none}
+  .single-user-mode .wf-app-frame:has(.wf-project-rail) .wf-app-main{margin-left:0}
+  .single-user-mode .wf-app-frame:has(.wf-project-rail) .wf-app-header{
+    position:fixed;
+    top:8px;
+    left:8px;
+    right:8px;
+    min-height:56px;
+    padding:7px 10px 7px 14px;
+    border-radius:22px;
+  }
+  .single-user-mode .wf-app-frame:has(.wf-project-rail) .wf-app-context::before{display:none}
+  .single-user-mode .wf-app-frame:has(.wf-project-rail) .wf-app-context{font-size:11px}
+  .single-user-mode .wf-app-frame:has(.wf-project-rail) .wf-app-utility-nav>a,
+  .single-user-mode .wf-app-frame:has(.wf-project-rail) .workspace-help{display:none}
+  .single-user-mode .wf-app-frame:has(.wf-project-rail) .project-content{padding:92px 16px 116px}
+  .single-user-mode .project-heading{margin-bottom:34px}
+  .single-user-mode .project-heading h1{font-size:46px}
+  .single-user-mode .wf-interview-heading{margin-bottom:28px}
+  .single-user-mode .wf-interview-heading .wf-text-action{position:static;margin-top:14px}
+  .single-user-mode .wf-interview-heading h1,.single-user-mode .wf-files-heading h1{font-size:48px}
+  .single-user-mode .wf-interview-heading p,.single-user-mode .wf-files-heading p{font-size:16px}
+  .single-user-mode .wf-question-card,.single-user-mode .wf-brief-panel,.single-user-mode .wf-dropzone,.single-user-mode .wf-files-context{border-radius:26px;padding:24px 20px}
+  .single-user-mode .wf-question-card{min-height:560px}
+  .single-user-mode .wf-question-card h2{font-size:38px}
+  .single-user-mode .wf-app-frame:not(:has(.wf-project-rail)) .wf-app-header{top:8px;width:calc(100% - 16px);margin:8px auto 0;border-radius:22px}
+  .single-user-mode .wf-app-frame:not(:has(.wf-project-rail)) .wf-app-main{padding:72px 16px 96px}
+  .single-user-mode .wf-projects-heading h1{font-size:52px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .wf-project-rail *,
+  .wf-project-rail *::before,
+  .wf-project-rail *::after,
+  .wf-app-main *,
+  .wf-app-main *::before,
+  .wf-app-main *::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}

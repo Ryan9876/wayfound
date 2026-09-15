@@ -1,0 +1,120 @@
+/* Desktop Overview card and section spacing.
+   Establishes a consistent spatial hierarchy without changing typography or content. */
+
+@media (min-width: 1180px) {
+  .overview {
+    --section-gap: 36px;
+    --card-gap: 18px;
+    --card-pad-lg: 30px;
+    --card-pad-md: 22px;
+    --inner-gap-lg: 24px;
+    --inner-gap-md: 16px;
+    --inner-gap-sm: 12px;
+  }
+
+  /* Release context forms one compact header block. */
+  .overview .release-heading {
+    gap: 36px;
+    margin-bottom: 30px;
+    padding-bottom: 22px;
+  }
+
+  .overview .stage-block {
+    gap: 10px;
+  }
+
+  /* Primary workspace: clear separation between recommendation and context. */
+  .overview-primary-grid {
+    gap: var(--card-gap);
+    align-items: stretch;
+  }
+
+  .overview .next-action-card {
+    padding: var(--card-pad-lg);
+  }
+
+  .overview .next-action-card::before {
+    left: var(--card-pad-lg);
+    right: var(--card-pad-lg);
+  }
+
+  .overview .action-intro {
+    gap: 18px;
+    padding: 28px 0 24px;
+  }
+
+  .overview .why-panel {
+    padding: 18px 20px;
+  }
+
+  .overview .minto-line {
+    margin-top: 11px;
+  }
+
+  .overview .action-buttons {
+    margin-top: var(--inner-gap-lg);
+  }
+
+  .overview-context-card {
+    padding: 26px 24px 22px;
+  }
+
+  .overview .context-evidence {
+    margin-top: 14px;
+    padding: 14px 15px;
+  }
+
+  .overview-context-card .context-list {
+    margin-top: 6px;
+  }
+
+  .overview-context-card .context-list > div {
+    padding: 15px 0;
+  }
+
+  .overview-context-card .context-footer {
+    padding-top: 16px;
+  }
+
+  /* Secondary information begins as a distinct section, not an extension of the hero cards. */
+  .overview-section-heading {
+    margin: var(--section-gap) 0 14px;
+  }
+
+  .overview-summary-grid {
+    gap: 14px;
+  }
+
+  .overview-summary-card {
+    padding: var(--card-pad-md);
+  }
+
+  .overview-summary-card .clean-list {
+    margin-top: var(--inner-gap-sm);
+  }
+
+  .overview-summary-card .release-stat {
+    margin-top: var(--inner-gap-sm);
+  }
+
+  /* Records remain connected to the release snapshot while reading as their own strip. */
+  .overview-records-strip {
+    gap: 22px;
+    margin-top: 14px;
+    padding: 18px 22px;
+  }
+
+  .overview-records-strip .record-items {
+    gap: 14px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .overview .release-heading {
+    margin-bottom: 32px;
+  }
+
+  .overview-section-heading {
+    margin-top: 40px;
+  }
+}

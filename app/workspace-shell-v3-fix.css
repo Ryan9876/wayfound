@@ -1,0 +1,20 @@
+/* Structural corrections for workspace shell v3.
+   Keep the fixed rail outside the workspace width instead of adding it to a 100vw canvas. */
+
+.single-user-mode .wf-app-frame:has(.wf-project-rail) .wf-app-main{
+  width:calc(100% - var(--wf3-sidebar));
+  margin-right:0;
+}
+
+.wf-project-rail .project-sidebar::before{
+  content:none;
+  display:none;
+}
+
+@media(max-width:760px){
+  .single-user-mode .wf-app-frame:has(.wf-project-rail) .wf-app-main{
+    width:100%;
+    margin-left:0;
+    margin-right:0;
+  }
+}

@@ -1,122 +1,148 @@
 # Wayfound Project Charter
 
-**Status:** Draft
-
-## Purpose
-
-This file defines why Wayfound exists, who it serves, the outcomes it must produce, and the boundaries that control the project.
-
-Do not place detailed implementation design in this file. Put technical design in `ARCHITECTURE.md` and detailed behavior in `PRODUCT_REQUIREMENTS.md`.
+**Status:** Approved product-definition baseline  
+**Active delivery state:** Increment 1 Validated; Increment 2 In progress under accepted ADR-0002 and ADR-0005
 
 ## 1. Product statement
 
-**TBD — define Wayfound in one clear sentence.**
+Wayfound is a software-delivery guidance and coordination workspace for one capable domain expert who needs to turn a business problem into accountable software delivery with AI assistance, without needing to evaluate every technical detail independently.
 
-Recommended pattern:
-
-> Wayfound is **[product/system type]** for **[primary users]** that **[primary outcome]** by **[core mechanism or differentiator]**.
+Wayfound recommends the next useful action, helps the owner prepare and review work, and keeps decisions, artifacts, responsibilities, evidence, and release state connected from discovery through maintenance.
 
 ## 2. Problem
 
-**TBD**
+The target user can explain the problem and make business decisions but cannot independently evaluate every code, architecture, security, design, quality, or operational detail.
 
-Describe the user or business problem that exists without Wayfound. State observable problems, not proposed features.
+Without Wayfound, the user can lose continuity across conversations, documents, prototypes, AI tools, and delivery systems. The user can also confuse completed work with reviewed or verified work.
 
-## 3. Primary users
+Wayfound addresses five persistent questions:
 
-**TBD**
+1. Where are we?
+2. What is next?
+3. What is mine to decide?
+4. What demonstrates completion?
+5. What changed?
 
-For each user group, define:
+## 3. Primary user and system actor
 
-- role or context
-- primary job to be done
-- important constraints
-- current alternative or workaround
+### Product owner
+
+The first-version human user is one authenticated product owner: a capable domain expert, small business owner, or operational leader who understands the business problem, can make scope decisions, and needs clear guidance without pretending to have expertise that has not been established.
+
+### AI assistant
+
+AI is a system capability, not a second human participant and not an independent authority. AI may draft, analyze, recommend, review, summarize, and identify risk. AI output must remain distinguishable from owner-approved project records and from objective verification evidence.
+
+An external human specialist may still be consulted outside Wayfound when the owner decides that independent expertise is necessary. The first version does not require that person to have a Wayfound account or participate inside the workspace.
 
 ## 4. Desired outcomes
 
-**TBD**
+Wayfound should help the product owner:
 
-Define outcomes that indicate Wayfound is useful. Prefer measurable outcomes when valid measures exist.
+- understand the current release state;
+- know the next useful action and why it matters;
+- keep assumptions and unresolved issues visible;
+- preserve accepted work when proposed work changes;
+- use AI assistance without confusing AI output with accepted project truth;
+- understand when independent evidence or external expertise is still required;
+- distinguish implementation, review, verification, and release states;
+- make a supported release decision;
+- retain operating ownership after launch.
 
-Do not invent targets. Mark unknown targets `TBD`.
+Numeric product-success targets remain `TBD` until user research establishes useful baselines.
 
-## 5. Scope
+## 5. First-version scope
 
 ### In scope
 
-**TBD**
+The first version is a responsive web workspace for one authenticated product owner. It includes:
 
-### Out of scope
+- a 15-stage journey from clarification through maintenance;
+- a recommended next action with visible reasoning and assumptions;
+- structured problem, scope, decision, requirement, work, evidence, release, and maintenance records;
+- versioned artifacts and portable project records;
+- manual uploads and external references;
+- requirement-to-acceptance-criterion-to-evidence links;
+- explicit lifecycle and evidence states;
+- dependency-aware impact review and outdated-evidence handling;
+- release packets, concrete authorization records, deployment outcomes, and operating ownership;
+- maintenance due items and recurring maintenance records;
+- AI-assisted drafting, analysis, and recommendations that remain distinguishable from accepted records;
+- durable provenance for consequential AI-assisted review when that capability enters an approved implementation slice.
 
-**TBD**
+### Deliberately deferred
 
-Use this section to prevent adjacent ideas from silently becoming commitments.
+The first version does not require:
+
+- collaborator accounts, invitations, membership administration, or ownership transfer;
+- human work assignment inside Wayfound;
+- specialist reviewer accounts, reviewer-code exchange, or assignment-scoped human review inside Wayfound;
+- manual specialist handoff and return workflows as a core product surface;
+- verified direct connectors to specialist tools;
+- automatic test-evidence ingestion from external pipelines;
+- automatic repository change analysis;
+- scheduling integrations;
+- rich side-by-side document comparison;
+- portfolio reporting;
+- automatic production deployment or other production-changing actions.
+
+Wayfound does not publish products, purchase services, or change production systems in the first version.
 
 ## 6. Product principles
 
-The following baseline principles apply unless an approved decision changes them:
-
-1. **Clarity over cleverness** — users and maintainers must be able to understand the system.
-2. **Explicit ownership** — data, actions, and operational responsibilities must have clear owners.
-3. **Traceable decisions** — consequential product and architecture decisions must be recorded.
-4. **Validated behavior** — implementation is not complete until required behavior is verified.
-5. **Reversible change where practical** — prefer designs that reduce the cost of correction.
-6. **Secure by design** — trust boundaries, access, secrets, and sensitive data must be deliberate.
-7. **Operational visibility** — important failures must be observable and diagnosable.
+1. **Continuity over fragmentation.** The project record must survive changes in tools and time.
+2. **Accountability over ambiguity.** Important decisions, evidence, unresolved issues, and the human authority must be explicit.
+3. **Clarity over cleverness.** Guidance must be understandable without weakening the underlying obligation.
+4. **Evidence before confidence.** Completed work must not appear verified without current evidence.
+5. **AI stays advisory.** AI may provide technical analysis, but AI output does not silently become independent expert review, accepted project direction, or verification evidence.
+6. **Reversible change where practical.** Low-cost experiments are preferred when they can resolve uncertainty safely.
+7. **Secure by design.** Trust boundaries, authorization, secrets, and sensitive data require deliberate treatment.
+8. **Operational ownership is part of delivery.** Release is incomplete without clear operating responsibility.
 
 ## 7. Constraints
 
-**TBD**
-
-Record known constraints such as:
-
-- platform or deployment constraints
-- regulatory or policy constraints
-- security requirements
-- data residency or privacy requirements
-- budget constraints
-- supported environments
-- integration limitations
-- staffing or operational support constraints
+- The first release must work on phone and desktop web browsers.
+- Imported or AI-generated work must not silently become accepted work.
+- A failed import must not replace the accepted artifact.
+- Status must not imply verification that did not occur.
+- AI-generated technical analysis must not be presented as independent qualified human review.
+- Consequential claims still require evidence appropriate to the claim before they can be represented as verified or validated.
+- Commercial name clearance, market demand, pricing, and legal obligations remain outside the current evidence base unless separately verified.
 
 ## 8. Non-goals
 
-**TBD**
-
-State outcomes the project intentionally does not optimize for.
+Wayfound does not optimize for multi-user project collaboration, replacing every specialist, generating code as its primary value proposition, making unverified software appear safe, maximizing automation before continuity and evidence comprehension are validated, or forcing every project through the same level of ceremony.
 
 ## 9. Success measures
 
-**TBD**
-
-For each measure, define:
-
 | Measure | Baseline | Target | Source | Review cadence |
 | --- | --- | --- | --- | --- |
-| TBD | TBD | TBD | TBD | TBD |
+| User can identify the next action and explain why | TBD | TBD | Task-based research | Per prototype round |
+| User can resume a project without reconstructing context | TBD | TBD | Pause/resume study | Per prototype round |
+| User distinguishes completed, AI-reviewed, owner-accepted, verified, and outdated work | TBD | TBD | Comprehension test | Per prototype round |
+| User can understand what AI recommended and what evidence supports the final state | TBD | TBD | Guided workflow trial | Per prototype round |
 
-## 10. Stakeholders and decision rights
+## 10. Decision rights
 
-**TBD**
+- The product owner approves product scope, business decisions, and project direction.
+- AI provides advisory analysis and recommendations but does not hold approval authority.
+- Objective evidence supports verification decisions; AI commentary alone does not establish verification.
+- If the owner uses an external human specialist, that review may be recorded as external evidence without requiring a second Wayfound user account.
+- The product owner makes the business release decision after required evidence and applicable review are available.
+- Production-changing execution remains outside first-version automatic authority.
+- The product owner retains ongoing operating responsibility unless a later approved scope explicitly introduces another accountable human role.
 
-Define who can approve:
+## 11. Current delivery target
 
-- product scope
-- requirements
-- architecture
-- security exceptions
-- release readiness
-- production changes
+Build and validate vertical slices that test the core single-user claims before deeper automation:
 
-## 11. Open decisions
+1. A user can orient to the current release quickly.
+2. One recommended next action provides useful direction.
+3. The project record makes evidence and unresolved assumptions understandable.
+4. AI assistance can be used without obscuring which records the human owner accepted and which claims have objective verification evidence.
 
-| Decision | Why it matters | Owner | Needed by | Status |
-| --- | --- | --- | --- | --- |
-| Define Wayfound product statement | Establishes the project boundary | Project owner | TBD | Open |
-| Define primary users and core problem | Controls requirements and UX priorities | Project owner | TBD | Open |
-| Define initial delivery target | Controls sequencing and architecture depth | Project owner | TBD | Open |
+The illustrative Borrow Desk project remains the current prototype scenario where fixture-backed prototype routes are used.
 
 ## 12. Change rule
 
-A material change to product purpose, primary users, scope, or governing constraints must update this charter before or with implementation.
+A material change to product purpose, primary user, first-version scope, AI authority boundary, or governing constraints must update this charter before or with implementation.

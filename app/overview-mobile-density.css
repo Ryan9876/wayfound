@@ -1,0 +1,121 @@
+/* Mobile Overview lower-page density refinement.
+   Preserves all content while reducing repeated card chrome and scroll height. */
+
+@media (max-width: 820px) {
+  .overview-section-heading {
+    margin-top: 22px;
+    margin-bottom: 10px;
+  }
+
+  .overview-summary-grid {
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid #d9e0dd;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  .overview-summary-card {
+    padding: 14px 16px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .overview-summary-card + .overview-summary-card {
+    border-top: 1px solid #e5e9e7;
+  }
+
+  .overview-summary-card .card-heading {
+    min-height: 22px;
+  }
+
+  .overview-summary-card .clean-list {
+    margin-top: 8px;
+    gap: 6px;
+  }
+
+  .overview-summary-card .clean-list li {
+    align-items: flex-start;
+  }
+
+  .overview-summary-card .release-stat {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: 7px;
+  }
+
+  .overview-summary-card .mini-progress {
+    margin: 8px 0 7px;
+  }
+
+  .overview-summary-card.release-card > p {
+    margin: 0;
+  }
+
+  .overview-records-strip {
+    gap: 9px;
+    margin-top: 10px;
+    padding: 14px 16px;
+  }
+
+  .overview-records-strip h3 {
+    margin-top: 3px;
+  }
+
+  .overview-records-strip .record-items {
+    gap: 0;
+  }
+
+  .overview-records-strip .record-items > span {
+    min-height: 38px;
+    padding: 6px 0;
+  }
+
+  .overview-records-strip .record-items b,
+  .overview-records-strip .record-items small {
+    line-height: 1.2;
+  }
+
+  .overview-records-strip > .text-link {
+    min-height: 36px;
+    margin-top: -2px;
+  }
+}
+
+@media (max-width: 520px) {
+  .overview-section-heading {
+    margin-top: 20px;
+    margin-bottom: 9px;
+  }
+
+  .overview-summary-grid {
+    border-radius: 13px;
+  }
+
+  .overview-summary-card {
+    padding: 13px 14px;
+  }
+
+  .overview-summary-card .clean-list {
+    margin-top: 7px;
+    gap: 5px;
+  }
+
+  .overview-summary-card .release-stat {
+    margin-top: 6px;
+  }
+
+  .overview-records-strip {
+    gap: 8px;
+    margin-top: 9px;
+    padding: 13px 14px;
+  }
+
+  .overview-records-strip .record-items > span {
+    min-height: 36px;
+    padding: 5px 0;
+  }
+}

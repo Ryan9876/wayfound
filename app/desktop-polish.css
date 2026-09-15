@@ -1,0 +1,550 @@
+/* Desktop refinement pass.
+   Keeps the approved Wayfound palette and information architecture while
+   improving scale, hierarchy, reading width, and visual finish. */
+
+@media (min-width: 1180px) {
+  :root {
+    --sidebar: 268px;
+    --desktop-reading-width: 1184px;
+    --desktop-card-radius: 14px;
+    --desktop-shadow: 0 1px 2px rgba(23, 43, 42, 0.035), 0 12px 32px rgba(23, 43, 42, 0.045);
+  }
+
+  .sidebar {
+    padding: 28px 18px 22px;
+    background: rgba(255, 255, 255, 0.965);
+    border-right-color: #d9dfdc;
+    backdrop-filter: blur(18px);
+  }
+
+  .brand-lockup {
+    gap: 12px;
+    padding: 0 10px;
+  }
+
+  .brand-mark {
+    width: 36px;
+    height: 36px;
+  }
+
+  .brand-copy strong {
+    font-size: 21px;
+    letter-spacing: -0.035em;
+  }
+
+  .brand-copy small {
+    margin-top: 4px;
+    font-size: 11px;
+    color: #6e7d79;
+  }
+
+  .project-switcher {
+    margin: 26px 0 20px;
+    padding: 12px 13px;
+    border-radius: 11px;
+    box-shadow: 0 1px 1px rgba(23, 43, 42, 0.02);
+  }
+
+  .project-switcher small {
+    font-size: 9px;
+  }
+
+  .project-switcher strong {
+    font-size: 12.5px;
+  }
+
+  .desktop-nav {
+    gap: 3px;
+  }
+
+  .nav-item {
+    position: relative;
+    min-height: 42px;
+    gap: 12px;
+    padding: 10px 13px;
+    border-radius: 9px;
+    font-size: 13.5px;
+    color: #566561;
+  }
+
+  .nav-item.active {
+    background: #edf4f1;
+    color: var(--pine);
+  }
+
+  .nav-item.active::before {
+    content: "";
+    position: absolute;
+    left: -18px;
+    top: 9px;
+    bottom: 9px;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: var(--pine);
+  }
+
+  .profile-row {
+    padding: 11px 9px 10px;
+  }
+
+  .profile-copy strong {
+    font-size: 12px;
+  }
+
+  .profile-copy small {
+    font-size: 10.5px;
+  }
+
+  .sync-state strong {
+    font-size: 10.5px;
+  }
+
+  .sync-state small {
+    font-size: 9.5px;
+  }
+
+  .topbar {
+    height: 64px;
+    padding: 0 32px;
+    border-bottom-color: rgba(214, 221, 218, 0.92);
+    background: rgba(247, 247, 242, 0.94);
+    backdrop-filter: blur(18px);
+  }
+
+  .topbar > p {
+    font-size: 12px;
+    font-weight: 600;
+    color: #667572;
+  }
+
+  .topbar-actions {
+    gap: 9px;
+  }
+
+  .search-box {
+    width: 292px;
+    height: 38px;
+    border-radius: 9px;
+    box-shadow: 0 1px 1px rgba(23, 43, 42, 0.02);
+  }
+
+  .search-box input {
+    font-size: 12px;
+  }
+
+  .content-wrap {
+    max-width: var(--desktop-reading-width);
+    margin: 0 auto;
+    padding: 42px 32px 72px;
+  }
+
+  .overview,
+  .standard-page {
+    width: 100%;
+    max-width: none;
+  }
+
+  .eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.13em;
+  }
+
+  .release-heading {
+    gap: 46px;
+    margin-bottom: 30px;
+  }
+
+  .release-heading h1,
+  .page-title-row h1 {
+    margin: 8px 0 10px;
+    font-size: 36px;
+    line-height: 1.06;
+    letter-spacing: -0.038em;
+    font-weight: 700;
+  }
+
+  .release-heading > div:first-child > p,
+  .page-title-row > div > p {
+    max-width: 650px;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .stage-block {
+    min-width: 390px;
+    gap: 17px;
+  }
+
+  .stage-pill {
+    padding: 7px 11px;
+    font-size: 11px;
+    border-color: #bfd2cc;
+    background: #f8fbfa;
+  }
+
+  .phase-step {
+    width: 72px;
+  }
+
+  .phase-step small {
+    font-size: 9px;
+    line-height: 1.15;
+  }
+
+  .phase-marker {
+    width: 21px;
+    height: 21px;
+    margin-bottom: 8px;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1.72fr) minmax(300px, 0.78fr);
+    gap: 18px;
+  }
+
+  .next-action-card,
+  .context-card,
+  .summary-card,
+  .records-strip,
+  .feature-card,
+  .list-panel,
+  .records-table,
+  .readiness-card {
+    border-radius: var(--desktop-card-radius);
+    border-color: #d7dedb;
+    box-shadow: var(--desktop-shadow);
+  }
+
+  .next-action-card {
+    padding: 27px 28px 25px;
+    background: linear-gradient(145deg, #f4f8f6 0%, #edf5f1 100%);
+    border-color: #c9dbd5;
+  }
+
+  .pager b {
+    font-size: 9.5px;
+  }
+
+  .action-intro {
+    grid-template-columns: 48px 1fr;
+    gap: 18px;
+    padding: 30px 0 26px;
+  }
+
+  .round-icon {
+    width: 46px;
+    height: 46px;
+  }
+
+  .action-intro h2 {
+    max-width: 620px;
+    margin-bottom: 10px;
+    font-size: 29px;
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+  }
+
+  .action-intro p {
+    max-width: 690px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .why-panel {
+    padding-top: 21px;
+    border-top-color: #cad9d4;
+  }
+
+  .minto-line {
+    grid-template-columns: 78px 1fr;
+    gap: 12px;
+    margin-top: 12px;
+    padding-left: 14px;
+  }
+
+  .minto-line b {
+    font-size: 11px;
+  }
+
+  .minto-line span {
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+
+  .action-buttons {
+    gap: 10px;
+    margin-top: 26px;
+  }
+
+  .button {
+    min-height: 40px;
+    padding: 0 16px;
+    border-radius: 8px;
+    font-size: 11.5px;
+  }
+
+  .button.primary {
+    box-shadow: 0 1px 2px rgba(15, 86, 73, 0.18);
+  }
+
+  .context-card {
+    padding: 24px 23px;
+  }
+
+  .card-heading > a,
+  .text-link {
+    font-size: 10.5px;
+  }
+
+  .context-list {
+    margin-top: 12px;
+  }
+
+  .context-list > div {
+    padding: 17px 0;
+  }
+
+  .context-list dt {
+    margin-bottom: 7px;
+    font-size: 11.5px;
+  }
+
+  .context-list dd {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .status-chip {
+    padding: 6px 9px;
+    font-size: 9.5px;
+  }
+
+  .context-footer {
+    padding-top: 18px;
+  }
+
+  .context-footer small {
+    font-size: 9px;
+  }
+
+  .context-footer strong {
+    font-size: 11px;
+  }
+
+  .summary-grid {
+    gap: 18px;
+    margin-top: 18px;
+  }
+
+  .summary-card {
+    min-height: 176px;
+    padding: 22px;
+  }
+
+  .clean-list {
+    margin-top: 16px;
+    gap: 11px;
+  }
+
+  .clean-list li {
+    font-size: 11.5px;
+    line-height: 1.5;
+  }
+
+  .release-stat strong {
+    font-size: 32px;
+  }
+
+  .release-stat span,
+  .release-card > p {
+    font-size: 10.5px;
+  }
+
+  .records-strip {
+    margin-top: 18px;
+    padding: 22px 24px;
+    grid-template-columns: 1fr 2.1fr auto;
+  }
+
+  .records-strip h3 {
+    font-size: 15px;
+  }
+
+  .record-items b {
+    font-size: 10.5px;
+  }
+
+  .record-items small {
+    font-size: 9px;
+  }
+
+  .page-title-row {
+    margin-bottom: 32px;
+  }
+
+  .page-title-row h1 {
+    max-width: 760px;
+    font-size: 34px;
+  }
+
+  .journey-groups {
+    gap: 36px;
+  }
+
+  .group-title {
+    margin-bottom: 14px;
+    padding-bottom: 11px;
+  }
+
+  .group-title h2 {
+    font-size: 14px;
+  }
+
+  .group-title span {
+    font-size: 9.5px;
+  }
+
+  .stage-grid {
+    gap: 12px;
+  }
+
+  .stage-card {
+    min-height: 164px;
+    padding: 18px;
+    grid-template-columns: 33px 1fr;
+    column-gap: 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.88);
+  }
+
+  .stage-card.active {
+    box-shadow: inset 3px 0 0 var(--pine), 0 8px 20px rgba(23, 43, 42, 0.035);
+  }
+
+  .stage-number {
+    width: 29px;
+    height: 29px;
+    font-size: 8.5px;
+  }
+
+  .stage-kicker {
+    font-size: 8.5px;
+  }
+
+  .stage-card h3 {
+    margin: 4px 0 6px;
+    font-size: 14px;
+  }
+
+  .stage-card p {
+    font-size: 10.5px;
+    line-height: 1.45;
+  }
+
+  .stage-state {
+    bottom: 14px;
+    left: 63px;
+    font-size: 9px;
+  }
+
+  .list-row {
+    min-height: 92px;
+    padding: 20px 22px;
+    grid-template-columns: 92px 1fr auto;
+    gap: 16px;
+  }
+
+  .row-status {
+    font-size: 9px;
+  }
+
+  .list-row h3 {
+    margin-bottom: 5px;
+    font-size: 14px;
+  }
+
+  .list-row p,
+  .text-button {
+    font-size: 10.5px;
+  }
+
+  .feature-grid.two {
+    gap: 20px;
+  }
+
+  .feature-card {
+    padding: 25px;
+  }
+
+  .feature-card h2 {
+    font-size: 23px;
+  }
+
+  .feature-card p {
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .feature-meta small {
+    font-size: 8.5px;
+  }
+
+  .feature-meta strong {
+    font-size: 11px;
+  }
+
+  .table-row {
+    min-height: 62px;
+    padding: 0 20px;
+    font-size: 11px;
+  }
+
+  .table-head {
+    min-height: 42px;
+    font-size: 8.5px;
+  }
+
+  .readiness-banner {
+    padding: 19px 21px;
+    margin-bottom: 20px;
+  }
+
+  .readiness-banner strong {
+    font-size: 12px;
+  }
+
+  .readiness-banner p {
+    margin-top: 4px;
+    font-size: 10.5px;
+    line-height: 1.5;
+  }
+
+  .readiness-grid {
+    gap: 13px;
+  }
+
+  .readiness-card {
+    min-height: 150px;
+    padding: 20px;
+  }
+
+  .readiness-card > span {
+    font-size: 9px;
+  }
+
+  .readiness-card h3 {
+    margin: 13px 0 6px;
+    font-size: 14px;
+  }
+
+  .readiness-card p {
+    font-size: 10.5px;
+    line-height: 1.5;
+  }
+}
+
+@media (min-width: 1600px) {
+  .content-wrap {
+    padding-top: 48px;
+  }
+}

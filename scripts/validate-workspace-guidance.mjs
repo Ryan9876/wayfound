@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { stageGuidance, workspaceView } from '../lib/workspace-guidance.ts';
+const read = name => readFile(new URL(`../${name}`, import.meta.url), 'utf8');
+assert.equal(stageGuidance.length, 15);
+assert.equal(new Set(stageGuidance.map(stage => stage.state)).size, 15);
+assert.equal(stageGuidance[1].state, 'You’re validating the problem.');
+for (const stage of stageGuidance) for (const key of ['state', 'next', 'why', 'question']) assert(stage[key]?.trim());
+for (const view of ['overview', 'journey', 'work', 'records', 'release-care', 'more']) assert.equal(workspaceView(view), view);
+for (const value of [undefined, '', ['work'], 'invalid', 'https://example.com']) assert.equal(workspaceView(value), 'overview');
+const active = await read('app/workspaces/[id]/page.tsx');
+assert(active.includes('process.env.WAYFOUND_SINGLE_USER_MODE !== "true"'));
+assert(active.includes('<GuidedWorkspace'));
+const ui = (await read('components/guided-workspace.tsx')).replace(/\s+/g, ' ');
+for (const boundary of ['This is your description, not a verified finding.', 'Suggested question', 'This describes the check. It is not a test result.', 'This does not mark the check as passed.']) assert(ui.includes(boundary), boundary);
+for (const forbidden of ['AssignTechnicalChoiceReviewForm', 'SpecialistReviewOwnerPanel', 'TechnicalRequirementOwnerPanel']) assert(!ui.includes(forbidden));
+console.log('PASS: all 15 stages have distinct guidance, unknown destinations resolve safely, and saved records remain separate from guidance and verification.');

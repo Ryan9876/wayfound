@@ -1,0 +1,31 @@
+/* ADR-0005: active first-version mode is one human owner working with AI assistance. */
+
+.single-user-mode #technical-decisions,
+.single-user-mode #technical-requirements,
+.single-user-mode .specialist-review-panel,
+.single-user-mode a[href="/handoffs"] {
+  display: none !important;
+}
+
+.single-user-mode-notice {
+  width: min(1120px, calc(100% - 32px));
+  margin: 16px auto 0;
+  padding: 12px 16px;
+  border: 1px solid #d6ddda;
+  border-radius: 10px;
+  background: #f7f7f2;
+  color: #24312e;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.single-user-mode-notice strong {
+  color: #176b5b;
+}
+
+@media (max-width: 640px) {
+  .single-user-mode-notice {
+    width: min(100% - 24px, 1120px);
+    margin-top: 12px;
+  }
+}

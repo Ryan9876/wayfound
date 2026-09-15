@@ -1,0 +1,282 @@
+/* Final desktop Overview visual finish.
+   This pass changes presentation only. It does not change the Wayfound information model. */
+
+@media (min-width: 1180px) {
+  .overview {
+    --overview-rule: rgba(214, 221, 218, 0.92);
+    --overview-soft-rule: rgba(214, 221, 218, 0.68);
+  }
+
+  .overview .release-heading {
+    padding-bottom: 23px;
+    border-bottom: 1px solid var(--overview-rule);
+  }
+
+  .overview .release-title-block h1 {
+    color: #152a28;
+    font-weight: 700;
+  }
+
+  .overview .release-title-block h1 span {
+    color: #a0aba7;
+    font-weight: 400;
+  }
+
+  .overview .stage-pill {
+    box-shadow: 0 1px 2px rgba(23, 43, 42, 0.025);
+  }
+
+  .overview .stage-pill i {
+    box-shadow: 0 0 0 3px rgba(23, 107, 91, 0.09);
+  }
+
+  .overview .phase-track {
+    isolation: isolate;
+  }
+
+  .overview .phase-step::before {
+    z-index: 0;
+    top: 10px;
+    height: 1px;
+  }
+
+  .overview .phase-marker,
+  .overview .phase-step small {
+    position: relative;
+    z-index: 1;
+  }
+
+  .overview .phase-marker {
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.62);
+  }
+
+  .overview .phase-step.done .phase-marker,
+  .overview .phase-step.active .phase-marker {
+    box-shadow: 0 0 0 3px rgba(232, 240, 238, 0.92);
+  }
+
+  .overview .phase-step small {
+    color: #8a9692;
+    font-weight: 600;
+  }
+
+  .overview .phase-step.done small {
+    color: #5e7770;
+  }
+
+  .overview .phase-step.active small {
+    color: #223d38;
+    font-weight: 750;
+  }
+
+  .overview .next-action-card {
+    border-color: #c6d8d2;
+    box-shadow:
+      0 1px 1px rgba(23, 43, 42, 0.025),
+      0 14px 34px rgba(23, 43, 42, 0.05);
+  }
+
+  .overview .next-action-card::before {
+    opacity: 0.92;
+  }
+
+  .overview .card-topline .eyebrow {
+    color: #5e716c;
+  }
+
+  .overview .action-position {
+    letter-spacing: 0.005em;
+  }
+
+  .overview .round-icon {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+  }
+
+  .overview .action-kicker {
+    letter-spacing: 0.005em;
+  }
+
+  .overview .action-intro h2 {
+    color: #132927;
+    font-weight: 710;
+  }
+
+  .overview .why-panel {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.62);
+  }
+
+  .overview .why-panel > .eyebrow {
+    color: #62746f;
+  }
+
+  .overview .minto-line {
+    border-left-color: #8eb5aa;
+  }
+
+  .overview .minto-line b {
+    letter-spacing: 0.005em;
+  }
+
+  .overview .button {
+    transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease, border-color 120ms ease;
+  }
+
+  .overview .button.primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(15, 86, 73, 0.16);
+  }
+
+  .overview .button.secondary:hover {
+    transform: translateY(-1px);
+    border-color: #9eb9b1;
+    background: rgba(255, 255, 255, 0.84);
+  }
+
+  .overview .button:focus-visible,
+  .overview a:focus-visible {
+    outline: 2px solid rgba(23, 107, 91, 0.72);
+    outline-offset: 3px;
+  }
+
+  .overview .text-link,
+  .overview .card-heading > a {
+    text-underline-offset: 3px;
+    transition: color 120ms ease;
+  }
+
+  .overview .text-link:hover,
+  .overview .card-heading > a:hover {
+    color: var(--pine-dark);
+    text-decoration: underline;
+  }
+
+  .overview-context-card {
+    display: flex;
+    flex-direction: column;
+    border-color: #d5ddda;
+    background: rgba(255, 255, 255, 0.94);
+  }
+
+  .overview-context-card .card-heading {
+    min-height: 24px;
+  }
+
+  .overview .context-evidence {
+    position: relative;
+    overflow: hidden;
+    border-color: #e8dcc1;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  }
+
+  .overview .context-evidence::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: var(--ochre);
+  }
+
+  .overview .context-evidence-label svg,
+  .overview-context-card .context-list dt svg {
+    color: var(--pine);
+    flex: 0 0 auto;
+  }
+
+  .overview-context-card .context-list dt {
+    color: #304843;
+  }
+
+  .overview-context-card .context-list dd {
+    color: #60706c;
+  }
+
+  .overview-context-card .context-footer small {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+  }
+
+  .overview-context-card .context-footer strong {
+    color: #2a413d;
+  }
+
+  .overview-section-heading {
+    padding-left: 1px;
+  }
+
+  .overview-section-heading .eyebrow {
+    color: #71807c;
+  }
+
+  .overview-section-heading h2 {
+    color: #203936;
+  }
+
+  .overview-summary-card {
+    border-color: #dde3e0;
+  }
+
+  .overview-summary-card .card-heading {
+    min-height: 23px;
+  }
+
+  .overview-summary-card .count-badge {
+    min-width: 27px;
+    height: 22px;
+    border: 1px solid #d4e3de;
+    background: #edf5f2;
+  }
+
+  .overview-summary-card .count-badge.amber {
+    border-color: #eadbb8;
+    background: #faf3e4;
+  }
+
+  .overview-summary-card .clean-list li {
+    color: #52645f;
+  }
+
+  .overview-summary-card .check-list svg {
+    margin-top: 2px;
+  }
+
+  .overview-summary-card .release-stat {
+    gap: 9px;
+  }
+
+  .overview-summary-card .release-stat strong {
+    color: #173c35;
+    font-weight: 680;
+  }
+
+  .overview-summary-card .mini-progress {
+    height: 5px;
+    margin: 11px 0 10px;
+    background: #e6ebe8;
+  }
+
+  .overview-summary-card .mini-progress span {
+    box-shadow: 1px 0 0 rgba(15, 86, 73, 0.2);
+  }
+
+  .overview-records-strip {
+    border-color: #dce2df;
+  }
+
+  .overview-records-strip .record-items > span {
+    min-height: 34px;
+    padding: 2px 0;
+  }
+
+  .overview-records-strip .record-dot {
+    box-shadow: 0 0 0 3px rgba(214, 221, 218, 0.28);
+  }
+
+  .overview-records-strip .record-dot.accepted {
+    box-shadow: 0 0 0 3px rgba(23, 107, 91, 0.08);
+  }
+
+  .overview-records-strip .record-dot.proposed {
+    box-shadow: 0 0 0 3px rgba(217, 184, 108, 0.12);
+  }
+}
