@@ -37,6 +37,9 @@ jobs:
       - name: Check local AI connection contract
         run: npm run test:local-ai-connection
 
+      - name: Check local refresh package contract
+        run: npm run test:local-test-package
+
       - name: Check workspace guidance contract
         run: npm run test:workspace-guidance
 
