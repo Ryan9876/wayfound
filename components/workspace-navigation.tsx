@@ -24,37 +24,59 @@ const destinations = [
 ] as const;
 
 function hrefFor(id: string, view: WorkspaceDestination) {
-  if (view === "interview" || view === "project-files") return `/workspaces/${id}/${view}`;
+  if (view === "interview" || view === "project-files") {
+    return `/workspaces/${id}/${view}`;
+  }
   return `/workspaces/${id}?view=${view}`;
 }
 
-export function WorkspaceNavigation({ id, active }: { id: string; active: WorkspaceDestination }) {
+export function WorkspaceNavigation({
+  id,
+  active,
+}: {
+  id: string;
+  active: WorkspaceDestination;
+}) {
   const mobile = [
     destinations[0],
     destinations[1],
+    destinations[2],
     destinations[3],
     { view: "more", label: "More", icon: Ellipsis } as const,
   ];
-  const moreActive = ["journey", "records", "project-files", "release-care", "more"].includes(active);
+  const moreActive = ["records", "project-files", "release-care", "more"].includes(
+    active,
+  );
 
   return (
     <>
       <nav className="project-sidebar" aria-label="Project navigation">
         {destinations.map(({ view, label, icon: Icon }) => (
-          <Link key={view} href={hrefFor(id, view)} aria-current={active === view ? "page" : undefined}>
+          <Link
+            key={view}
+            href={hrefFor(id, view)}
+            aria-current={active === view ? "page" : undefined}
+          >
             <Icon size={18} aria-hidden="true" />
-            {label}
+            <span>{label}</span>
           </Link>
         ))}
       </nav>
       <nav className="project-mobile-nav" aria-label="Mobile project navigation">
         {mobile.map(({ view, label, icon: Icon }) => {
-          const href = view === "more" ? `/workspaces/${id}?view=more` : hrefFor(id, view);
+          const href =
+            view === "more"
+              ? `/workspaces/${id}?view=more`
+              : hrefFor(id, view);
           const current = active === view || (view === "more" && moreActive);
           return (
-            <Link key={view} href={href} aria-current={current ? "page" : undefined}>
+            <Link
+              key={view}
+              href={href}
+              aria-current={current ? "page" : undefined}
+            >
               <Icon size={18} aria-hidden="true" />
-              {label}
+              <span>{label}</span>
             </Link>
           );
         })}
