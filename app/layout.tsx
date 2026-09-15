@@ -25,6 +25,7 @@ import "./release-care-polish.css";
 import "./more-polish.css";
 import "./accessibility-polish.css";
 import "./wayfound-next.css";
+import "./workspace-shell-v2.css";
 
 const sourceSans = Source_Sans_3({ subsets: ["latin"], variable: "--font-source-sans", display: "swap" });
 const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-plex-mono", display: "swap" });
