@@ -24,28 +24,15 @@ import "./handoffs-records-polish.css";
 import "./release-care-polish.css";
 import "./more-polish.css";
 import "./accessibility-polish.css";
+import "./wayfound-next.css";
 
-const sourceSans = Source_Sans_3({
-  subsets: ["latin"],
-  variable: "--font-source-sans",
-  display: "swap",
-});
+const sourceSans = Source_Sans_3({ subsets: ["latin"], variable: "--font-source-sans", display: "swap" });
+const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-plex-mono", display: "swap" });
 
-const plexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-plex-mono",
-  display: "swap",
-});
-
-export const metadata: Metadata = {
-  title: "Wayfound",
-  description: "Know the next step.",
-};
+export const metadata: Metadata = { title: "Wayfound", description: "Know the next step." };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const singleUserMode = process.env.WAYFOUND_SINGLE_USER_MODE === "true";
-
   return (
     <html lang="en" className={`${sourceSans.variable} ${plexMono.variable}`}>
       <body className={singleUserMode ? "single-user-mode" : undefined}>{children}</body>

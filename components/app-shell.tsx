@@ -5,10 +5,12 @@ import {
   ChevronDown,
   ClipboardCheck,
   FileText,
+  FolderOpen,
   Handshake,
   House,
   Leaf,
   Map,
+  MessageSquareText,
   MoreHorizontal,
   Search,
 } from "lucide-react";
@@ -17,10 +19,12 @@ import { demoRelease } from "@/lib/demo-data";
 
 const nav = [
   { key: "overview", label: "Overview", href: "/", icon: House },
+  { key: "interview", label: "Interview", href: "/interview", icon: MessageSquareText },
   { key: "journey", label: "Journey", href: "/journey", icon: Map },
   { key: "work", label: "Work", href: "/work", icon: ClipboardCheck },
   { key: "handoffs", label: "Handoffs", href: "/handoffs", icon: Handshake },
   { key: "records", label: "Records", href: "/records", icon: FileText },
+  { key: "project-files", label: "Project Files", href: "/project-files", icon: FolderOpen },
   { key: "release-care", label: "Release & Care", href: "/release-care", icon: Leaf },
 ] as const;
 
@@ -32,7 +36,7 @@ type AppShellProps = {
 };
 
 export function AppShell({ active, children }: AppShellProps) {
-  const moreActive = active === "more" || active === "handoffs" || active === "records" || active === "release-care";
+  const moreActive = active === "more" || active === "handoffs" || active === "records" || active === "project-files" || active === "release-care";
 
   return (
     <div className="app-shell">
@@ -71,7 +75,7 @@ export function AppShell({ active, children }: AppShellProps) {
 
       <main className="main-area">
         <header className="topbar">
-          <p>Clearer work. Kinder handoffs. Better software.</p>
+          <p>Turn ambiguity into an ordered path.</p>
           <div className="topbar-actions">
             <label className="search-box">
               <Search size={17} aria-hidden="true" />
@@ -88,9 +92,9 @@ export function AppShell({ active, children }: AppShellProps) {
 
       <nav className="mobile-nav" aria-label="Mobile navigation">
         <Link href="/" className={active === "overview" ? "mobile-nav-item active" : "mobile-nav-item"} aria-current={active === "overview" ? "page" : undefined}><House size={20} /><span>Overview</span></Link>
-        <Link href="/journey" className={active === "journey" ? "mobile-nav-item active" : "mobile-nav-item"} aria-current={active === "journey" ? "page" : undefined}><Map size={20} /><span>Journey</span></Link>
+        <Link href="/interview" className={active === "interview" ? "mobile-nav-item active" : "mobile-nav-item"} aria-current={active === "interview" ? "page" : undefined}><MessageSquareText size={20} /><span>Interview</span></Link>
         <Link href="/work" className={active === "work" ? "mobile-nav-item active" : "mobile-nav-item"} aria-current={active === "work" ? "page" : undefined}><BookOpenCheck size={20} /><span>Work</span></Link>
-        <Link href="/more" className={moreActive ? "mobile-nav-item active" : "mobile-nav-item"} aria-current={moreActive ? "page" : undefined}><MoreHorizontal size={20} /><span>More</span></Link>
+        <Link href="/more" className={moreActive || active === "journey" ? "mobile-nav-item active" : "mobile-nav-item"} aria-current={moreActive ? "page" : undefined}><MoreHorizontal size={20} /><span>More</span></Link>
       </nav>
     </div>
   );
