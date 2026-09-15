@@ -239,8 +239,8 @@ try {
   const model = dialog.getByLabel('Model');
   await provider.waitFor();
   await assert.doesNotReject(async () => {
-    await model.locator('option[value="lm-active"]').waitFor({ timeout: 10_000 });
-    await model.locator('option[value="lm-idle"]').waitFor({ timeout: 10_000 });
+    await model.locator('option[value="lm-active"]').waitFor({ state: 'attached', timeout: 10_000 });
+    await model.locator('option[value="lm-idle"]').waitFor({ state: 'attached', timeout: 10_000 });
   });
   assert.equal(await provider.inputValue(), 'lm-studio', 'development console did not default to LM Studio');
   assert.equal(await model.inputValue(), 'lm-active', 'running LM Studio model was not preferred');
@@ -261,8 +261,8 @@ try {
   assert((await exchanges.nth(0).textContent()).includes('in 9 · out 4 · total 13'), 'LM Studio trace omitted token metrics');
 
   await provider.selectOption('ollama');
-  await model.locator('option[value="ollama-active"]').waitFor({ timeout: 10_000 });
-  await model.locator('option[value="ollama-idle"]').waitFor({ timeout: 10_000 });
+  await model.locator('option[value="ollama-active"]').waitFor({ state: 'attached', timeout: 10_000 });
+  await model.locator('option[value="ollama-idle"]').waitFor({ state: 'attached', timeout: 10_000 });
   assert.equal(await model.locator('option[value="remote-cloud"]').count(), 0, 'Ollama cloud-backed model leaked into local selection');
   assert.equal(await model.inputValue(), 'ollama-active', 'running Ollama model was not preferred');
   await dialog.getByText('Connected · Ollama', { exact: true }).waitFor();
@@ -285,7 +285,7 @@ try {
   assert.equal(await dialog.locator('.ai-dev-exchange').count(), 2, 'OpenAI no-key state created unexpected network trace');
 
   await provider.selectOption('ollama');
-  await model.locator('option[value="ollama-active"]').waitFor({ timeout: 10_000 });
+  await model.locator('option[value="ollama-active"]').waitFor({ state: 'attached', timeout: 10_000 });
   assert.equal(await model.inputValue(), 'ollama-active');
   await dialog.getByRole('button', { name: 'Close', exact: true }).click();
   await consoleButton.click();
