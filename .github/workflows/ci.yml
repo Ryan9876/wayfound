@@ -63,11 +63,16 @@ jobs:
       - name: Check keyboard navigation
         run: node scripts/validate-keyboard.mjs
 
+      - name: Check guided Interview and Project Files
+        run: npm run test:guided-ui
+
       - name: Capture UI screenshots
         run: |
           mkdir -p artifacts/ui-screenshots
           npx playwright screenshot --browser=chromium --viewport-size="390,844" --wait-for-timeout=1200 http://127.0.0.1:3000 artifacts/ui-screenshots/overview-mobile-first.png
           npx playwright screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000 artifacts/ui-screenshots/overview-mobile-full.png
+          npx playwright screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/interview artifacts/ui-screenshots/interview-mobile-full.png
+          npx playwright screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/project-files artifacts/ui-screenshots/project-files-mobile-full.png
           npx playwright screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/journey artifacts/ui-screenshots/journey-mobile-full.png
           npx playwright screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/work artifacts/ui-screenshots/work-mobile-full.png
           npx playwright screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/more artifacts/ui-screenshots/more-mobile-full.png
@@ -75,6 +80,8 @@ jobs:
           npx playwright screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/records artifacts/ui-screenshots/records-mobile-full.png
           npx playwright screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/release-care artifacts/ui-screenshots/release-care-mobile-full.png
           npx playwright screenshot --browser=chromium --viewport-size="1440,1200" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000 artifacts/ui-screenshots/overview-desktop-full.png
+          npx playwright screenshot --browser=chromium --viewport-size="1440,1200" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/interview artifacts/ui-screenshots/interview-desktop-full.png
+          npx playwright screenshot --browser=chromium --viewport-size="1440,1200" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/project-files artifacts/ui-screenshots/project-files-desktop-full.png
           npx playwright screenshot --browser=chromium --viewport-size="1440,1200" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/journey artifacts/ui-screenshots/journey-desktop-full.png
           npx playwright screenshot --browser=chromium --viewport-size="1440,1200" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/work artifacts/ui-screenshots/work-desktop-full.png
           npx playwright screenshot --browser=chromium --viewport-size="1440,1200" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/handoffs artifacts/ui-screenshots/handoffs-desktop-full.png
