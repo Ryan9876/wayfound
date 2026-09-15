@@ -6,7 +6,7 @@ const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
 const launcher = readFileSync('scripts/wayfound-local-test.mjs', 'utf8');
 const gitignore = readFileSync('.gitignore', 'utf8');
 const packageSpec = readFileSync('docs/LOCAL_TEST_REFRESH_PACKAGE.md', 'utf8');
-const localDevelopment = readFileSync('docs/LOCAL_DEVELOPMENT.md', 'utf8');
+const quickStart = readFileSync('docs/LOCAL_TEST_QUICK_START.md', 'utf8');
 
 const plan = JSON.parse(execFileSync(process.execPath, ['scripts/wayfound-local-test.mjs', 'plan', '--json'], { encoding: 'utf8' }));
 
@@ -56,9 +56,10 @@ assert(!launcher.includes('console.log(apiKey'), 'launcher must not print public
 assert(packageSpec.includes('**Status:** In progress'), 'package slice must remain In progress until Mac execution is recorded');
 assert(packageSpec.includes('Mac execution using Docker Desktop is still required'), 'package validation boundary must require intended Mac execution');
 for (const command of ['npm run local:refresh', 'npm run local:start', 'npm run local:status', 'npm run local:stop', 'npm run local:reset']) {
-  assert(localDevelopment.includes(command), `LOCAL_DEVELOPMENT.md must document ${command}`);
+  assert(quickStart.includes(command), `LOCAL_TEST_QUICK_START.md must document ${command}`);
 }
-assert(localDevelopment.includes('preserves local project data'), 'local development guide must state the non-destructive refresh behavior');
-assert(localDevelopment.includes('LM Studio') && localDevelopment.includes('Ollama'), 'local development guide must identify both local providers');
+assert(quickStart.includes('preserves local project data'), 'quick-start guide must state the non-destructive refresh behavior');
+assert(quickStart.includes('LM Studio') && quickStart.includes('Ollama'), 'quick-start guide must identify both local providers');
+assert(quickStart.includes('OpenAI') && quickStart.includes('explicit'), 'quick-start guide must keep public-provider use explicit');
 
 console.log('PASS: local refresh package contract preserves the host-app/Supabase-Docker architecture, uses fast-forward-only updates and non-destructive migrations, separates explicit reset, keeps runtime state ignored, enables the validated AI console, and documents LM Studio/Ollama plus optional explicit cloud testing.');
