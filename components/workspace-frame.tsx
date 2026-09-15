@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { WayfoundLogo } from "./wayfound-logo";
 import { LocalAiStatus } from "./local-ai-status";
+import { AiDevelopmentConsole } from "./ai-development-console";
 import { signOut } from "@/app/workspaces/actions";
 import { detectLocalAi } from "@/lib/ai/local-ai";
+import { aiDevelopmentConsoleEnabled } from "@/lib/ai/dev-trace";
 import { singleUserInteractiveLoginDisabled } from "@/lib/auth/single-user-auto-session";
 
 export async function WorkspaceFrame({
@@ -15,6 +17,7 @@ export async function WorkspaceFrame({
   const singleUserMode = process.env.WAYFOUND_SINGLE_USER_MODE === "true";
   const noInteractiveLogin = singleUserInteractiveLoginDisabled();
   const aiStatus = singleUserMode && signedIn ? await detectLocalAi() : null;
+  const showAiDevelopmentConsole = signedIn && aiDevelopmentConsoleEnabled();
   return (
     <div className="durable-frame">
       <a className="project-skip" href="#workspace-main">
@@ -24,6 +27,7 @@ export async function WorkspaceFrame({
         <WayfoundLogo />
         <div className="durable-header-actions">
           {aiStatus ? <LocalAiStatus status={aiStatus} /> : null}
+          {showAiDevelopmentConsole ? <AiDevelopmentConsole initialProvider={aiStatus?.provider ?? "lm-studio"} initialModel={aiStatus?.model ?? null} /> : null}
           <nav aria-label="Workspace navigation">
             {signedIn && (
               <>
