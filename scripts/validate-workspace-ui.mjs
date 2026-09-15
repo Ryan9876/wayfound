@@ -44,8 +44,22 @@ try {
   assert.equal(await page.locator('.project-content form').count(), 0);
   assert.equal(await page.locator('#technical-decisions, #technical-requirements, .specialist-review-panel').count(), 0);
   assert(!/product-owner authority|acceptance gate|exact-revision specialist review/i.test(await page.locator('.project-content').innerText()));
-  assert.deepEqual(await page.getByRole('navigation', { name: 'Project navigation', exact: true }).getByRole('link').allTextContents(), ['Overview', 'Journey', 'Work', 'Records', 'Release & Care']);
+  assert.deepEqual(await page.getByRole('navigation', { name: 'Project navigation', exact: true }).getByRole('link').allTextContents(), ['Overview', 'Interview', 'Journey', 'Work', 'Records', 'Project Files', 'Release & Care']);
   await uniqueIds(); await noOverflow(); await screenshot('overview-desktop');
+
+  await page.getByRole('navigation', { name: 'Project navigation', exact: true }).getByRole('link', { name: 'Interview', exact: true }).click();
+  await page.waitForURL(/\/interview$/);
+  await visible(page.getByRole('heading', { name: 'Turn an incomplete idea into a coherent product brief.' }));
+  assert.match(await page.getByLabel('Idea or problem', { exact: true }).inputValue(), /People lose time finding equipment/);
+  await uniqueIds(); await noOverflow(); await screenshot('interview-desktop');
+  await page.goto(workspaceUrl);
+  await page.getByRole('navigation', { name: 'Project navigation', exact: true }).getByRole('link', { name: 'Project Files', exact: true }).click();
+  await page.waitForURL(/\/project-files$/);
+  await visible(page.getByRole('heading', { name: 'Keep useful project context close to the work.' }));
+  await visible(page.getByText('Browser session only', { exact: true }));
+  await uniqueIds(); await noOverflow(); await screenshot('project-files-desktop');
+  await page.goto(workspaceUrl);
+
   await page.getByRole('link', { name: 'Plan this step' }).click();
   await visible(page.getByRole('heading', { name: 'Work', exact: true }));
   await hidden(page.getByLabel('Work title', { exact: true }));
@@ -122,18 +136,25 @@ try {
     await visible(page.getByRole('navigation', { name: 'Mobile project navigation', exact: true }));
     await hidden(page.getByRole('navigation', { name: 'Project navigation', exact: true }));
   }
+  await page.goto(`${workspaceUrl}/interview`);
+  await visible(page.getByRole('heading', { name: 'Turn an incomplete idea into a coherent product brief.' }));
+  await uniqueIds(); await noOverflow(); await screenshot('interview-mobile');
+  await page.goto(`${workspaceUrl}/project-files`);
+  await visible(page.getByRole('heading', { name: 'Keep useful project context close to the work.' }));
+  await uniqueIds(); await noOverflow(); await screenshot('project-files-mobile');
+
   const backPage = await context.newPage();
   backPage.on('pageerror', error => errors.push(error.message));
   await backPage.setViewportSize({ width: 390, height: 844 });
   await backPage.goto(`${workspaceUrl}?view=more`);
-  await visible(backPage.getByRole('heading', { name: 'More', exact: true }));
-  await backPage.getByRole('link', { name: 'Records Review decisions, requirements, evidence, and documents.' }).click();
+  await visible(backPage.getByRole('heading', { name: 'Project destinations', exact: true }));
+  await backPage.getByRole('link', { name: /Records.*Review project continuity/i }).click();
   await backPage.waitForURL(/view=records$/);
   await visible(backPage.getByRole('heading', { name: 'Records', exact: true }));
   await backPage.goBack();
   await backPage.waitForURL(/view=more$/);
-  await visible(backPage.getByRole('heading', { name: 'More', exact: true }));
+  await visible(backPage.getByRole('heading', { name: 'Project destinations', exact: true }));
   await backPage.close();
   assert.deepEqual(errors, []);
-  console.log('PASS: active single-user UI creation, work implementation completion, required confirmations, saved statuses, next-action guidance, navigation, disclosure, evidence distinction, unique DOM IDs, desktop/mobile rendering, reload, and browser back.');
+  console.log('PASS: active single-user UI creation, guided Interview and session-only Project Files destinations, work implementation completion, required confirmations, saved statuses, next-action guidance, navigation, disclosure, evidence distinction, unique DOM IDs, desktop/mobile rendering, reload, and browser back.');
 } finally { await browser.close(); }
