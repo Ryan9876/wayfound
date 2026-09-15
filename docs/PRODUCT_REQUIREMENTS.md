@@ -100,6 +100,24 @@ The first bounded durable implementation is **Validated** for exact `Implemented
 
 **Requirement:** AI output MUST NOT automatically approve a requirement, accept a decision or artifact, verify a criterion, declare a release ready, or authorize a production-changing action.
 
+### WF-AI-003 — Development provider selection and observability
+
+**Priority:** P0  
+**Status:** Approved by the project owner's development-testing instruction
+
+**Requirement:** In the approved local single-user development/test experience, Wayfound MUST make supported AI connectivity observable and debuggable without changing AI authority. Wayfound MUST detect supported LM Studio and Ollama models, use LM Studio as the default development provider, allow an available local provider/model to be selected for normal development AI-review calls, show connection state with text, and provide temporary development-only visibility into sanitized request/response traffic and available performance metrics.
+
+An explicitly configured public provider MAY be available for development connection testing, but Wayfound MUST NOT silently switch from local AI to a public provider. Provider credentials MUST remain server-side and MUST NOT appear in development traces.
+
+**Acceptance criteria:**
+
+- Given LM Studio or Ollama reports multiple models, when the owner opens the development AI console, then every supported discovered model remains selectable, with running/loaded models prioritized in the list.
+- Given the owner selects an LM Studio or Ollama model, when a normal development AI review runs, then Wayfound uses that explicit local selection instead of silently choosing another model.
+- Given the development console is enabled, when Wayfound sends or receives an instrumented AI request, then the console can show the sanitized outbound request, bounded inbound response, provider/model, endpoint/result, elapsed time, and reported token/performance metrics without persisting that trace as project evidence.
+- Given a configured public provider is selected, when the owner explicitly tests it, then Wayfound may send the bounded test request to that provider; local-provider failure alone must never cause a public request.
+- Given the durable AI-review provenance boundary does not yet permit a selected public provider, when the owner attempts that durable review, then Wayfound fails visibly rather than silently sending the project review to the public provider or falling back to another model.
+- Given the temporary development console is disabled, then its trace and selection surfaces are unavailable and existing approved AI authority boundaries remain unchanged.
+
 ## 4. Durable records and status
 
 ### WF-REC-001 — Durable project record
