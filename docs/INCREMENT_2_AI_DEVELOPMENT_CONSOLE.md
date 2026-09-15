@@ -1,6 +1,6 @@
 # Increment 2 — AI development console
 
-**Status:** In progress
+**Status:** Validated
 
 ## Outcome
 
@@ -95,6 +95,12 @@ Trace retention is bounded in process memory. Restarting Wayfound clears the tra
 17. Given OpenAI is explicitly selected, when the owner requests a durable project AI review, then the request fails visibly before cloud inference rather than silently widening the durable provider boundary or falling back to another model.
 18. Given development console configuration is disabled, then the trace/selection API and console surface are unavailable and the existing validated local-review behavior remains unchanged.
 19. Given a public-provider health test passes, then Wayfound does not represent the result as verification, validation, release readiness, or authorization for durable cloud project review.
+
+## Validation
+
+Validated at application/test head `8ff850afb99eb6a9e73635b700ae2543086826eb` through CI run 399 (`34922539323`). The focused browser validation exercised LM Studio and Ollama discovery/selection, connection state, request/response tracing, token/performance metrics, selected-model routing for normal local AI review, OpenAI `Not configured` behavior, configured OpenAI discovery/testing with server-side authorization, secret non-disclosure, and the explicit block against durable OpenAI review or silent local fallback.
+
+See [validation/increment-2-ai-development-console.md](validation/increment-2-ai-development-console.md) for the executed evidence and rendered-evidence inspection.
 
 ## Removal rule
 
