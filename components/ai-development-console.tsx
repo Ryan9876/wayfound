@@ -13,6 +13,7 @@ type Provider = {
 };
 
 type Catalog = { defaultProvider: "lm-studio"; providers: Provider[] };
+type Selection = { provider: Provider["id"]; model: string | null };
 
 type Metrics = {
   promptTokens: number | null;
@@ -61,6 +62,11 @@ function stateText(state: Provider["state"]) {
   return "Offline";
 }
 
+function providerModelChoices(provider: Provider | null | undefined): string[] {
+  if (!provider) return [];
+  return [...new Set([...provider.activeModels, ...provider.models])];
+}
+
 export function AiDevelopmentConsole({ initialProvider, initialModel }: { initialProvider: string | null; initialModel: string | null }) {
   const [open, setOpen] = useState(false);
   const [providers, setProviders] = useState<Provider[]>([]);
@@ -74,21 +80,57 @@ export function AiDevelopmentConsole({ initialProvider, initialModel }: { initia
 
   const selected = useMemo(() => providers.find(provider => provider.id === providerId) ?? null, [providers, providerId]);
 
+  async function readSelection(): Promise<Selection | null> {
+    try {
+      const response = await fetch("/api/ai-dev/selection", { cache: "no-store" });
+      const body = await response.json().catch(() => null) as { selection?: Selection } | null;
+      return response.ok && body?.selection ? body.selection : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function saveSelection(provider: Provider["id"], selectedModel: string) {
+    try {
+      const response = await fetch("/api/ai-dev/selection", {
+        method: "POST",
+        cache: "no-store",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ provider, model: selectedModel }),
+      });
+      const body = await response.json().catch(() => null) as { error?: string } | null;
+      if (!response.ok) throw new Error(body?.error || "Wayfound could not save the development AI selection.");
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Wayfound could not save the development AI selection.");
+    }
+  }
+
   async function loadProviders() {
     setLoadingProviders(true);
     setError(null);
     try {
-      const response = await fetch("/api/ai-dev/providers", { cache: "no-store" });
+      const [response, savedSelection] = await Promise.all([
+        fetch("/api/ai-dev/providers", { cache: "no-store" }),
+        readSelection(),
+      ]);
       const body = await response.json().catch(() => null) as Catalog | { error?: string } | null;
       if (!response.ok || !body || !("providers" in body)) throw new Error(body && "error" in body && body.error ? body.error : "Provider discovery failed.");
       setProviders(body.providers);
-      const preferred = body.providers.find(provider => provider.id === providerId)
+
+      const savedProvider = savedSelection ? body.providers.find(provider => provider.id === savedSelection.provider) : null;
+      const preferred = savedProvider
         ?? body.providers.find(provider => provider.id === body.defaultProvider)
         ?? body.providers[0];
       if (preferred) {
         setProviderId(preferred.id);
-        const choices = preferred.activeModels.length ? preferred.activeModels : preferred.models;
-        setModel(current => choices.includes(current) ? current : choices[0] ?? "");
+        const choices = providerModelChoices(preferred);
+        const selectedModel = savedSelection?.provider === preferred.id && savedSelection.model && choices.includes(savedSelection.model)
+          ? savedSelection.model
+          : choices[0] ?? "";
+        setModel(selectedModel);
+        if (selectedModel && (!savedSelection || savedSelection.provider !== preferred.id || savedSelection.model !== selectedModel)) {
+          await saveSelection(preferred.id, selectedModel);
+        }
       }
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Provider discovery failed.");
@@ -120,9 +162,19 @@ export function AiDevelopmentConsole({ initialProvider, initialModel }: { initia
   function chooseProvider(nextId: string) {
     setProviderId(nextId);
     setResult(null);
+    setError(null);
     const next = providers.find(provider => provider.id === nextId);
-    const choices = next?.activeModels.length ? next.activeModels : next?.models ?? [];
-    setModel(choices[0] ?? "");
+    const choices = providerModelChoices(next);
+    const nextModel = choices[0] ?? "";
+    setModel(nextModel);
+    if (next && nextModel) void saveSelection(next.id, nextModel);
+  }
+
+  function chooseModel(nextModel: string) {
+    setModel(nextModel);
+    setResult(null);
+    setError(null);
+    if (selected && nextModel) void saveSelection(selected.id, nextModel);
   }
 
   async function testConnection() {
@@ -131,6 +183,7 @@ export function AiDevelopmentConsole({ initialProvider, initialModel }: { initia
     setError(null);
     setResult(null);
     try {
+      await saveSelection(selected.id, model);
       const response = await fetch("/api/ai-dev/test", {
         method: "POST",
         cache: "no-store",
@@ -157,7 +210,7 @@ export function AiDevelopmentConsole({ initialProvider, initialModel }: { initia
     }
   }
 
-  const modelChoices = selected?.activeModels.length ? selected.activeModels : selected?.models ?? [];
+  const modelChoices = providerModelChoices(selected);
 
   return (
     <div className="ai-dev-console-control">
@@ -175,7 +228,7 @@ export function AiDevelopmentConsole({ initialProvider, initialModel }: { initia
             <label>Provider<select value={providerId} onChange={event => chooseProvider(event.target.value)} disabled={loadingProviders || !providers.length}>
               {providers.map(provider => <option key={provider.id} value={provider.id}>{provider.label}{provider.kind === "cloud" ? " · public" : " · local"}</option>)}
             </select></label>
-            <label>Model<select value={model} onChange={event => setModel(event.target.value)} disabled={!modelChoices.length}>
+            <label>Model<select value={model} onChange={event => chooseModel(event.target.value)} disabled={!modelChoices.length}>
               {modelChoices.length ? modelChoices.map(name => <option key={name} value={name}>{name}</option>) : <option value="">No model available</option>}
             </select></label>
             <button className="ai-dev-secondary" type="button" onClick={loadProviders} disabled={loadingProviders}>{loadingProviders ? "Refreshing…" : "Refresh models"}</button>
@@ -183,7 +236,7 @@ export function AiDevelopmentConsole({ initialProvider, initialModel }: { initia
           </div>
 
           {selected ? <div className={`ai-dev-provider-state ai-dev-provider-${selected.state}`} role="status"><span aria-hidden="true" /><div><strong>{stateText(selected.state)} · {selected.label}</strong><p>{selected.detail}</p></div></div> : null}
-          {selected?.kind === "cloud" ? <p className="ai-dev-cloud-warning"><strong>Public provider:</strong> a connection test sends the bounded test prompt to {selected.label}. Local-provider failure never triggers this automatically.</p> : null}
+          {selected?.kind === "cloud" ? <p className="ai-dev-cloud-warning"><strong>Public provider:</strong> a connection test sends the bounded test prompt to {selected.label}. Durable project AI review is still local-only; selecting OpenAI will not silently send a durable review to the cloud.</p> : <p className="ai-dev-local-note">The selected local model is also used by normal Wayfound AI reviews while this development console is enabled.</p>}
           {error ? <p className="ai-dev-error" role="alert">{error}</p> : null}
 
           {result ? <section className={`ai-dev-result ${result.ok ? "pass" : "fail"}`}><div><strong>{result.ok ? "Connection passed" : "Connection failed"}</strong><span>{result.providerLabel} · {result.model}</span></div><p>{result.detail}</p><dl>
@@ -209,7 +262,7 @@ export function AiDevelopmentConsole({ initialProvider, initialModel }: { initia
               </article>
             ))}
           </div>
-          <p className="ai-dev-footnote">Secrets and authorization headers are excluded. This development trace is transient and is not project evidence. Durable project AI review remains local-only until its provider provenance is separately migrated and validated.</p>
+          <p className="ai-dev-footnote">Secrets and authorization headers are excluded. This development trace and selection are transient and are not project evidence. LM Studio/Ollama selections control development AI reviews. OpenAI can be tested explicitly, but durable OpenAI review remains disabled until its provenance is separately migrated and validated.</p>
         </section>
       ) : null}
     </div>

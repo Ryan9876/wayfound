@@ -4,7 +4,7 @@
 
 ## Outcome
 
-The owner can see which AI provider and model Wayfound is using, test LM Studio, Ollama, and an explicitly configured OpenAI connection, and inspect the actual sanitized request/response exchanges that pass through Wayfound while the AI integration is being developed.
+The owner can see which AI provider and model Wayfound is using, test LM Studio, Ollama, and an explicitly configured OpenAI connection, select a discovered local model for normal Wayfound AI review, and inspect the actual sanitized request/response exchanges that pass through Wayfound while the AI integration is being developed.
 
 This is temporary development instrumentation. It is not a durable project record and will be removed or disabled when the AI integration is sufficiently stable.
 
@@ -13,8 +13,9 @@ This is temporary development instrumentation. It is not a durable project recor
 This slice adds:
 
 - LM Studio as the default development provider;
-- automatic discovery of LM Studio and Ollama models;
+- automatic discovery of all reported LM Studio and local Ollama models;
 - explicit provider and model selection for development connection tests;
+- transient single-user local selection of an LM Studio or Ollama model for normal Wayfound AI-review calls;
 - an explicit OpenAI public-provider connection path when `OPENAI_API_KEY` is configured;
 - a text connection indicator;
 - a terminal-style in-memory traffic viewer;
@@ -23,7 +24,7 @@ This slice adds:
 - secret redaction;
 - Docker Desktop host-address support without arbitrary provider URLs.
 
-This slice does not yet route durable project AI reviews through OpenAI. The existing durable review provenance boundary remains `lm-studio` or `ollama` until a separate schema and validation slice expands it.
+This slice does not yet route durable project AI reviews through OpenAI. The existing durable review provenance boundary remains `lm-studio` or `ollama` until a separate schema and validation slice expands it. If OpenAI is selected in the development console and the owner attempts the existing durable review action, Wayfound must fail visibly rather than silently use OpenAI or silently switch to another provider.
 
 ## Development configuration
 
@@ -41,6 +42,14 @@ Local provider base URLs may use approved development defaults. When the Wayfoun
 When Wayfound runs directly on the host, loopback defaults remain valid.
 
 OpenAI uses the server-side `OPENAI_API_KEY`. The key must not be returned by an API route, written into the trace, or committed to the repository.
+
+## Provider/model selection
+
+The development selection is intentionally transient and process-local because this console is temporary troubleshooting instrumentation. It is not a project record and is not written to PostgreSQL.
+
+LM Studio is the default. Opening the console discovers available models. Running or loaded models are listed first, but every discovered model remains selectable. An explicit LM Studio or Ollama selection controls subsequent normal Wayfound local AI-review inference while the console is enabled. Restarting Wayfound resets the development selection.
+
+OpenAI may be selected for an explicit connection test. That selection does not widen the durable AI-review schema. A durable project review attempted while OpenAI is explicitly selected fails with a clear local-only provenance message; it does not fall back to LM Studio/Ollama and does not send the durable review to OpenAI.
 
 ## Traffic trace
 
@@ -69,21 +78,23 @@ Trace retention is bounded in process memory. Restarting Wayfound clears the tra
 
 1. Given local test mode and the development console are enabled, when the owner opens Wayfound, then a text AI connection indicator is visible.
 2. Given LM Studio is available, when provider discovery completes, then LM Studio is the default selectable provider.
-3. Given LM Studio reports multiple models, when the console opens, then the models are listed and the owner can select one.
-4. Given Ollama reports installed or running models, when the console opens, then Ollama is selectable and its models are listed.
+3. Given LM Studio reports multiple models, when the console opens, then all reported LLM models are listed and the owner can select one.
+4. Given Ollama reports installed or running models, when the console opens, then Ollama is selectable and all reported local models are listed.
 5. Given both LM Studio and Ollama are available, then Wayfound does not hide Ollama and does not silently change the explicit owner selection.
-6. Given `OPENAI_API_KEY` is absent, when the console inspects OpenAI, then it shows `Not configured` and sends no OpenAI request.
-7. Given `OPENAI_API_KEY` is configured and the owner explicitly opens or selects the OpenAI provider, when model discovery succeeds, then available model identifiers are shown without exposing the key.
-8. Given a provider and model are selected, when the owner runs `Test connection`, then the test uses that exact selection.
-9. Given a test or instrumented AI operation sends a request, when the console trace refreshes, then the terminal view shows the sanitized outbound request and bounded inbound response.
-10. Given a provider reports token or timing metrics, when the exchange renders, then the available values are visible.
-11. Given a metric is unavailable, when the exchange renders, then Wayfound shows `Not reported` or omits the optional metric instead of inventing a value.
-12. Given an API key or authorization value exists, when a trace entry is created, then the secret value is not present in the stored or returned trace.
-13. Given the trace reaches its retention limit, when another exchange is recorded, then the oldest trace entry is discarded.
-14. Given the owner clears the console, when the trace refreshes, then the in-memory entries are removed without changing project records.
-15. Given LM Studio or Ollama fails, then Wayfound does not contact OpenAI unless the owner explicitly selected or tested OpenAI.
-16. Given development console configuration is disabled, then the trace API and console surface are unavailable.
-17. Given a public-provider health test passes, then Wayfound does not represent the result as verification, validation, release readiness, or authorization for durable cloud project review.
+6. Given an LM Studio or Ollama model is explicitly selected, when a normal Wayfound local AI review runs, then that exact provider and model are used.
+7. Given `OPENAI_API_KEY` is absent, when the console inspects OpenAI, then it shows `Not configured` and sends no OpenAI request.
+8. Given `OPENAI_API_KEY` is configured and the owner explicitly opens or selects the OpenAI provider, when model discovery succeeds, then available model identifiers are shown without exposing the key.
+9. Given a provider and model are selected, when the owner runs `Test connection`, then the test uses that exact selection.
+10. Given a test or instrumented normal AI operation sends a request, when the console trace refreshes, then the terminal view shows the sanitized outbound request and bounded inbound response.
+11. Given a provider reports token or timing metrics, when the exchange renders, then the available values are visible.
+12. Given a metric is unavailable, when the exchange renders, then Wayfound shows `Not reported` or omits the optional metric instead of inventing a value.
+13. Given an API key or authorization value exists, when a trace entry is created, then the secret value is not present in the stored or returned trace.
+14. Given the trace reaches its retention limit, when another exchange is recorded, then the oldest trace entry is discarded.
+15. Given the owner clears the console, when the trace refreshes, then the in-memory entries are removed without changing project records.
+16. Given LM Studio or Ollama fails, then Wayfound does not contact OpenAI unless the owner explicitly selected or tested OpenAI.
+17. Given OpenAI is explicitly selected, when the owner requests a durable project AI review, then the request fails visibly before cloud inference rather than silently widening the durable provider boundary or falling back to another model.
+18. Given development console configuration is disabled, then the trace/selection API and console surface are unavailable and the existing validated local-review behavior remains unchanged.
+19. Given a public-provider health test passes, then Wayfound does not represent the result as verification, validation, release readiness, or authorization for durable cloud project review.
 
 ## Removal rule
 

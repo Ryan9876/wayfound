@@ -9,6 +9,11 @@ export type AiDevTraceMetrics = {
   timeToFirstTokenMs: number | null;
 };
 
+export type AiDevelopmentSelection = {
+  provider: "lm-studio" | "ollama" | "openai";
+  model: string | null;
+};
+
 export type AiDevTraceEntry = {
   id: number;
   timestamp: string;
@@ -29,6 +34,7 @@ export type AiDevTraceEntry = {
 type TraceStore = {
   nextId: number;
   entries: AiDevTraceEntry[];
+  selection: AiDevelopmentSelection;
 };
 
 type TraceInput = Omit<AiDevTraceEntry, "id" | "timestamp" | "requestBody" | "responseBody" | "metrics"> & {
@@ -57,7 +63,11 @@ const globalTrace = globalThis as typeof globalThis & {
 
 function store(): TraceStore {
   if (!globalTrace.__wayfoundAiDevTrace) {
-    globalTrace.__wayfoundAiDevTrace = { nextId: 1, entries: [] };
+    globalTrace.__wayfoundAiDevTrace = {
+      nextId: 1,
+      entries: [],
+      selection: { provider: "lm-studio", model: null },
+    };
   }
   return globalTrace.__wayfoundAiDevTrace;
 }
@@ -77,6 +87,18 @@ export function aiDevelopmentConsoleEnabled(): boolean {
     && process.env.WAYFOUND_LOCAL_TEST === "1"
     && process.env.WAYFOUND_AI_DEV_CONSOLE === "true"
     && isLoopbackOrigin(process.env.APP_ORIGIN);
+}
+
+export function getAiDevelopmentSelection(): AiDevelopmentSelection {
+  return { ...store().selection };
+}
+
+export function setAiDevelopmentSelection(provider: AiDevelopmentSelection["provider"], model: string | null): AiDevelopmentSelection {
+  if (!aiDevelopmentConsoleEnabled()) throw new Error("AI_DEVELOPMENT_CONSOLE_DISABLED");
+  const normalizedModel = model?.trim() || null;
+  if (normalizedModel && normalizedModel.length > 500) throw new Error("INVALID_SELECTION");
+  store().selection = { provider, model: normalizedModel };
+  return getAiDevelopmentSelection();
 }
 
 function sanitize(value: unknown, depth = 0): unknown {

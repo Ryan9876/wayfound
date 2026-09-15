@@ -1,7 +1,8 @@
 import "server-only";
 
 import { detectLocalAi, type LocalAiProviderId } from "@/lib/ai/local-ai";
-import { recordAiDevTrace } from "@/lib/ai/dev-trace";
+import { lmStudioDevelopmentUrl, ollamaDevelopmentUrl } from "@/lib/ai/ai-development-console";
+import { aiDevelopmentConsoleEnabled, getAiDevelopmentSelection, recordAiDevTrace } from "@/lib/ai/dev-trace";
 import type { AiWorkSnapshot } from "@/lib/domain/ai-review";
 
 export type LocalAiReviewResult = {
@@ -176,9 +177,18 @@ function emptyFailure(
   };
 }
 
+function selectedLmStudioUrl() {
+  return aiDevelopmentConsoleEnabled() ? lmStudioDevelopmentUrl() ?? LM_STUDIO_URL : LM_STUDIO_URL;
+}
+
+function selectedOllamaUrl() {
+  return aiDevelopmentConsoleEnabled() ? ollamaDevelopmentUrl() ?? OLLAMA_URL : OLLAMA_URL;
+}
+
 async function reviewWithLmStudio(model: string, purpose: string, snapshot: AiWorkSnapshot): Promise<LocalAiReviewResult> {
   const prompt = reviewPrompt(purpose, snapshot);
-  const native = await postJson(`${LM_STUDIO_URL}/api/v1/chat`, {
+  const lmStudioUrl = selectedLmStudioUrl();
+  const native = await postJson(`${lmStudioUrl}/api/v1/chat`, {
     model,
     input: prompt,
     system_prompt: systemInstruction(),
@@ -209,7 +219,7 @@ async function reviewWithLmStudio(model: string, purpose: string, snapshot: AiWo
     }
   }
 
-  const compatible = await postJson(`${LM_STUDIO_URL}/v1/chat/completions`, {
+  const compatible = await postJson(`${lmStudioUrl}/v1/chat/completions`, {
     model,
     messages: [
       { role: "system", content: systemInstruction() },
@@ -248,7 +258,8 @@ async function reviewWithOllama(model: string, purpose: string, snapshot: AiWork
   if (model.toLowerCase().includes("cloud")) {
     return emptyFailure("ollama", "Ollama", model, "Wayfound will not invoke an Ollama model identified as cloud-backed.");
   }
-  const result = await postJson(`${OLLAMA_URL}/api/chat`, {
+  const ollamaUrl = selectedOllamaUrl();
+  const result = await postJson(`${ollamaUrl}/api/chat`, {
     model,
     messages: [
       { role: "system", content: systemInstruction() },
@@ -287,6 +298,30 @@ async function reviewWithOllama(model: string, purpose: string, snapshot: AiWork
 }
 
 export async function runLocalAiWorkReview(purpose: string, snapshot: AiWorkSnapshot): Promise<LocalAiReviewResult> {
+  if (aiDevelopmentConsoleEnabled()) {
+    const selection = getAiDevelopmentSelection();
+    if (selection.model) {
+      if (selection.provider === "openai") {
+        return emptyFailure(
+          null,
+          "OpenAI",
+          selection.model,
+          "OpenAI is selected in the development console, but durable project AI review remains local-only until public-provider provenance is separately migrated and validated.",
+        );
+      }
+      try {
+        return selection.provider === "lm-studio"
+          ? await reviewWithLmStudio(selection.model, purpose, snapshot)
+          : await reviewWithOllama(selection.model, purpose, snapshot);
+      } catch (error) {
+        const detail = error instanceof Error && error.name === "TimeoutError"
+          ? "The selected local AI review timed out before inference completed."
+          : "The selected local AI review could not complete.";
+        return emptyFailure(selection.provider, selection.provider === "lm-studio" ? "LM Studio" : "Ollama", selection.model, detail);
+      }
+    }
+  }
+
   const status = await detectLocalAi();
   if (!status.provider || !status.model) return emptyFailure(status.provider, status.providerLabel, status.model, status.detail);
   try {
