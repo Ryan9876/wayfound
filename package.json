@@ -15,6 +15,7 @@
     "test:local-test-package": "node scripts/validate-local-test-package.mjs",
     "test:prototype": "node scripts/validate-prototype.mjs",
     "test:accessibility": "node scripts/validate-accessibility.mjs",
+    "test:guided-ui": "node scripts/validate-guided-ui.mjs",
     "test:single-user-mode": "node scripts/validate-single-user-mode.mjs",
     "test:ai-dev-console": "node scripts/validate-ai-development-console.mjs",
     "test:local-ai-connection": "node scripts/validate-local-ai-connection.mjs && npm run test:ai-dev-console",
