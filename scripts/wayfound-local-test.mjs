@@ -26,6 +26,7 @@ function plan() {
     localProviders: { lmStudio: LM_STUDIO_BASE_URL, ollama: OLLAMA_BASE_URL, default: 'lm-studio' },
     refresh: {
       git: 'fetch-origin-then-ff-only',
+      launcherReload: 'reexec-after-fast-forward',
       dependencies: 'npm-ci-when-lockfile-changed-or-missing',
       backend: `supabase start -x ${SUPABASE_EXCLUDES}`,
       migrations: 'supabase migration up --local',
@@ -81,8 +82,11 @@ function refreshGit() {
   if (dirty) fail('Local files have uncommitted changes. Commit or stash them before running local:refresh; Wayfound will not discard them.');
   const branch = gitOutput(['branch', '--show-current']);
   if (branch !== TEST_BRANCH) fail(`local:refresh updates only ${TEST_BRANCH}. Current branch: ${branch || '(detached)'}.`);
+  const beforeHead = gitOutput(['rev-parse', 'HEAD']);
   command('git', ['fetch', 'origin', TEST_BRANCH], { inherit: true, label: 'Git fetch' });
   command('git', ['merge', '--ff-only', `origin/${TEST_BRANCH}`], { inherit: true, label: 'Git fast-forward' });
+  const afterHead = gitOutput(['rev-parse', 'HEAD']);
+  return beforeHead !== afterHead;
 }
 
 function lockHash() {
@@ -369,7 +373,18 @@ async function main() {
   }
   if (mode === 'refresh') {
     requireNode22();
-    refreshGit();
+    const headChanged = refreshGit();
+    if (headChanged && process.env.WAYFOUND_REFRESH_REEXEC !== '1') {
+      console.log('Wayfound updated. Continuing with the refreshed launcher…');
+      const refreshedArgs = ['scripts/wayfound-local-test.mjs', 'start'];
+      if (noOpen) refreshedArgs.push('--no-open');
+      command(process.execPath, refreshedArgs, {
+        inherit: true,
+        label: 'Refreshed Wayfound launcher',
+        env: { ...process.env, WAYFOUND_REFRESH_REEXEC: '1' },
+      });
+      return;
+    }
     await startEnvironment({ noOpen });
     return;
   }
