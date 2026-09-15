@@ -29,8 +29,9 @@ try {
   const idea = page.getByLabel("Idea or problem", { exact: true });
   await idea.fill("Too short");
   await page.getByRole("button", { name: "Start interview", exact: true }).click();
-  await page.getByRole("alert").waitFor();
-  assert.match(await page.getByRole("alert").innerText(), /enough information/i);
+  const ideaError = page.locator(".wf-form-error");
+  await ideaError.waitFor();
+  assert.match(await ideaError.innerText(), /enough information/i);
 
   await idea.fill("Our team tracks requests through email and several spreadsheets, so nobody has a reliable view of status or ownership.");
   await page.getByRole("button", { name: "Start interview", exact: true }).click();
