@@ -28,12 +28,12 @@ try {
 
   const idea = page.getByLabel("Idea or problem", { exact: true });
   await idea.fill("Too short");
-  await page.getByRole("button", { name: "Start interview" }).click();
+  await page.getByRole("button", { name: "Start interview", exact: true }).click();
   await page.getByRole("alert").waitFor();
   assert.match(await page.getByRole("alert").innerText(), /enough information/i);
 
   await idea.fill("Our team tracks requests through email and several spreadsheets, so nobody has a reliable view of status or ownership.");
-  await page.getByRole("button", { name: "Start interview" }).click();
+  await page.getByRole("button", { name: "Start interview", exact: true }).click();
   await page.getByRole("heading", { name: "What are you mainly trying to change?" }).waitFor();
   await page.getByRole("note", { name: "Wayfound recommendation" }).waitFor();
   assert.match(await page.getByRole("note", { name: "Wayfound recommendation" }).innerText(), /Improve an existing workflow/i);
