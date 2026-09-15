@@ -1,7 +1,8 @@
 # Increment 2 — Product acceptance-criterion withdrawal
 
-**Status:** In progress  
-**Basis:** Approved remaining acceptance-criterion lifecycle priority; WF-REC-001, WF-REC-002, WF-OWN-001, WF-AI-002; ADR-0002 and ADR-0005.
+**Status:** Validated at application/test head `8e6c267ae737689691f313999c0f792786954a71`, CI run 383  
+**Basis:** Approved remaining acceptance-criterion lifecycle priority; WF-REC-001, WF-REC-002, WF-OWN-001, WF-AI-002; ADR-0002 and ADR-0005.  
+**Validation:** [validation/increment-2-criterion-withdrawal.md](validation/increment-2-criterion-withdrawal.md)
 
 ## Outcome and bounded scope
 
@@ -44,7 +45,7 @@ Failure rolls back all parts.
 
 The active guided Records surface exposes **Manage acceptance criteria** for owner product requirements. It lists every criterion with text lifecycle status. Active criteria can be withdrawn only when another active condition will remain. A withdrawal requires a reason and explicit owner confirmation.
 
-Withdrawn criteria remain visible in management history with their reason and revision transition. The interface states that existing evidence remains historical and that withdrawal is not a verification decision.
+Withdrawn criteria remain visible in management history with their reason and revision transition. The canonical criterion card keeps historical evidence visible, removes the **Add evidence** action for withdrawn conditions, and states that new evidence cannot be recorded. The interface states that withdrawal is not a verification decision.
 
 ## Acceptance coverage and validation gate
 
@@ -59,6 +60,8 @@ Withdrawn criteria remain visible in management history with their reason and re
 9. No decision, work, artifact, stage, release, verification, AI authority, or production authority changes.
 10. Browser withdrawal, error retention, keyboard reachability, text lifecycle status, unique IDs, desktop/390 px overflow checks, restart, and re-login persistence pass. Actual screenshots must be inspected before UI validation.
 11. Full existing CI regression chain, TypeScript, production build, and database security checks pass at an identified application head. Record validation and reconcile project records, then require green exact reconciliation-head CI.
+
+Acceptance items 1–11 passed at application/test head `8e6c267ae737689691f313999c0f792786954a71` through CI run 383. The run-383 `workspace-screenshots` artifact (`10374313444`) was directly inspected on desktop and 390 px mobile. Exact project-record reconciliation-head CI remains required before repository-wide status is final.
 
 ## Recovery and limits
 
