@@ -5,9 +5,10 @@ const requireText = (source, text, label) => {
   if (!source.includes(text)) throw new Error(`${label}: expected ${JSON.stringify(text)}`);
 };
 
-const [trace, service, component, frame, styles, env, spec, adr, providersRoute, testRoute, traceRoute] = await Promise.all([
+const [trace, service, review, component, frame, styles, env, spec, adr, providersRoute, testRoute, traceRoute] = await Promise.all([
   read('lib/ai/dev-trace.ts'),
   read('lib/ai/ai-development-console.ts'),
+  read('lib/ai/local-ai-review.ts'),
   read('components/ai-development-console.tsx'),
   read('components/workspace-frame.tsx'),
   read('app/ai-development-console.css'),
@@ -37,7 +38,9 @@ requireText(service, '/models', 'OpenAI model discovery');
 requireText(service, '/responses', 'OpenAI development inference');
 requireText(service, 'Authorization: `Bearer ${key}`', 'server-side OpenAI authorization');
 requireText(service, 'provider.models.includes(normalizedModel)', 'server-side model selection validation');
-requireText(service, 'recordAiDevTrace', 'traffic capture');
+requireText(service, 'recordAiDevTrace', 'connection-test traffic capture');
+requireText(review, 'recordAiDevTrace', 'normal Wayfound AI-review traffic capture');
+requireText(review, 'operation: "durable-work-review"', 'normal review traffic label');
 requireText(component, 'AI traffic console', 'console heading');
 requireText(component, 'Refresh models', 'model refresh control');
 requireText(component, 'Test connection', 'selected model connection test');
@@ -62,4 +65,4 @@ requireText(providersRoute, 'client.auth.getUser()', 'provider discovery authent
 requireText(testRoute, 'request.headers.get("origin") !== process.env.APP_ORIGIN', 'test origin guard');
 requireText(traceRoute, 'request.headers.get("origin") !== process.env.APP_ORIGIN', 'trace clear origin guard');
 
-console.log('PASS: development AI console is explicit local-test instrumentation, defaults to LM Studio, discovers selectable LM Studio/Ollama/OpenAI models, supports Docker host bridging on fixed ports, requires explicit cloud configuration/use, captures bounded sanitized request/response traffic and metrics, keeps secrets server-side, and does not expand durable cloud-review authority.');
+console.log('PASS: development AI console is explicit local-test instrumentation, defaults to LM Studio, discovers selectable LM Studio/Ollama/OpenAI models, supports Docker host bridging on fixed ports, requires explicit cloud configuration/use, captures bounded sanitized connection-test and normal Wayfound AI-review request/response traffic and metrics, keeps secrets server-side, and does not expand durable cloud-review authority.');

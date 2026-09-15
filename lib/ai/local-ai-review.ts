@@ -1,6 +1,7 @@
 import "server-only";
 
 import { detectLocalAi, type LocalAiProviderId } from "@/lib/ai/local-ai";
+import { recordAiDevTrace } from "@/lib/ai/dev-trace";
 import type { AiWorkSnapshot } from "@/lib/domain/ai-review";
 
 export type LocalAiReviewResult = {
@@ -92,22 +93,64 @@ function reviewPrompt(purpose: string, snapshot: AiWorkSnapshot) {
   ].join("\n");
 }
 
+function traceContext(url: string, body: unknown) {
+  const provider: LocalAiProviderId = url.includes(":11434") ? "ollama" : "lm-studio";
+  const providerLabel = provider === "ollama" ? "Ollama" : "LM Studio";
+  const record = body && typeof body === "object" ? body as Record<string, unknown> : {};
+  const model = typeof record.model === "string" ? record.model : null;
+  return { provider, providerLabel, model };
+}
+
 async function postJson(url: string, body: unknown): Promise<{ ok: boolean; status: number; body: unknown; elapsedMs: number }> {
   const started = performance.now();
-  const response = await fetch(url, {
-    method: "POST",
-    cache: "no-store",
-    signal: AbortSignal.timeout(REVIEW_TIMEOUT_MS),
-    headers: { Accept: "application/json", "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  let parsed: unknown = null;
+  const trace = traceContext(url, body);
   try {
-    parsed = await response.json();
-  } catch {
-    parsed = null;
+    const response = await fetch(url, {
+      method: "POST",
+      cache: "no-store",
+      signal: AbortSignal.timeout(REVIEW_TIMEOUT_MS),
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    let parsed: unknown = null;
+    try {
+      parsed = await response.json();
+    } catch {
+      parsed = null;
+    }
+    const elapsedMs = Math.round(performance.now() - started);
+    recordAiDevTrace({
+      operation: "durable-work-review",
+      provider: trace.provider,
+      providerLabel: trace.providerLabel,
+      model: trace.model,
+      method: "POST",
+      endpoint: url,
+      requestBody: body,
+      responseStatus: response.status,
+      responseBody: parsed,
+      elapsedMs,
+      error: null,
+    });
+    return { ok: response.ok, status: response.status, body: parsed, elapsedMs };
+  } catch (error) {
+    const elapsedMs = Math.round(performance.now() - started);
+    const message = error instanceof Error ? error.message : "Local AI request failed";
+    recordAiDevTrace({
+      operation: "durable-work-review",
+      provider: trace.provider,
+      providerLabel: trace.providerLabel,
+      model: trace.model,
+      method: "POST",
+      endpoint: url,
+      requestBody: body,
+      responseStatus: null,
+      responseBody: { error: message },
+      elapsedMs,
+      error: message,
+    });
+    throw error;
   }
-  return { ok: response.ok, status: response.status, body: parsed, elapsedMs: Math.round(performance.now() - started) };
 }
 
 function emptyFailure(
