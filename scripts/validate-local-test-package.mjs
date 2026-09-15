@@ -17,6 +17,7 @@ assert.equal(plan.localProviders.default, 'lm-studio');
 assert.equal(plan.localProviders.lmStudio, 'http://127.0.0.1:1234');
 assert.equal(plan.localProviders.ollama, 'http://127.0.0.1:11434');
 assert.equal(plan.refresh.git, 'fetch-origin-then-ff-only');
+assert.equal(plan.refresh.launcherReload, 'reexec-after-fast-forward');
 assert.equal(plan.refresh.migrations, 'supabase migration up --local');
 assert.equal(plan.refresh.destructiveReset, false);
 assert.equal(plan.refresh.preservesLocalData, true);
@@ -38,9 +39,14 @@ assert.equal(packageJson.scripts['local:start'], 'node scripts/wayfound-local-te
 assert.equal(packageJson.scripts['local:status'], 'node scripts/wayfound-local-test.mjs status');
 assert.equal(packageJson.scripts['local:stop'], 'node scripts/wayfound-local-test.mjs stop');
 assert.equal(packageJson.scripts['local:reset'], 'node scripts/wayfound-local-test.mjs reset');
+assert.equal(packageJson.scripts.lint, 'next typegen && tsc --noEmit');
 
 assert(gitignore.split(/\r?\n/).includes('.wayfound/'), '.wayfound runtime state must be ignored');
+assert(gitignore.split(/\r?\n/).includes('next-env.d.ts'), 'Next.js generated next-env.d.ts must be ignored');
 assert(launcher.includes("['merge', '--ff-only'"), 'refresh must use fast-forward-only Git merge');
+assert(launcher.includes("gitOutput(['rev-parse', 'HEAD'])"), 'refresh must detect when Git fast-forward changes the launcher checkout');
+assert(launcher.includes('WAYFOUND_REFRESH_REEXEC'), 'refresh must re-exec the newly pulled launcher after a fast-forward');
+assert(launcher.includes("['scripts/wayfound-local-test.mjs', 'start'"), 'refreshed launcher must continue with local:start semantics');
 assert(!launcher.includes('reset --hard'), 'launcher must not hard-reset Git');
 assert(!launcher.includes('checkout -f'), 'launcher must not force-checkout Git');
 assert(launcher.includes("['migration', 'up', '--local']"), 'normal backend setup must apply pending migrations');
@@ -62,4 +68,4 @@ assert(quickStart.includes('preserves local project data'), 'quick-start guide m
 assert(quickStart.includes('LM Studio') && quickStart.includes('Ollama'), 'quick-start guide must identify both local providers');
 assert(quickStart.includes('OpenAI') && quickStart.includes('explicit'), 'quick-start guide must keep public-provider use explicit');
 
-console.log('PASS: local refresh package contract preserves the host-app/Supabase-Docker architecture, uses fast-forward-only updates and non-destructive migrations, separates explicit reset, keeps runtime state ignored, enables the validated AI console, and documents LM Studio/Ollama plus optional explicit cloud testing.');
+console.log('PASS: local refresh package contract preserves the host-app/Supabase-Docker architecture, re-execs newly pulled launcher code, uses fast-forward-only updates and non-destructive migrations, separates explicit reset, ignores generated/runtime state, enables the validated AI console, and documents LM Studio/Ollama plus optional explicit cloud testing.');
