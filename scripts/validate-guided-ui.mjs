@@ -21,8 +21,9 @@ async function choose(title) {
 try {
   await page.goto(`${base}/interview`);
   await page.getByRole("heading", { name: "Turn an incomplete idea into a coherent product brief." }).waitFor();
-  await page.getByRole("link", { name: "Interview", exact: true }).filter({ visible: true }).first().waitFor();
-  assert.equal(await page.getByRole("link", { name: "Interview", exact: true }).first().getAttribute("aria-current"), "page");
+  const desktopInterviewLink = page.locator(".desktop-nav").getByRole("link", { name: "Interview", exact: true });
+  await desktopInterviewLink.waitFor();
+  assert.equal(await desktopInterviewLink.getAttribute("aria-current"), "page");
   await noOverflow();
 
   const idea = page.getByLabel("Idea or problem", { exact: true });
@@ -91,13 +92,15 @@ try {
   await page.goto(`${base}/interview`);
   await page.getByRole("heading", { name: "Turn an incomplete idea into a coherent product brief." }).waitFor();
   await page.locator(".wf-brief-panel").waitFor();
+  const mobileNav = page.getByRole("navigation", { name: "Mobile navigation", exact: true });
+  for (const label of ["Overview", "Interview", "Journey", "Work", "More"]) await mobileNav.getByRole("link", { name: label, exact: true }).waitFor();
   await noOverflow();
   await page.goto(`${base}/project-files`);
   await page.getByRole("heading", { name: "Keep useful project context close to the work." }).waitFor();
   await noOverflow();
 
   assert.deepEqual(errors, []);
-  console.log("PASS: guided Interview validates initial input, recommendation without auto-selection, non-recommended choice, back/change invalidation, adaptive progression, coherent brief completion, reduced motion, and responsive Project Files session behavior.");
+  console.log("PASS: guided Interview validates initial input, recommendation without auto-selection, non-recommended choice, back/change invalidation, adaptive progression, coherent brief completion, reduced motion, five-destination mobile navigation, and responsive Project Files session behavior.");
 } finally {
   await browser.close();
 }
