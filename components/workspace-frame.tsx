@@ -18,22 +18,30 @@ export async function WorkspaceFrame({
   const noInteractiveLogin = singleUserInteractiveLoginDisabled();
   const aiStatus = singleUserMode && signedIn ? await detectLocalAi() : null;
   const showAiDevelopmentConsole = signedIn && aiDevelopmentConsoleEnabled();
+
   return (
-    <div className="durable-frame">
+    <div className="durable-frame wf-app-frame">
       <a className="project-skip" href="#workspace-main">
         Skip to content
       </a>
-      <header className="durable-header">
-        <WayfoundLogo />
-        <div className="durable-header-actions">
+      <header className="durable-header wf-app-header">
+        <div className="wf-app-brand">
+          <WayfoundLogo />
+          {singleUserMode && signedIn ? (
+            <span className="wf-app-context">Guided product workspace</span>
+          ) : null}
+        </div>
+        <div className="durable-header-actions wf-app-header-actions">
           {aiStatus ? <LocalAiStatus status={aiStatus} /> : null}
           {showAiDevelopmentConsole ? (
             <AiDevelopmentConsole
               initialProvider="lm-studio"
-              initialModel={aiStatus?.provider === "lm-studio" ? aiStatus.model : null}
+              initialModel={
+                aiStatus?.provider === "lm-studio" ? aiStatus.model : null
+              }
             />
           ) : null}
-          <nav aria-label="Workspace navigation">
+          <nav className="wf-app-utility-nav" aria-label="Workspace navigation">
             {signedIn && (
               <>
                 <Link href="/workspaces">
@@ -68,7 +76,11 @@ export async function WorkspaceFrame({
           </nav>
         </div>
       </header>
-      <main id="workspace-main" tabIndex={-1} className="durable-content">
+      <main
+        id="workspace-main"
+        tabIndex={-1}
+        className="durable-content wf-app-main"
+      >
         {children}
       </main>
     </div>
