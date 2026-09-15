@@ -90,11 +90,12 @@ export function AppShell({ active, children }: AppShellProps) {
         <div className="content-wrap">{children}</div>
       </main>
 
-      <nav className="mobile-nav" aria-label="Mobile navigation">
+      <nav className="mobile-nav" aria-label="Mobile navigation" style={{ gridTemplateColumns: "repeat(5, minmax(0, 1fr))" }}>
         <Link href="/" className={active === "overview" ? "mobile-nav-item active" : "mobile-nav-item"} aria-current={active === "overview" ? "page" : undefined}><House size={20} /><span>Overview</span></Link>
         <Link href="/interview" className={active === "interview" ? "mobile-nav-item active" : "mobile-nav-item"} aria-current={active === "interview" ? "page" : undefined}><MessageSquareText size={20} /><span>Interview</span></Link>
+        <Link href="/journey" className={active === "journey" ? "mobile-nav-item active" : "mobile-nav-item"} aria-current={active === "journey" ? "page" : undefined}><Map size={20} /><span>Journey</span></Link>
         <Link href="/work" className={active === "work" ? "mobile-nav-item active" : "mobile-nav-item"} aria-current={active === "work" ? "page" : undefined}><BookOpenCheck size={20} /><span>Work</span></Link>
-        <Link href="/more" className={moreActive || active === "journey" ? "mobile-nav-item active" : "mobile-nav-item"} aria-current={moreActive ? "page" : undefined}><MoreHorizontal size={20} /><span>More</span></Link>
+        <Link href="/more" className={moreActive ? "mobile-nav-item active" : "mobile-nav-item"} aria-current={moreActive ? "page" : undefined}><MoreHorizontal size={20} /><span>More</span></Link>
       </nav>
     </div>
   );
