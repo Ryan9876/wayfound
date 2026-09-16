@@ -1,0 +1,244 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Check prototype structure
+        run: npm run test:prototype
+
+      - name: Check accessibility baseline
+        run: npm run test:accessibility
+
+      - name: Check single-user product mode
+        run: npm run test:single-user-mode
+
+      - name: Check local AI connection contract
+        run: npm run test:local-ai-connection
+
+      - name: Check local refresh package contract
+        run: npm run test:local-test-package
+
+      - name: Check workspace guidance contract
+        run: npm run test:workspace-guidance
+
+      - name: Check TypeScript
+        run: npm run lint
+
+      - name: Build application
+        run: npm run build
+
+      - name: Install visual test tooling
+        run: |
+          npm install --no-save --no-audit --no-fund playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start built application
+        run: |
+          npm run start > /tmp/wayfound-next.log 2>&1 &
+          echo $! > /tmp/wayfound-next.pid
+          npx --yes wait-on@8.0.1 http://127.0.0.1:3000
+
+      - name: Check keyboard navigation
+        run: node scripts/validate-keyboard.mjs
+
+      - name: Check guided Interview and Project Files
+        run: npm run test:guided-ui
+
+      - name: Capture UI screenshots
+        run: |
+          mkdir -p artifacts/ui-screenshots
+          npx playwright screenshot --browser=chromium --viewport-size="390,844" --wait-for-timeout=1200 http://127.0.0.1:3000 artifacts/ui-screenshots/overview-mobile-first.png
+          npx playwright screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000 artifacts/ui-screenshots/overview-mobile-full.png
+          npx playwright screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/interview artifacts/ui-screenshots/interview-mobile-full.png
+          npx playwright screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/project-files artifacts/ui-screenshots/project-files-mobile-full.png
+          npx playwright screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/journey artifacts/ui-screenshots/journey-mobile-full.png
+          npx playwright screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/work artifacts/ui-screenshots/work-mobile-full.png
+          npx playwright screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/more artifacts/ui-screenshots/more-mobile-full.png
+          npx playwright screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/handoffs artifacts/ui-screenshots/handoffs-mobile-full.png
+          npx playwright screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/records artifacts/ui-screenshots/records-mobile-full.png
+          npx playwright screenshot --browser=chromium --viewport-size="390,844" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/release-care artifacts/ui-screenshots/release-care-mobile-full.png
+          npx playwright screenshot --browser=chromium --viewport-size="1440,1200" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000 artifacts/ui-screenshots/overview-desktop-full.png
+          npx playwright screenshot --browser=chromium --viewport-size="1440,1200" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/interview artifacts/ui-screenshots/interview-desktop-full.png
+          npx playwright screenshot --browser=chromium --viewport-size="1440,1200" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/project-files artifacts/ui-screenshots/project-files-desktop-full.png
+          npx playwright screenshot --browser=chromium --viewport-size="1440,1200" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/journey artifacts/ui-screenshots/journey-desktop-full.png
+          npx playwright screenshot --browser=chromium --viewport-size="1440,1200" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/work artifacts/ui-screenshots/work-desktop-full.png
+          npx playwright screenshot --browser=chromium --viewport-size="1440,1200" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/handoffs artifacts/ui-screenshots/handoffs-desktop-full.png
+          npx playwright screenshot --browser=chromium --viewport-size="1440,1200" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/records artifacts/ui-screenshots/records-desktop-full.png
+          npx playwright screenshot --browser=chromium --viewport-size="1440,1200" --full-page --wait-for-timeout=1200 http://127.0.0.1:3000/release-care artifacts/ui-screenshots/release-care-desktop-full.png
+
+      - name: Upload UI screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-screenshots
+          path: artifacts/ui-screenshots
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Stop built application
+        if: always()
+        run: |
+          if [ -f /tmp/wayfound-next.pid ]; then
+            kill "$(cat /tmp/wayfound-next.pid)" || true
+          fi
+
+      - name: Smoke-test single-user route boundary
+        run: |
+          rm -rf .next
+          WAYFOUND_SINGLE_USER_MODE=true npm run build
+          WAYFOUND_SINGLE_USER_MODE=true npm run start -- --hostname 127.0.0.1 --port 3001 > /tmp/wayfound-single-user.log 2>&1 &
+          echo $! > /tmp/wayfound-single-user.pid
+          npx --yes wait-on@8.0.1 http://127.0.0.1:3001
+          specialist_headers="$(curl -sSI http://127.0.0.1:3001/specialist-reviews | tr -d '\r')"
+          printf '%s\n' "$specialist_headers"
+          printf '%s\n' "$specialist_headers" | grep -Ei '^location: /workspaces$'
+          handoff_headers="$(curl -sSI http://127.0.0.1:3001/handoffs | tr -d '\r')"
+          printf '%s\n' "$handoff_headers"
+          printf '%s\n' "$handoff_headers" | grep -Ei '^location: /records$'
+
+      - name: Stop single-user application
+        if: always()
+        run: |
+          if [ -f /tmp/wayfound-single-user.pid ]; then
+            kill "$(cat /tmp/wayfound-single-user.pid)" || true
+          fi
+
+  durable-workspace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install pinned dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Start isolated Supabase
+        run: npx supabase start -x realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+      - name: Build application
+        run: npm run build
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+      - name: Check database security
+        run: npx supabase db advisors --local --type security --fail-on error
+      - name: Validate additional product criteria
+        run: |
+          WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
+          npm run test:multiple-criteria
+      - name: Validate durable workspace
+        run: npm run test:workspace
+      - name: Validate durable evidence
+        run: |
+          WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
+          npm run test:evidence
+      - name: Validate durable artifacts
+        run: |
+          WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
+          npm run test:artifacts
+      - name: Validate artifact acceptance
+        run: |
+          WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
+          npm run test:artifact-acceptance
+      - name: Validate specialist review
+        run: |
+          WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
+          npm run test:specialist-review
+      - name: Validate owner work lifecycle
+        run: |
+          WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
+          npm run test:work-lifecycle
+      - name: Validate work implementation completion
+        run: |
+          WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
+          npm run test:work-completion
+      - name: Validate durable AI work review
+        run: |
+          WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
+          npm run test:ai-review
+      - name: Validate durable work dependencies
+        run: |
+          WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
+          npm run test:work-dependencies
+      - name: Validate durable work project-direction links
+        run: |
+          WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
+          npm run test:work-direction-links
+      - name: Validate technical decision authority
+        run: |
+          WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
+          npm run test:technical-decisions
+      - name: Validate technical requirement authority
+        run: |
+          WAYFOUND_LOCAL_TEST=1 node scripts/wait-for-local-backend.mjs
+          npm run test:technical-requirements
+      - name: Validate automatic single-user owner session
+        env:
+          WAYFOUND_SEED_EMAIL: owner-auto@wayfound.local
+          WAYFOUND_SEED_PASSWORD: Wayfound-Auto-Owner-2026!
+        run: |
+          set -euo pipefail
+          npx supabase db reset --local
+          STATUS_JSON="$(npx supabase status -o json)"
+          export SUPABASE_URL="$(printf '%s' "$STATUS_JSON" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const j=JSON.parse(s);process.stdout.write(j.API_URL||"")})')"
+          export SUPABASE_PUBLISHABLE_KEY="$(printf '%s' "$STATUS_JSON" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const j=JSON.parse(s);process.stdout.write(j.PUBLISHABLE_KEY||j.ANON_KEY||"")})')"
+          export APP_ORIGIN=http://127.0.0.1:3200
+          export WAYFOUND_SINGLE_USER_MODE=true
+          export WAYFOUND_SINGLE_USER_AUTO_SIGN_IN=true
+          export WAYFOUND_LOCAL_TEST=1
+          export WAYFOUND_SINGLE_USER_OWNER_EMAIL="$WAYFOUND_SEED_EMAIL"
+          export WAYFOUND_SINGLE_USER_OWNER_PASSWORD="$WAYFOUND_SEED_PASSWORD"
+          npm run seed:single-user-local
+          rm -rf .next
+          npm run build
+          npm run start -- --hostname 127.0.0.1 --port 3200 > /tmp/wayfound-auto-session.log 2>&1 &
+          APP_PID=$!
+          trap 'kill "$APP_PID" >/dev/null 2>&1 || true' EXIT
+          npx --yes wait-on@8.0.1 http://127.0.0.1:3200/workspaces
+          rm -f /tmp/wayfound-auto-cookies.txt
+          curl -fsS -c /tmp/wayfound-auto-cookies.txt http://127.0.0.1:3200/workspaces -o /tmp/wayfound-auto-workspaces.html
+          grep -F 'Your projects' /tmp/wayfound-auto-workspaces.html
+          if grep -Fq 'Sign in to Wayfound' /tmp/wayfound-auto-workspaces.html; then
+            echo 'Interactive login leaked into the no-login workspace experience.' >&2
+            exit 1
+          fi
+          if grep -Fq 'Sign out' /tmp/wayfound-auto-workspaces.html; then
+            echo 'Sign-out control leaked into the no-login workspace experience.' >&2
+            exit 1
+          fi
+          curl -sS -D /tmp/wayfound-auto-signin.headers -o /dev/null -b /tmp/wayfound-auto-cookies.txt http://127.0.0.1:3200/sign-in
+          tr -d '\r' < /tmp/wayfound-auto-signin.headers | grep -Ei '^location: /workspaces$'
+          WAYFOUND_UI_TEST_URL=http://127.0.0.1:3200 npm run test:workspace-ui
+          kill "$APP_PID" >/dev/null 2>&1 || true
+          trap - EXIT
+      - name: Upload workspace screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workspace-screenshots
+          path: artifacts/workspace
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Stop isolated Supabase
+        if: always()
+        run: npx supabase stop

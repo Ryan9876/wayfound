@@ -170,3 +170,10 @@ Before sending or committing important project communication, verify:
 7. Does the reader know the required next action?
 
 If any answer is no, revise the communication.
+## 7. Primary interface language
+
+Lead with the current state or next action. Use calm, conversational language for a capable domain expert who may not know software-development terms. Prefer “Add a decision,” “What did you decide?”, “Done when,” and “What will show it worked?” over internal record and governance language.
+
+Keep canonical terminology for traceability in secondary labels, metadata, help, or Details. Do not remove a required confirmation or change a status meaning to simplify wording. Keep fact, assumption, decision, risk, issue, and open question distinct. Keep Implemented, Validated, and Released distinct.
+
+See `INCREMENT_2_WORKSPACE_UX.md` for the active workspace contract and label mappings.

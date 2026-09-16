@@ -1,0 +1,45 @@
+import type { Metadata } from "next";
+import { IBM_Plex_Mono, Source_Sans_3 } from "next/font/google";
+import "./globals.css";
+import "./durable-workspace.css";
+import "./single-user-mode.css";
+import "./local-ai-status.css";
+import "./ai-development-console.css";
+import "./typography.css";
+import "./desktop-polish.css";
+import "./overview-polish.css";
+import "./overview-finish.css";
+import "./overview-type-spacing.css";
+import "./overview-card-spacing.css";
+import "./overview-mobile.css";
+import "./overview-mobile-typography.css";
+import "./overview-mobile-spacing.css";
+import "./overview-mobile-density.css";
+import "./overview-mobile-first-screen.css";
+import "./overview-mobile-action-hierarchy.css";
+import "./overview-mobile-cta.css";
+import "./journey-polish.css";
+import "./work-polish.css";
+import "./handoffs-records-polish.css";
+import "./release-care-polish.css";
+import "./more-polish.css";
+import "./accessibility-polish.css";
+import "./wayfound-next.css";
+import "./workspace-shell-v2.css";
+import "./workspace-shell-v3.css";
+import "./workspace-shell-v3-fix.css";
+import "./workspace-pages-v4.css";
+
+const sourceSans = Source_Sans_3({ subsets: ["latin"], variable: "--font-source-sans", display: "swap" });
+const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-plex-mono", display: "swap" });
+
+export const metadata: Metadata = { title: "Wayfound", description: "Know the next step." };
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const singleUserMode = process.env.WAYFOUND_SINGLE_USER_MODE === "true";
+  return (
+    <html lang="en" className={`${sourceSans.variable} ${plexMono.variable}`}>
+      <body className={singleUserMode ? "single-user-mode" : undefined}>{children}</body>
+    </html>
+  );
+}

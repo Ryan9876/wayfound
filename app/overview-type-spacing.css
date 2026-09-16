@@ -1,0 +1,319 @@
+/* Desktop Overview typography and spacing pass.
+   Normalizes the visual rhythm without changing content or information architecture. */
+
+@media (min-width: 1180px) {
+  .overview {
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-7: 28px;
+    --space-8: 32px;
+    --space-9: 36px;
+    --space-10: 40px;
+  }
+
+  .overview .eyebrow {
+    font-size: 10.5px;
+    line-height: 1.2;
+    letter-spacing: 0.125em;
+    font-weight: 700;
+  }
+
+  .overview .release-heading {
+    gap: var(--space-10);
+    margin-bottom: var(--space-7);
+    padding-bottom: var(--space-7);
+  }
+
+  .overview .release-title-block h1 {
+    margin: 7px 0 10px;
+    font-size: 40px;
+    line-height: 1.04;
+    letter-spacing: -0.04em;
+    font-weight: 700;
+  }
+
+  .overview .release-title-block > p {
+    max-width: 590px;
+    font-size: 14.5px;
+    line-height: 1.58;
+  }
+
+  .overview .stage-block {
+    gap: var(--space-3);
+  }
+
+  .overview .stage-pill {
+    min-height: 30px;
+    padding: 6px 11px;
+    font-size: 11px;
+    line-height: 1.2;
+  }
+
+  .overview .phase-track {
+    padding: 11px 12px 9px;
+  }
+
+  .overview .phase-step small {
+    margin-top: 1px;
+    font-size: 9.5px;
+    line-height: 1.15;
+  }
+
+  .overview-primary-grid {
+    gap: var(--space-5);
+  }
+
+  .overview .next-action-card {
+    min-height: 0;
+    padding: var(--space-8);
+  }
+
+  .overview .next-action-card::before {
+    left: var(--space-8);
+    right: var(--space-8);
+  }
+
+  .overview .card-topline {
+    min-height: 30px;
+  }
+
+  .overview .action-position {
+    min-height: 28px;
+    padding: 5px 10px;
+    font-size: 10.5px;
+    line-height: 1.2;
+  }
+
+  .overview .action-intro {
+    grid-template-columns: 52px 1fr;
+    gap: var(--space-5);
+    padding: var(--space-8) 0 var(--space-7);
+  }
+
+  .overview .round-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .overview .action-kicker {
+    margin-bottom: 7px;
+    font-size: 11px;
+    line-height: 1.25;
+  }
+
+  .overview .action-intro h2 {
+    max-width: 670px;
+    margin: 0 0 12px;
+    font-size: 36px;
+    line-height: 1.06;
+    letter-spacing: -0.04em;
+    font-weight: 700;
+  }
+
+  .overview .action-intro p {
+    max-width: 660px;
+    font-size: 14px;
+    line-height: 1.58;
+  }
+
+  .overview .why-panel {
+    padding: var(--space-5);
+  }
+
+  .overview .why-panel > .eyebrow {
+    display: block;
+    margin-bottom: 1px;
+  }
+
+  .overview .minto-line {
+    grid-template-columns: 78px 1fr;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+    padding-left: var(--space-3);
+  }
+
+  .overview .minto-line b {
+    font-size: 11.5px;
+    line-height: 1.45;
+  }
+
+  .overview .minto-line span {
+    font-size: 13px;
+    line-height: 1.52;
+  }
+
+  .overview .action-buttons {
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+
+  .overview .button {
+    min-height: 42px;
+    padding: 0 var(--space-4);
+    font-size: 12px;
+    line-height: 1;
+  }
+
+  .overview .button.primary {
+    padding-inline: 19px;
+  }
+
+  .overview-context-card {
+    min-height: 0;
+    padding: var(--space-7) var(--space-6) var(--space-6);
+  }
+
+  .overview-context-card .card-heading {
+    min-height: 28px;
+  }
+
+  .overview .card-heading > a,
+  .overview .text-link {
+    font-size: 10.5px;
+    line-height: 1.25;
+  }
+
+  .overview .context-evidence {
+    gap: 9px;
+    margin: var(--space-4) 0 0;
+    padding: 14px var(--space-4);
+  }
+
+  .overview .context-evidence-label {
+    font-size: 11.5px;
+    line-height: 1.3;
+  }
+
+  .overview-context-card .status-chip {
+    font-size: 10px;
+    line-height: 1.2;
+  }
+
+  .overview-context-card .context-list {
+    margin-top: var(--space-2);
+  }
+
+  .overview-context-card .context-list > div {
+    padding: var(--space-4) 0;
+  }
+
+  .overview-context-card .context-list dt {
+    gap: var(--space-2);
+    margin-bottom: 7px;
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
+  .overview-context-card .context-list dd {
+    font-size: 12.5px;
+    line-height: 1.52;
+  }
+
+  .overview-context-card .context-footer {
+    gap: var(--space-4);
+    margin-top: auto;
+    padding-top: var(--space-4);
+  }
+
+  .overview-context-card .context-footer small {
+    font-size: 9px;
+    line-height: 1.2;
+  }
+
+  .overview-context-card .context-footer strong {
+    margin-top: 2px;
+    font-size: 11.5px;
+    line-height: 1.3;
+  }
+
+  .overview-section-heading {
+    margin: var(--space-9) 0 var(--space-4);
+  }
+
+  .overview-section-heading h2 {
+    margin: 6px 0 0;
+    font-size: 19px;
+    line-height: 1.2;
+    letter-spacing: -0.018em;
+    font-weight: 700;
+  }
+
+  .overview-summary-grid {
+    gap: var(--space-4);
+  }
+
+  .overview-summary-card {
+    min-height: 0;
+    padding: var(--space-5);
+  }
+
+  .overview-summary-card .card-heading {
+    min-height: 24px;
+  }
+
+  .overview-summary-card .clean-list {
+    margin-top: var(--space-3);
+    gap: 9px;
+  }
+
+  .overview-summary-card .clean-list li {
+    font-size: 11.5px;
+    line-height: 1.5;
+  }
+
+  .overview-summary-card .release-stat {
+    margin-top: var(--space-3);
+  }
+
+  .overview-summary-card .release-stat strong {
+    font-size: 32px;
+    line-height: 1;
+  }
+
+  .overview-summary-card .release-stat span,
+  .overview-summary-card.release-card > p {
+    font-size: 10.5px;
+    line-height: 1.45;
+  }
+
+  .overview-summary-card .mini-progress {
+    margin: 12px 0 10px;
+  }
+
+  .overview-records-strip {
+    gap: var(--space-6);
+    margin-top: var(--space-4);
+    padding: var(--space-5) var(--space-6);
+  }
+
+  .overview-records-strip h3 {
+    margin: 5px 0 0;
+    font-size: 15px;
+    line-height: 1.25;
+  }
+
+  .overview-records-strip .record-items {
+    gap: var(--space-3);
+  }
+
+  .overview-records-strip .record-items b {
+    font-size: 10.5px;
+    line-height: 1.25;
+  }
+
+  .overview-records-strip .record-items small {
+    margin-top: 3px;
+    font-size: 9px;
+    line-height: 1.25;
+  }
+}
+
+@media (min-width: 1600px) {
+  .overview .release-heading {
+    margin-top: var(--space-1);
+  }
+}
