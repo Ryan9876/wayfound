@@ -229,7 +229,7 @@ The Interview must begin from user intent instead of forcing the user to transla
 
 **Requirement:**
 
-> When the current Interview pass has all required starter decisions, Wayfound MUST show a summary and a recommended next action so that the user knows what happens next.
+> When the current Interview pass has all currently required decisions, Wayfound MUST show a summary and a recommended next action so that the user knows what happens next.
 
 **Acceptance criteria:**
 
@@ -242,6 +242,114 @@ The Interview must begin from user intent instead of forcing the user to transla
 
 - Unit test for completion and summary behavior.
 - Manual browser review.
+
+
+### WF-008 — Select questions adaptively
+
+**Status:** Validated
+
+**Priority:** P0
+
+**User or system:** Wayfound
+
+**Requirement:**
+
+> When a user starts or continues an Interview, Wayfound MUST select the next required question from the user’s current idea and accepted decisions instead of forcing every user through one fixed question sequence.
+
+**Rationale:**
+
+A useful Interview should spend the user’s attention on decisions that can change the project. A game, study helper, shared family tool, and technical automation system do not need the same questions.
+
+**Acceptance criteria:**
+
+- Given the same idea and accepted answers, Wayfound selects the same next question.
+- A game idea can receive a game-specific question without receiving automation or external-dependency questions when those topics are not applicable.
+- A learning idea can receive a learning-specific question without receiving a game-specific question when game behavior is not applicable.
+- An automation idea can receive a control question.
+- An idea that mentions an external connection, API, service, or device can receive an external-dependency question.
+- The current local classifier exposes its detected signals as routing hints and does not present them as permanent facts about the project.
+
+**Constraints:**
+
+- The initial adaptive slice MUST remain local and deterministic.
+- The initial adaptive slice MUST NOT require an external AI service.
+- Keyword or rule-based classification is a bounded routing mechanism, not an authoritative interpretation of user intent.
+
+**Evidence / validation:**
+
+- Automated adaptive model tests.
+- Browser review across representative idea types.
+
+### WF-009 — Let answers change what must be asked next
+
+**Status:** Validated
+
+**Priority:** P0
+
+**User or system:** Wayfound
+
+**Requirement:**
+
+> When an accepted answer creates or removes a material decision, Wayfound MUST recalculate the applicable Interview questions so that later questions reflect the project’s current state.
+
+**Acceptance criteria:**
+
+- Choosing an automation control model that permits action can make failure behavior applicable.
+- Choosing a shared or public collaboration model can make privacy behavior applicable when privacy was not otherwise implied by the starting idea.
+- Choosing a one-person collaboration model does not by itself force a privacy question.
+- Answers that are no longer applicable do not count toward current progress or the completion summary.
+
+**Evidence / validation:**
+
+- Automated applicability tests.
+- Browser interaction review.
+
+### WF-010 — Calculate progress from useful required questions
+
+**Status:** Validated
+
+**Priority:** P1
+
+**User or system:** User
+
+**Requirement:**
+
+> While the Interview is active, Wayfound MUST calculate progress and completion from the required questions that currently apply so that the user is not measured against irrelevant work.
+
+**Acceptance criteria:**
+
+- The progress denominator changes when a newly applicable required question is introduced.
+- The Interview does not complete while a currently applicable required question is unanswered.
+- The Interview can complete when all currently applicable required questions have accepted answers.
+- Completion shows only applicable decisions in the current summary.
+
+**Evidence / validation:**
+
+- Automated completion and summary tests.
+- Full browser-flow validation.
+
+### WF-011 — Preserve choices during adaptive review
+
+**Status:** Validated
+
+**Priority:** P1
+
+**User or system:** User
+
+**Requirement:**
+
+> When a user goes back or reviews an adaptive Interview, Wayfound MUST preserve accepted choices and restore the applicable question context so that the user can revise a decision without restarting the Interview.
+
+**Acceptance criteria:**
+
+- Going back restores the prior question and its selected option.
+- Reviewing a completed Interview returns the user to the applicable decision flow with prior choices intact.
+- Changing the starting idea resets prior decision state because the earlier routing context may no longer apply.
+
+**Evidence / validation:**
+
+- Automated history test.
+- Browser keyboard and back-navigation review.
 
 ## 5. Non-functional requirements
 
@@ -287,7 +395,7 @@ The prototype uses standards-based HTML, CSS, and JavaScript. Formal supported-b
 
 Consequential Interview behavior must be represented in repository documentation and must have a practical validation path.
 
-The Interview decision model SHOULD remain separate from rendering logic so later adaptive question selection can evolve without requiring a complete UI rewrite.
+The Interview decision model SHOULD remain separate from rendering logic so question-routing rules or a future approved semantic classifier can evolve without requiring a complete UI rewrite.
 
 ## 6. Requirement index
 
@@ -300,6 +408,10 @@ The Interview decision model SHOULD remain separate from rendering logic so late
 | WF-005 | Preserve uncertainty explicitly | P0 | Validated | Automated state tests |
 | WF-006 | Use friendly, broad, precise language | P0 | Validated | UX content review |
 | WF-007 | End the first definition pass with a usable summary | P1 | Validated | Manual + state tests |
+| WF-008 | Select questions adaptively | P0 | Validated | Adaptive model + browser tests |
+| WF-009 | Let answers change what must be asked next | P0 | Validated | Applicability + browser tests |
+| WF-010 | Calculate progress from useful required questions | P1 | Validated | Completion + browser tests |
+| WF-011 | Preserve choices during adaptive review | P1 | Validated | History + browser tests |
 
 ## 7. Validation record
 
@@ -314,6 +426,18 @@ The Interview decision model SHOULD remain separate from rendering logic so late
 - Content smoke checks used game, school, family, hobby, and technical-system ideas.
 
 The current slice is validated for its defined prototype scope. It is not released as a production service.
+
+
+**2026-09-17 — Adaptive Interview slice**
+
+- `node --test tests/*.test.mjs`: 12 tests passed.
+- JavaScript syntax checks passed for `app/interview.js` and `app/interview-model.js`.
+- Browser validation confirmed different applicable question sets for game, learning, family/shared, and technical automation ideas.
+- Browser validation confirmed answer-driven applicability: control choices can add failure questions and sharing choices can add privacy questions.
+- A `not sure` answer creates a visible open question without creating a blocker by itself.
+- Full adaptive completion reached 100% using only the required questions applicable to the idea and accepted answers.
+- Keyboard selection, back-navigation, original-idea traceability, and responsive layouts down to 320 px were reviewed.
+- No external AI, persistence, account, or network dependency was introduced.
 
 ## 8. Change rule
 
