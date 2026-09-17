@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { requireActor } from '@/server/auth/clerk-actor';
-import { acceptInterviewAnswer } from '@/server/persistence/project-store';
+import { requireActor } from '@/server/auth/actor';
+import { acceptInterviewAnswer } from '@/server/persistence/store';
 import { commandErrorResponse, requestIdFrom } from '@/server/http/response';
 import { invalid } from '@/server/domain/errors';
 import { logCommandEvent } from '@/server/observability';
