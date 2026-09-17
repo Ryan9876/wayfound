@@ -1,4 +1,4 @@
-import { configurationError } from '../domain/errors';
+import { configurationError } from '../domain/errors.ts';
 
 export type AiProviderId = 'off' | 'ollama' | 'lmstudio' | 'openai-compatible';
 
