@@ -10,13 +10,13 @@ Do not use this file to redefine product scope or architecture. Update the autho
 
 ## 1. Current objective
 
-Deliver and validate traceable Interview records without introducing persistence or a second data authority.
+Deliver and validate draft build-artifact previews without approving, persisting, or executing generated artifacts.
 
-The records slice must project accepted Interview choices and derived uncertainty into structured records, show those records in Wayfound Records, and preserve the current session when the user moves between Interview and Records.
+The draft-artifact slice must transform current Records into a draft build brief, Journey, requirement candidates, and follow-up work while keeping every generated item traceable to its source Record and visibly unapproved.
 
-Included requirements: WF-012 through WF-013, while preserving WF-001 through WF-011.
+Included requirements: WF-014 through WF-015, while preserving WF-001 through WF-013.
 
-Excluded from this objective: persistence, accounts, external AI or model calls, code generation, production integrations, and production deployment.
+Excluded from this objective: artifact approval/promotion, persistence, accounts, external AI or model calls, code generation, production integrations, and production deployment.
 
 ## 2. Delivery rules
 
@@ -81,7 +81,6 @@ Excluded from this objective: persistence, accounts, external AI or model calls,
 
 **Status:** Validated
 
-
 ### M0.7 — Traceable Interview records
 
 **Goal:** Turn current Interview state into explicit records that Wayfound can show and later reference without creating a second authority.
@@ -101,11 +100,31 @@ Excluded from this objective: persistence, accounts, external AI or model calls,
 
 **Status:** Validated
 
+### M0.8 — Draft build artifacts
+
+**Goal:** Show how traceable Records can become useful build artifacts without confusing generated suggestions with approved state.
+
+**Entry criteria:** M0.7 traceable Interview records validated.
+
+**Exit criteria:**
+
+- Current Records can produce a draft build brief.
+- Accepted decisions produce traceable draft Journey steps.
+- Only mapped behavior decisions produce draft requirement candidates.
+- Assumptions, blockers, and open questions produce draft follow-up work.
+- `Not sure` and unresolved state do not become requirements.
+- Every generated artifact retains source Record IDs.
+- Records displays an unmistakable `Draft only` boundary.
+- Desktop and mobile browser review passes.
+- Artifact projection tests pass.
+
+**Status:** Validated
+
 ### M1 — Production architecture baseline
 
 **Goal:** Select the minimum production architecture required after the Interview experience is validated.
 
-**Entry criteria:** M0.7 traceable Interview records validated and next production outcome approved.
+**Entry criteria:** M0.8 draft build artifacts validated and next production outcome approved.
 
 **Exit criteria:**
 
@@ -149,7 +168,9 @@ Excluded from this objective: persistence, accounts, external AI or model calls,
 | Preserve adaptive back/review history | WF-011 | Implementation | Validated | Adaptive navigation | History + browser tests |
 | Implement structured Interview record projection | WF-012 | Implementation | Validated | Adaptive Interview state | Record-model tests |
 | Implement Records view for current session | WF-013 | Implementation | Validated | Record projection | Desktop + mobile browser review |
-| Select production architecture | Architecture / future ADRs | Project owner | Blocked | Validated Interview Records slice and next production outcome | Architecture review |
+| Derive draft build artifacts from Records | WF-014 | Implementation | Validated | Traceable Records | Artifact-model tests + browser review |
+| Show draft build artifacts in Records | WF-015 | Implementation | Validated | Draft artifact projection | Desktop + mobile browser review |
+| Select production architecture | Architecture / future ADRs | Project owner | Blocked | Validated Draft artifacts slice and next production outcome | Architecture review |
 
 ## 5. Work item standard
 
@@ -185,10 +206,10 @@ Do not use `blocked` for ordinary uncertainty that can be handled by a reversibl
 
 ## 7. Future work
 
-Next candidate work after the validated Interview Records slice:
+Next candidate work after the validated Draft artifacts slice:
 
 - richer semantic question routing if the deterministic classifier proves too limited
-- promote selected records into draft Requirements, Journey, and Work artifacts
+- add an explicit review/promotion workflow that can turn selected draft artifacts into approved project state
 - persistence with defined privacy and data authority
 - external AI assistance with explicit trust and data-processing boundaries
 - browser-level automated interaction and accessibility validation
