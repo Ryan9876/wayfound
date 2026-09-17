@@ -66,3 +66,34 @@ jobs:
         run: npm run migrate
       - name: PostgreSQL integration tests
         run: npm run test:integration
+      - name: Verify schema is present
+        env:
+          EXPECT_WAYFOUND_SCHEMA: present
+        run: npm run test:schema
+      - name: Backup synthetic M2 data
+        run: >-
+          docker run --rm --network host
+          -e PGPASSWORD=postgres
+          -v "${{ github.workspace }}/web:/backup"
+          postgres:17
+          pg_dump -h 127.0.0.1 -U postgres -d wayfound -Fc -f /backup/m2-ci.dump
+      - name: Restore synthetic M2 backup
+        run: |
+          docker run --rm --network host -e PGPASSWORD=postgres postgres:17 createdb -h 127.0.0.1 -U postgres wayfound_restore
+          docker run --rm --network host -e PGPASSWORD=postgres -v "${{ github.workspace }}/web:/backup" postgres:17 pg_restore -h 127.0.0.1 -U postgres -d wayfound_restore /backup/m2-ci.dump
+      - name: Verify restored project data
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/wayfound_restore
+        run: npm run test:restore
+      - name: Roll back M2 schema
+        run: npm run rollback
+      - name: Verify rollback removed M2 schema
+        env:
+          EXPECT_WAYFOUND_SCHEMA: absent
+        run: npm run test:schema
+      - name: Reapply M2 migration
+        run: npm run migrate
+      - name: Verify schema after reapply
+        env:
+          EXPECT_WAYFOUND_SCHEMA: present
+        run: npm run test:schema
