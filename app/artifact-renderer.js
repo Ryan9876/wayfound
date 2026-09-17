@@ -1,3 +1,5 @@
+import { renderArtifactReview } from './artifact-review-renderer.js';
+
 const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (character) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
 }[character]));
@@ -75,4 +77,6 @@ export function renderArtifactPreview(preview, artifacts) {
         <ul class="artifact-list">${work}</ul>
       </section>
     </div>`;
+
+  renderArtifactReview(preview, artifacts);
 }
