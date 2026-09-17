@@ -129,6 +129,7 @@ function renderComplete() {
       <p>Wayfound has turned the conversation into clear decisions. Next, it can turn those decisions into requirements, design choices, things to check, and a build plan.</p>
 
       <div class="summary-grid">
+        <div class="summary-card idea"><small>Your idea</small><strong>${escapeHtml(state.idea)}</strong></div>
         <div class="summary-card"><small>Primary outcome</small><strong>${escapeHtml(summary.outcome)}</strong></div>
         <div class="summary-card"><small>Control level</small><strong>${escapeHtml(summary.control)}</strong></div>
         <div class="summary-card"><small>Unknowns</small><strong>${escapeHtml(summary.unknowns)}</strong></div>
@@ -165,7 +166,7 @@ function renderProjectState() {
   const progressLabel = state.step === -1
     ? 'Start'
     : state.step >= QUESTION_BANK.length
-      ? 'Definition complete'
+      ? 'First pass complete'
       : getQuestion(QUESTION_BANK[state.step].id).stage;
   document.querySelector('#progressLabel').textContent = progressLabel;
 
@@ -189,7 +190,7 @@ function renderProjectState() {
 
   const decisionLog = document.querySelector('#decisionLog');
   decisionLog.innerHTML = recent.length
-    ? `<div class="separator"></div><div class="side-title compact">Recent decisions</div>${recent.map((question) => {
+    ? `<div class="separator"></div><div class="side-title compact">Recent choices</div>${recent.map((question) => {
         const option = getSelectedOption(state, question.id);
         return `<div class="decision-item"><strong>${escapeHtml(question.stage)}</strong>${escapeHtml(option.label)}</div>`;
       }).join('')}`
