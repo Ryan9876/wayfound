@@ -8,14 +8,15 @@ import { getDurableInterview, saveDurableInterviewAnswer } from '@/server/interv
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function GET(_request: Request, context: { params: Promise<{ projectId: string }> }): Promise<NextResponse> {
+export async function GET(request: Request, context: { params: Promise<{ projectId: string }> }): Promise<NextResponse> {
+  const requestId = requestIdFrom(request) ?? crypto.randomUUID();
   const { projectId } = await context.params;
   try {
     const actor = await requireActor();
     const interview = await getDurableInterview(actor.actorId, projectId);
     return NextResponse.json({ interview });
   } catch (error) {
-    return commandErrorResponse(error, { operation: 'get-durable-interview', projectId });
+    return commandErrorResponse(error, { requestId, operation: 'get-durable-interview', projectId });
   }
 }
 
