@@ -407,6 +407,7 @@ A useful Interview should spend the user’s attention on decisions that can cha
 - Browser interaction review at desktop and mobile widths.
 - Automated model tests for the record projection consumed by the page.
 
+
 ### WF-014 — Derive draft build artifacts from Records
 
 **Status:** Validated
@@ -465,6 +466,45 @@ A useful Interview should spend the user’s attention on decisions that can cha
 
 - Browser interaction and responsive review.
 - Artifact-model tests for empty, partial, and resolved record sets.
+
+### WF-016 — Review actionable draft artifacts without implying approval
+
+**Status:** Validated
+
+**Priority:** P0
+
+**User or system:** User
+
+**Requirement:**
+
+> When Wayfound shows actionable draft requirements or draft follow-up work, Wayfound MUST let the user explicitly leave the item as Draft, mark it Proposed for project-owner review, or Set it aside without representing any of those actions as formal approval.
+
+**Rationale:**
+
+Generated drafts need an intentional human disposition before they can become authoritative project state. In the current session-only prototype there is no identity or approval authority, so `Proposed` is the strongest safe promotion state.
+
+**Acceptance criteria:**
+
+- Draft requirements and draft work expose `Propose` and `Set aside` actions.
+- Proposed items are visibly labeled `Proposed` and the UI explains that Proposed means carry forward for project-owner review, not Approved.
+- Set-aside items are visibly labeled `Set aside`.
+- Proposed and Set-aside items can be returned to Draft with Undo.
+- The build brief and Journey preview are not reviewable promotion targets in this slice.
+- The review model does not accept an `approved` disposition.
+- If a reviewable artifact disappears, its saved review disposition is discarded.
+- If a reviewable artifact keeps the same identifier but its material content or source-record signature changes, its prior Proposed or Set-aside state is discarded and it returns to Draft.
+- Review state remains session-only and does not change the source Record or generated Draft artifact status.
+
+**Constraints:**
+
+- This slice MUST NOT create formal approval authority.
+- This slice MUST NOT persist review state outside the current browser session.
+- Formal approval requires a later explicit design for project authority, identity, persistence, and auditability.
+
+**Evidence / validation:**
+
+- Seven automated artifact-review model tests pass, including invalid-approval rejection and stale-content reset.
+- Chromium browser validation passed for Propose, Set aside, Undo, explicit non-approval language, stale-content reset, and responsive behavior at 1440 px and 390 px with no horizontal overflow.
 
 ## 5. Non-functional requirements
 
@@ -531,6 +571,7 @@ The Interview decision model SHOULD remain separate from rendering logic so ques
 | WF-013 | Show current Interview records in Wayfound Records | P1 | Validated | Browser + record-model tests |
 | WF-014 | Derive draft build artifacts from Records | P0 | Validated | Artifact-model + browser tests |
 | WF-015 | Show draft outputs clearly in Records | P1 | Validated | Browser + artifact-model tests |
+| WF-016 | Review actionable draft artifacts without implying approval | P0 | Validated | Review-state model + Chromium interaction tests |
 
 ## 7. Validation record
 
@@ -568,6 +609,7 @@ The current slice is validated for its defined prototype scope. It is not releas
 - Mobile navigation was added so Interview and Records remain reachable after the desktop sidebar collapses.
 - Records remain session-only and derived from Interview state; no persistence or second data authority was introduced.
 
+
 **2026-09-17 — Draft artifact preview slice**
 
 - The complete model suite reached 23 passing tests before modularization; the isolated artifact module revalidation adds six passing artifact-projection tests with the adaptive Interview/Records core unchanged.
@@ -576,6 +618,18 @@ The current slice is validated for its defined prototype scope. It is not releas
 - Representative partial state did not manufacture requirement candidates from outcome/audience-only decisions or unresolved `not sure` answers.
 - Desktop and 390 px mobile layouts were reviewed with no horizontal overflow.
 - Generated artifacts remain session-only projections. No persistence, approval, publishing, code generation, external AI, or execution behavior was introduced.
+
+**2026-09-17 — Artifact review slice (implementation evidence)**
+
+- Seven artifact-review model tests pass.
+- The model supports Draft, Proposed, and Set aside, and rejects `approved` as an invalid disposition.
+- Proposed artifacts are returned as separate proposed views while the underlying generated artifact remains `draft`.
+- Dispositions are reconciled away when artifacts disappear.
+- A content/source signature change resets prior Proposed or Set-aside state to Draft even when the artifact identifier is unchanged.
+- JavaScript syntax checks pass for the review model and renderer.
+- Browser interaction validation passed in headless Chromium using an isolated injected review harness after local URL navigation was blocked by environment policy. Propose, Set aside, Undo, explicit non-approval language, and same-ID content-change reset all passed.
+- Responsive validation passed at 1440 px and 390 px with no horizontal overflow; the review summary and artifact grid stack correctly at mobile width.
+- The browser harness exercised the exact review-state and review-rendering behavior without deploying Wayfound or adding a network/data boundary.
 
 ## 8. Change rule
 

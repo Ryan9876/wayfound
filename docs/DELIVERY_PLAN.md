@@ -10,13 +10,13 @@ Do not use this file to redefine product scope or architecture. Update the autho
 
 ## 1. Current objective
 
-Deliver and validate draft build-artifact previews without approving, persisting, or executing generated artifacts.
+Implement and validate a bounded artifact-review step without turning a browser-session choice into formal approval.
 
-The draft-artifact slice must transform current Records into a draft build brief, Journey, requirement candidates, and follow-up work while keeping every generated item traceable to its source Record and visibly unapproved.
+The artifact-review slice must let users explicitly propose or set aside actionable draft requirements and follow-up work while preserving source traceability, keeping formal approval separate, and resetting stale review state when artifact content changes.
 
-Included requirements: WF-014 through WF-015, while preserving WF-001 through WF-013.
+Included requirement: WF-016, while preserving WF-001 through WF-015.
 
-Excluded from this objective: artifact approval/promotion, persistence, accounts, external AI or model calls, code generation, production integrations, and production deployment.
+Excluded from this objective: formal approval, persistent proposal state, accounts, external AI or model calls, code generation, production integrations, and production deployment.
 
 ## 2. Delivery rules
 
@@ -120,11 +120,30 @@ Excluded from this objective: artifact approval/promotion, persistence, accounts
 
 **Status:** Validated
 
+### M0.9 — Review actionable draft artifacts
+
+**Goal:** Let users explicitly carry actionable drafts forward for project-owner review, or set them aside, without confusing that review state with approval.
+
+**Entry criteria:** M0.8 draft build artifacts validated.
+
+**Exit criteria:**
+
+- Draft requirements and draft follow-up work can remain Draft, be marked Proposed, or be Set aside.
+- Build brief and Journey preview remain descriptive and are not promotion targets in this slice.
+- Proposed is visibly explained as pending project-owner review and never as approval.
+- The review model rejects an Approved disposition.
+- Undo returns Proposed or Set aside items to Draft.
+- Review state for an artifact is discarded if the artifact disappears or its content/source signature changes.
+- Review-state model tests pass.
+- Browser interaction and responsive validation pass before the milestone is marked Validated.
+
+**Status:** Validated — 7 review-state model tests and the Chromium interaction/responsive browser gate pass.
+
 ### M1 — Production architecture baseline
 
 **Goal:** Select the minimum production architecture required after the Interview experience is validated.
 
-**Entry criteria:** M0.8 draft build artifacts validated and next production outcome approved.
+**Entry criteria:** M0.9 artifact review validated and next production outcome approved.
 
 **Exit criteria:**
 
@@ -170,7 +189,8 @@ Excluded from this objective: artifact approval/promotion, persistence, accounts
 | Implement Records view for current session | WF-013 | Implementation | Validated | Record projection | Desktop + mobile browser review |
 | Derive draft build artifacts from Records | WF-014 | Implementation | Validated | Traceable Records | Artifact-model tests + browser review |
 | Show draft build artifacts in Records | WF-015 | Implementation | Validated | Draft artifact projection | Desktop + mobile browser review |
-| Select production architecture | Architecture / future ADRs | Project owner | Blocked | Validated Draft artifacts slice and next production outcome | Architecture review |
+| Review actionable draft artifacts | WF-016 | Implementation | Validated | Validated Draft artifacts | 7 model tests + Chromium interaction/responsive gate |
+| Select production architecture | Architecture / future ADRs | Project owner | Blocked | Validated artifact-review slice and next production outcome | Architecture review |
 
 ## 5. Work item standard
 
@@ -206,10 +226,10 @@ Do not use `blocked` for ordinary uncertainty that can be handled by a reversibl
 
 ## 7. Future work
 
-Next candidate work after the validated Draft artifacts slice:
+Next candidate work after the artifact-review slice:
 
 - richer semantic question routing if the deterministic classifier proves too limited
-- add an explicit review/promotion workflow that can turn selected draft artifacts into approved project state
+- define formal project-owner approval/promotion behavior after identity and authoritative-state boundaries are selected
 - persistence with defined privacy and data authority
 - external AI assistance with explicit trust and data-processing boundaries
 - browser-level automated interaction and accessibility validation

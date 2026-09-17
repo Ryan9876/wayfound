@@ -1,3 +1,5 @@
+import { renderArtifactReview } from './artifact-review-renderer.js';
+
 const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (character) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
 }[character]));
@@ -23,7 +25,7 @@ export function renderArtifactPreview(preview, artifacts) {
 
   const requirements = artifacts.requirements.length
     ? artifacts.requirements.map((item) => `
-        <li class="artifact-item">
+        <li class="artifact-item" data-reviewable-artifact data-artifact-id="${escapeHtml(item.id)}">
           <div class="artifact-item-meta"><span class="artifact-id">${escapeHtml(item.id)}</span><span>${escapeHtml(item.category)}</span></div>
           <strong>${escapeHtml(item.title)}</strong>
           <small>${escapeHtml(item.statement)}</small>
@@ -33,7 +35,7 @@ export function renderArtifactPreview(preview, artifacts) {
 
   const work = artifacts.work.length
     ? artifacts.work.map((item) => `
-        <li class="artifact-item">
+        <li class="artifact-item" data-reviewable-artifact data-artifact-id="${escapeHtml(item.id)}">
           <div class="artifact-item-meta"><span class="artifact-id">${escapeHtml(item.id)}</span><span>${escapeHtml(recordTypeLabel(item.workType))}</span></div>
           <strong>${escapeHtml(item.title)}</strong>
           <small>${escapeHtml(item.statement)}</small>
@@ -75,4 +77,6 @@ export function renderArtifactPreview(preview, artifacts) {
         <ul class="artifact-list">${work}</ul>
       </section>
     </div>`;
+
+  renderArtifactReview(preview, artifacts);
 }
