@@ -1,0 +1,38 @@
+{
+  "name": "@wayfound/web",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test tests/domain-rules.test.mjs tests/observability.test.mjs tests/ai-provider.test.mjs",
+    "test:local": "tsx --test tests/local-integration.test.mjs",
+    "test:e2e": "playwright test",
+    "test:integration": "tsx --test tests/actor-mapping.integration.test.mjs tests/postgres-integration.test.mjs",
+    "test:schema": "node --test tests/schema-state.test.mjs",
+    "test:restore": "node --test tests/restore-smoke.test.mjs",
+    "migrate": "node scripts/migrate.mjs",
+    "rollback": "node scripts/migrate.mjs db/migrations/0001_m2_durable_project.rollback.sql"
+  },
+  "dependencies": {
+    "@clerk/nextjs": "7.9.4",
+    "better-sqlite3": "13.0.3",
+    "next": "16.3.5",
+    "pg": "8.23.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/better-sqlite3": "9.6.0",
+    "@types/node": "^24.0.0",
+    "@types/pg": "8.23.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "tsx": "4.23.13",
+    "typescript": "5.8.3"
+  }
+}

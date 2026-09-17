@@ -1,0 +1,90 @@
+name: M2 local-first CI
+
+on:
+  pull_request:
+    paths:
+      - 'web/**'
+      - '.github/workflows/m2-web-ci.yml'
+      - 'docs/PRODUCT_REQUIREMENTS.md'
+      - 'docs/DELIVERY_PLAN.md'
+      - 'docs/ARCHITECTURE.md'
+      - 'docs/adr/0007-production-stack-selection.md'
+      - 'docs/adr/0009-local-first-runtime.md'
+
+permissions:
+  contents: read
+
+jobs:
+  local-wayfound:
+    runs-on: ubuntu-latest
+    env:
+      WAYFOUND_IDENTITY_MODE: local
+      WAYFOUND_PERSISTENCE_MODE: local
+      WAYFOUND_AI_PROVIDER: 'off'
+      WAYFOUND_LOCAL_DB: /tmp/wayfound-e2e.sqlite
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+      - name: Domain and AI boundary tests
+        run: npm test
+      - name: Local SQLite integration
+        run: npm run test:local
+      - name: Type check
+        run: npm run typecheck
+      - name: Production build
+        run: npm run build
+      - name: Install Chromium for local browser validation
+        run: npx playwright install --with-deps chromium
+      - name: Local browser flow
+        run: npm run test:e2e
+
+  optional-postgres-compatibility:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: wayfound
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d wayfound"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/wayfound
+      WAYFOUND_DATA_ENV: development
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+      - name: Apply hosted compatibility migration
+        run: npm run migrate
+      - name: PostgreSQL compatibility tests
+        run: npm run test:integration
+      - name: Verify schema is present
+        env:
+          EXPECT_WAYFOUND_SCHEMA: present
+        run: npm run test:schema
+      - name: Roll back hosted compatibility schema
+        run: npm run rollback
+      - name: Verify rollback removed schema
+        env:
+          EXPECT_WAYFOUND_SCHEMA: absent
+        run: npm run test:schema
