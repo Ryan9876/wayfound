@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { requireActor } from '@/server/auth/clerk-actor';
-import { getProject } from '@/server/persistence/project-store';
+import { requireActor } from '@/server/auth/actor';
+import { getProject } from '@/server/persistence/store';
 import { commandErrorResponse } from '@/server/http/response';
 
 export const runtime = 'nodejs';
