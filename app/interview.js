@@ -1,13 +1,18 @@
 import {
-  QUESTION_BANK,
+  advanceInterview,
+  classifyIdea,
   createInitialState,
   deriveProjectState,
-  getCoveragePercent,
-  getQuestion,
+  getApplicableQuestions,
+  getProgress,
+  getResolvedQuestion,
   getSelectedOption,
   getSummary,
+  goBackInterview,
   isInterviewComplete,
-  selectAnswer
+  reviewInterview,
+  selectAnswer,
+  startInterview
 } from './interview-model.js';
 
 let state = createInitialState();
@@ -24,14 +29,39 @@ const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (character) => (
   "'": '&#039;'
 }[character]));
 
+function renderIdeaHints() {
+  const hints = document.querySelector('#ideaHints');
+  if (!hints) return;
+  const tags = state.idea.trim() ? classifyIdea(state.idea) : [];
+  const friendlyTag = {
+    game: 'game or play',
+    learning: 'learning',
+    automation: 'something that can act for you',
+    integration: 'outside connections',
+    physical: 'devices or hardware',
+    collaboration: 'sharing with people',
+    'private-data': 'private information',
+    technical: 'a technical system',
+    general: 'a general idea'
+  };
+  hints.innerHTML = tags.length
+    ? `<div class="reason-box"><strong>What Wayfound noticed</strong><br>${escapeHtml(tags.map((tag) => friendlyTag[tag] ?? tag).join(', '))}<br><br><span>These are just clues Wayfound uses to pick better questions. Your idea can still change.</span></div>`
+    : '';
+}
+
 function setIdea(value) {
-  state = { ...state, idea: value };
-  render();
+  const changed = value !== state.idea;
+  state = changed
+    ? { ...createInitialState(), idea: value }
+    : { ...state, idea: value };
+  nextButton.disabled = !state.idea.trim();
+  renderIdeaHints();
+  renderProjectState();
 }
 
 function useDemoIdea() {
   state = {
-    ...state,
+    ...createInitialState(),
     idea: 'I want to make a game where you explore a weird little planet, collect clues, solve puzzles, and slowly figure out why all the robots are afraid of ducks.'
   };
   render();
@@ -43,24 +73,18 @@ function chooseOption(questionId, optionId) {
 }
 
 function continueInterview() {
-  if (state.step === -1) {
-    if (!state.idea.trim()) return;
-    state = { ...state, step: 0 };
-  } else if (state.step < QUESTION_BANK.length) {
-    const question = QUESTION_BANK[state.step];
-    if (!state.answers[question.id]) return;
-    state = { ...state, step: state.step + 1 };
+  if (!state.started) {
+    state = startInterview(state);
+  } else if (state.complete) {
+    state = reviewInterview(state);
   } else {
-    state = { ...state, step: 0 };
+    state = advanceInterview(state);
   }
   render();
 }
 
 function goBack() {
-  if (state.step <= -1) return;
-  if (state.step === 0) state = { ...state, step: -1 };
-  else if (state.step > QUESTION_BANK.length - 1) state = { ...state, step: QUESTION_BANK.length - 1 };
-  else state = { ...state, step: state.step - 1 };
+  state = goBackInterview(state);
   render();
 }
 
@@ -71,19 +95,23 @@ function renderStart() {
     <p class="question-help">Describe it in your own words. It can be rough, half-formed, or wildly ambitious. Wayfound will help sort it out.</p>
     <textarea id="ideaBox" placeholder="Example: I want to make a game where you explore a weird little planet and solve puzzles.">${escapeHtml(state.idea)}</textarea>
     <button class="text-action" id="demoIdeaBtn" type="button">Try a demo idea</button>
+    <div id="ideaHints"></div>
     <div class="why-box"><strong>What happens next</strong><br>Wayfound looks for what is clear, what is missing, and what could cause trouble later. Then it asks the next question that is actually worth answering.</div>
   `;
 
   document.querySelector('#ideaBox').addEventListener('input', (event) => setIdea(event.target.value));
   document.querySelector('#demoIdeaBtn').addEventListener('click', useDemoIdea);
+  renderIdeaHints();
   backButton.hidden = true;
   nextButton.textContent = 'Begin interview';
   nextButton.disabled = !state.idea.trim();
 }
 
 function renderQuestion() {
-  const question = QUESTION_BANK[state.step];
+  const question = getResolvedQuestion(state, state.currentQuestionId);
   const selectedOption = getSelectedOption(state, question.id);
+  const selectedIsRecommended = selectedOption?.id === question.recommendation?.optionId;
+  const recommendedOption = question.options.find((option) => option.recommended);
 
   questionBody.innerHTML = `
     <div class="stage-kicker">${escapeHtml(question.stage)}</div>
@@ -103,9 +131,14 @@ function renderQuestion() {
           </button>`;
       }).join('')}
     </div>
-    ${selectedOption?.reason ? `
-      <div class="reason-box"><strong>Why this is recommended</strong><br>${escapeHtml(selectedOption.reason)}
-      <br><br><strong>Tradeoff</strong><br>${escapeHtml(selectedOption.tradeoff)}</div>` : ''}
+    ${selectedOption ? `
+      <div class="reason-box">
+        <strong>${selectedIsRecommended ? 'Why Wayfound recommends this' : 'What to know about this choice'}</strong><br>
+        ${selectedIsRecommended
+          ? escapeHtml(question.recommendation?.reason ?? '')
+          : `Wayfound's starting recommendation is <strong>${escapeHtml(recommendedOption?.label ?? 'another option')}</strong>${question.recommendation?.reason ? ` because ${escapeHtml(question.recommendation.reason.charAt(0).toLowerCase() + question.recommendation.reason.slice(1))}` : '.'}`}
+        <br><br><strong>Tradeoff</strong><br>${escapeHtml(selectedOption.tradeoff ?? 'No material tradeoff is recorded yet.')}
+      </div>` : ''}
     <div class="why-box"><strong>Why Wayfound is asking this</strong><br>${escapeHtml(question.why)}</div>
   `;
 
@@ -114,7 +147,7 @@ function renderQuestion() {
   });
 
   backButton.hidden = false;
-  nextButton.textContent = state.step === QUESTION_BANK.length - 1 ? 'Finish interview' : 'Accept & continue';
+  nextButton.textContent = 'Accept & continue';
   nextButton.disabled = !state.answers[question.id];
 }
 
@@ -124,69 +157,68 @@ function renderComplete() {
 
   questionBody.innerHTML = `
     <div class="complete">
-      <div class="complete-badge">✓ First definition pass complete</div>
+      <div class="complete-badge">✓ First adaptive pass complete</div>
       <h2>You know enough to shape the first real version.</h2>
-      <p>Wayfound has turned the conversation into clear decisions. Next, it can turn those decisions into requirements, design choices, things to check, and a build plan.</p>
+      <p>Wayfound asked the questions that matched this idea and skipped the ones that did not. Next, these choices can become requirements, design decisions, things to check, and a build plan.</p>
 
       <div class="summary-grid">
         <div class="summary-card idea"><small>Your idea</small><strong>${escapeHtml(state.idea)}</strong></div>
-        <div class="summary-card"><small>Primary outcome</small><strong>${escapeHtml(summary.outcome)}</strong></div>
-        <div class="summary-card"><small>Control level</small><strong>${escapeHtml(summary.control)}</strong></div>
-        <div class="summary-card"><small>Unknowns</small><strong>${escapeHtml(summary.unknowns)}</strong></div>
-        <div class="summary-card"><small>Done means</small><strong>${escapeHtml(summary.validation)}</strong></div>
+        ${summary.decisions.map((decision) => `<div class="summary-card"><small>${escapeHtml(decision.label)}</small><strong>${escapeHtml(decision.value)}</strong></div>`).join('')}
       </div>
 
       <div class="next-step">
         <small>Recommended next action</small>
-        <strong>Turn these decisions into the first requirements and flag anything that truly blocks the next step.</strong>
+        <strong>Turn these choices into the first requirements and keep any open questions attached to the work they could affect.</strong>
       </div>
 
-      <div class="why-box"><strong>Traceability preview</strong><br>Each answer becomes a decision Wayfound can point back to later. Future requirements, design choices, tasks, tests, and releases can show where they came from.</div>
+      <div class="why-box"><strong>Traceability preview</strong><br>Each answer is tied to the question that created it. Future requirements, design choices, tasks, tests, and releases can point back to that decision.</div>
 
-      ${derived.blockers.length ? `<div class="warning-box"><strong>Blocking item</strong><br>${escapeHtml(derived.blockers[0])}</div>` : ''}
+      ${derived.blockers.length ? `<div class="warning-box"><strong>Something is stopping dependent work</strong><br>${escapeHtml(derived.blockers[0])}</div>` : ''}
     </div>
   `;
 
   backButton.hidden = false;
-  nextButton.textContent = 'Review decisions';
+  nextButton.textContent = 'Review choices';
   nextButton.disabled = false;
 }
 
 function renderProjectState() {
-  const coverage = getCoveragePercent(state);
+  const progress = getProgress(state);
   const derived = deriveProjectState(state);
-  const questionStatus = (id) => state.answers[id] ? 'Defined' : 'Open';
-  const doneClass = (id) => state.answers[id] ? ' done' : '';
+  const applicable = state.idea.trim() ? getApplicableQuestions(state) : [];
+  const answeredApplicable = applicable.filter((question) => state.answers[question.id]);
 
-  document.querySelector('#coveragePct').textContent = `${coverage}%`;
-  document.querySelector('#miniFill').style.width = `${coverage}%`;
-  document.querySelector('#progressBar').style.width = `${coverage}%`;
-  document.querySelector('#progressCount').textContent = `${Object.keys(state.answers).length} of ${QUESTION_BANK.length} decisions`;
+  document.querySelector('#coveragePct').textContent = `${progress.percent}%`;
+  document.querySelector('#miniFill').style.width = `${progress.percent}%`;
+  document.querySelector('#progressBar').style.width = `${progress.percent}%`;
+  document.querySelector('#progressCount').textContent = progress.total
+    ? `${progress.answered} of ${progress.total} useful choices`
+    : '0 choices made';
 
-  const progressLabel = state.step === -1
+  const progressLabel = !state.started
     ? 'Start'
-    : state.step >= QUESTION_BANK.length
+    : state.complete || isInterviewComplete(state)
       ? 'First pass complete'
-      : getQuestion(QUESTION_BANK[state.step].id).stage;
+      : getResolvedQuestion(state, state.currentQuestionId)?.stage ?? 'Next useful question';
   document.querySelector('#progressLabel').textContent = progressLabel;
 
-  document.querySelector('#sProblem').textContent = state.idea.trim() ? 'Defined' : 'Open';
-  document.querySelector('#sProblem').className = `state-value${state.idea.trim() ? ' done' : ''}`;
+  const stateList = document.querySelector('#stateList');
+  const rows = [
+    `<div class="state-row"><span>Idea</span><span class="state-value${state.idea.trim() ? ' done' : ''}">${state.idea.trim() ? 'Defined' : 'Open'}</span></div>`,
+    ...applicable.map((question) => `<div class="state-row"><span>${escapeHtml(question.stateLabel)}</span><span class="state-value${state.answers[question.id] ? ' done' : ''}">${state.answers[question.id] ? 'Defined' : 'Open'}</span></div>`)
+  ];
+  stateList.innerHTML = rows.join('');
 
-  ['outcome', 'control', 'dependencies', 'failure', 'unknowns', 'validation'].forEach((id) => {
-    const element = document.querySelector(`#s-${id}`);
-    element.textContent = questionStatus(id);
-    element.className = `state-value${doneClass(id)}`;
-  });
-
-  document.querySelector('#decisionCount').textContent = Object.keys(state.answers).length;
+  document.querySelector('#decisionCount').textContent = answeredApplicable.length;
   document.querySelector('#assumptionCount').textContent = derived.assumptions.length;
   document.querySelector('#blockerCount').textContent = derived.blockers.length;
   document.querySelector('#openQuestionCount').textContent = derived.openQuestions.length;
 
-  const recent = QUESTION_BANK
-    .filter((question) => state.answers[question.id])
-    .slice(-3);
+  const recentIds = [...state.history, state.currentQuestionId].filter(Boolean);
+  const recent = [...new Set(recentIds)]
+    .filter((id) => state.answers[id] && applicable.some((question) => question.id === id))
+    .slice(-3)
+    .map((id) => getResolvedQuestion(state, id));
 
   const decisionLog = document.querySelector('#decisionLog');
   decisionLog.innerHTML = recent.length
@@ -198,10 +230,9 @@ function renderProjectState() {
 }
 
 function render() {
-  if (state.step === -1) renderStart();
-  else if (state.step >= QUESTION_BANK.length && isInterviewComplete(state)) renderComplete();
+  if (!state.started) renderStart();
+  else if (state.complete && isInterviewComplete(state)) renderComplete();
   else renderQuestion();
-
   renderProjectState();
 }
 
