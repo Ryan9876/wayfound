@@ -23,7 +23,7 @@ test('local project survives navigation, saves a decision, proposes exact-source
   await page.getByRole('button', { name: 'Propose requirement' }).click();
   await expect(page.getByText('Project version 3')).toBeVisible();
   await expect(page.getByText(/REQ-DECISION-SPEED · proposed/)).toBeVisible();
-  await expect(page.getByText('Proposed. Still not approved — important little distinction.')).toBeVisible();
+  await expect(page.getByText('Proposal saves an exact revision and source link. M2 has no Approve button.')).toBeVisible();
 
   // Reopen through the saved-project list to prove navigation/session loss is not the authority.
   await page.getByRole('link', { name: 'Projects' }).click();
