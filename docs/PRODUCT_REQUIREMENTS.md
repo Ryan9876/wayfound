@@ -70,7 +70,7 @@ Priority does not replace status. A P0 requirement can still be Proposed.
 
 ### WF-001 — Capture the user's starting idea
 
-**Status:** Implemented
+**Status:** Validated
 
 **Priority:** P0
 
@@ -102,7 +102,7 @@ The Interview must begin from user intent instead of forcing the user to transla
 
 ### WF-002 — Present one guided decision at a time
 
-**Status:** Implemented
+**Status:** Validated
 
 **Priority:** P0
 
@@ -126,7 +126,7 @@ The Interview must begin from user intent instead of forcing the user to transla
 
 ### WF-003 — Explain recommendations and tradeoffs
 
-**Status:** Implemented
+**Status:** Validated
 
 **Priority:** P0
 
@@ -152,7 +152,7 @@ The Interview must begin from user intent instead of forcing the user to transla
 
 ### WF-004 — Keep project state visible
 
-**Status:** Implemented
+**Status:** Validated
 
 **Priority:** P1
 
@@ -176,7 +176,7 @@ The Interview must begin from user intent instead of forcing the user to transla
 
 ### WF-005 — Preserve uncertainty explicitly
 
-**Status:** Implemented
+**Status:** Validated
 
 **Priority:** P0
 
@@ -198,7 +198,7 @@ The Interview must begin from user intent instead of forcing the user to transla
 
 ### WF-006 — Use friendly, broad, precise language
 
-**Status:** Implemented
+**Status:** Validated
 
 **Priority:** P0
 
@@ -221,7 +221,7 @@ The Interview must begin from user intent instead of forcing the user to transla
 
 ### WF-007 — End the first definition pass with a usable summary
 
-**Status:** Implemented
+**Status:** Validated
 
 **Priority:** P1
 
@@ -293,14 +293,28 @@ The Interview decision model SHOULD remain separate from rendering logic so late
 
 | ID | Name | Priority | Status | Validation |
 | --- | --- | --- | --- | --- |
-| WF-001 | Capture the user's starting idea | P0 | Implemented | Manual + state tests |
-| WF-002 | Present one guided decision at a time | P0 | Implemented | Manual + state tests |
-| WF-003 | Explain recommendations and tradeoffs | P0 | Implemented | Manual review |
-| WF-004 | Keep project state visible | P1 | Implemented | Manual + state tests |
-| WF-005 | Preserve uncertainty explicitly | P0 | Implemented | Automated state tests |
-| WF-006 | Use friendly, broad, precise language | P0 | Implemented | UX content review |
-| WF-007 | End the first definition pass with a usable summary | P1 | Implemented | Manual + state tests |
+| WF-001 | Capture the user's starting idea | P0 | Validated | Manual + state tests |
+| WF-002 | Present one guided decision at a time | P0 | Validated | Manual + state tests |
+| WF-003 | Explain recommendations and tradeoffs | P0 | Validated | Manual review |
+| WF-004 | Keep project state visible | P1 | Validated | Manual + state tests |
+| WF-005 | Preserve uncertainty explicitly | P0 | Validated | Automated state tests |
+| WF-006 | Use friendly, broad, precise language | P0 | Validated | UX content review |
+| WF-007 | End the first definition pass with a usable summary | P1 | Validated | Manual + state tests |
 
-## 7. Change rule
+## 7. Validation record
+
+**2026-09-17 — Initial Interview slice**
+
+- `node --test tests/*.test.mjs`: 6 tests passed.
+- JavaScript syntax checks passed for `app/interview.js` and `app/interview-model.js`.
+- Headless Chromium completed the full six-decision Interview flow.
+- Keyboard selection, back-navigation, non-recommended choices, blocker visibility, completion summary, and review flow were exercised.
+- Responsive review passed at 1440, 980, 680, 390, and 320 pixel viewport widths with no horizontal overflow.
+- The completion summary includes the original idea and selected decision labels.
+- Content smoke checks used game, school, family, hobby, and technical-system ideas.
+
+The current slice is validated for its defined prototype scope. It is not released as a production service.
+
+## 8. Change rule
 
 When implementation changes observable product behavior, update the applicable requirement before or with the code change. When a requirement is intentionally changed, update its acceptance criteria and identify affected implementation and tests.
