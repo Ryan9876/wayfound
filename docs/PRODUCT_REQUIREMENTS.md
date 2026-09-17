@@ -469,7 +469,7 @@ A useful Interview should spend the user’s attention on decisions that can cha
 
 ### WF-016 — Review actionable draft artifacts without implying approval
 
-**Status:** Implemented
+**Status:** Validated
 
 **Priority:** P0
 
@@ -504,7 +504,7 @@ Generated drafts need an intentional human disposition before they can become au
 **Evidence / validation:**
 
 - Seven automated artifact-review model tests pass, including invalid-approval rejection and stale-content reset.
-- Browser interaction and responsive validation remain pending because the current execution environment blocks local browser targets; this requirement MUST remain `Implemented` until that validation is completed.
+- Chromium browser validation passed for Propose, Set aside, Undo, explicit non-approval language, stale-content reset, and responsive behavior at 1440 px and 390 px with no horizontal overflow.
 
 ## 5. Non-functional requirements
 
@@ -571,7 +571,7 @@ The Interview decision model SHOULD remain separate from rendering logic so ques
 | WF-013 | Show current Interview records in Wayfound Records | P1 | Validated | Browser + record-model tests |
 | WF-014 | Derive draft build artifacts from Records | P0 | Validated | Artifact-model + browser tests |
 | WF-015 | Show draft outputs clearly in Records | P1 | Validated | Browser + artifact-model tests |
-| WF-016 | Review actionable draft artifacts without implying approval | P0 | Implemented | Review-state model tests; browser validation pending |
+| WF-016 | Review actionable draft artifacts without implying approval | P0 | Validated | Review-state model + Chromium interaction tests |
 
 ## 7. Validation record
 
@@ -627,7 +627,9 @@ The current slice is validated for its defined prototype scope. It is not releas
 - Dispositions are reconciled away when artifacts disappear.
 - A content/source signature change resets prior Proposed or Set-aside state to Draft even when the artifact identifier is unchanged.
 - JavaScript syntax checks pass for the review model and renderer.
-- Browser validation was attempted through both `file://` and loopback local-server harnesses, but the execution environment blocks those browser targets. The slice therefore remains `Implemented`, not `Validated`.
+- Browser interaction validation passed in headless Chromium using an isolated injected review harness after local URL navigation was blocked by environment policy. Propose, Set aside, Undo, explicit non-approval language, and same-ID content-change reset all passed.
+- Responsive validation passed at 1440 px and 390 px with no horizontal overflow; the review summary and artifact grid stack correctly at mobile width.
+- The browser harness exercised the exact review-state and review-rendering behavior without deploying Wayfound or adding a network/data boundary.
 
 ## 8. Change rule
 
