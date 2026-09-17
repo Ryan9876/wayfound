@@ -169,7 +169,7 @@ Excluded from M2 until separately approved: formal Artifact approval, public pro
 - Hosted adapters, if retained, do not become required dependencies for local operation.
 - Release decision is explicit.
 
-**Status:** In progress — local SQLite/Actor/AI provider adapters are being integrated and CI is being converted to make local operation the primary M2 gate.
+**Status:** Validated — M2 local-first CI run #66 passes the complete local gate: domain/AI tests, SQLite integration and reopen behavior, TypeScript, production build without hosted credentials, Chromium create/reopen/save/propose/stale-conflict flow, 390 px responsive check, and optional PostgreSQL compatibility.
 
 ## 4. Active work
 
@@ -179,12 +179,12 @@ Excluded from M2 until separately approved: formal Artifact approval, public pro
 | Preserve traceable Records and Draft artifact/review behavior | WF-012 through WF-016 | Implementation | Validated | M0.7-M0.9 | Existing model + browser evidence |
 | Preserve durable domain/command/revision boundaries | ADR-0001 through ADR-0006 | Implementation | Accepted | M1 | Architecture + domain tests |
 | Correct runtime to local-first | ADR-0009 | Project owner | Accepted | Project-owner decision | ADR + architecture reconciliation |
-| Implement stable local human Actor | WF-017 / ADR-0009 | Implementation | Implemented; validation pending | Local SQLite | Local integration test |
-| Implement local SQLite project store | WF-018 through WF-021 / ADR-0009 | Implementation | Implemented; validation pending | SQLite schema | Local integration + reopen tests |
-| Preserve exact revisions, trace links, idempotency, and stale-write checks locally | WF-019 through WF-021 | Implementation | Implemented; validation pending | Local project store | Local integration tests |
-| Add local/provider-optional AI adapter boundary | WF-022 / ADR-0009 | Implementation | Implemented; validation pending | Provider configuration | AI boundary tests |
-| Make local runtime build without hosted credentials | ADR-0009 | Implementation | Implemented; CI pending | Next.js + SQLite native package | Typecheck + production build |
-| Retain PostgreSQL/Clerk hosted adapters as optional compatibility paths | ADR-0008 / ADR-0009 | Implementation | Implemented; non-blocking | Hosted mode requirements later | Optional compatibility tests |
+| Implement stable local human Actor | WF-017 / ADR-0009 | Implementation | Validated | Local SQLite | Local integration + reopen tests |
+| Implement local SQLite project store | WF-018 through WF-021 / ADR-0009 | Implementation | Validated | SQLite schema | Local integration + Chromium reopen flow |
+| Preserve exact revisions, trace links, idempotency, and stale-write checks locally | WF-019 through WF-021 | Implementation | Validated | Local project store | Local integration + Chromium stale-conflict flow |
+| Add local/provider-optional AI adapter boundary | WF-022 / ADR-0009 | Implementation | Validated | Provider configuration | AI boundary tests + no-cloud build |
+| Make local runtime build without hosted credentials | ADR-0009 | Implementation | Validated | Next.js + SQLite native package | Typecheck + production build + Chromium |
+| Retain PostgreSQL/Clerk hosted adapters as optional compatibility paths | ADR-0008 / ADR-0009 | Implementation | PostgreSQL compatibility validated; Clerk retained, non-blocking | Hosted mode requirements later | Optional compatibility tests |
 | Migrate validated Interview UX onto local durable state | WF-001 through WF-016 | Implementation | Planned after M2 authority slice | Validated local durable project | Browser E2E |
 
 ## 5. Work item standard
@@ -221,7 +221,7 @@ Do not use `blocked` for ordinary uncertainty that can be handled by a reversibl
 
 ## 7. Future work
 
-Near-term work after M2 local validation:
+Near-term work after M2 validation:
 
 - migrate the validated adaptive Interview experience onto the local durable project model incrementally
 - add a user-facing AI/provider settings screen instead of environment-only configuration

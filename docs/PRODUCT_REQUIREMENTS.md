@@ -508,7 +508,7 @@ Generated drafts need an intentional human disposition before they can become au
 
 ### WF-017 — Reuse a stable local Wayfound Actor without requiring sign-in
 
-**Status:** Approved
+**Status:** Validated
 
 **Priority:** P0
 
@@ -539,7 +539,7 @@ Generated drafts need an intentional human disposition before they can become au
 
 ### WF-018 — Create and reopen a private durable local project through server authority
 
-**Status:** Approved
+**Status:** Validated
 
 **Priority:** P0
 
@@ -571,7 +571,7 @@ Generated drafts need an intentional human disposition before they can become au
 
 ### WF-019 — Persist accepted answers as immutable local revisions with traceable Records
 
-**Status:** Approved
+**Status:** Validated
 
 **Priority:** P0
 
@@ -603,7 +603,7 @@ Generated drafts need an intentional human disposition before they can become au
 
 ### WF-020 — Materialize a proposal against exact current local source revisions
 
-**Status:** Approved
+**Status:** Validated
 
 **Priority:** P0
 
@@ -636,7 +636,7 @@ Generated drafts need an intentional human disposition before they can become au
 
 ### WF-021 — Enforce Wayfound project authorization in local and optional hosted modes
 
-**Status:** Approved
+**Status:** Validated
 
 **Priority:** P0
 
@@ -668,7 +668,7 @@ Generated drafts need an intentional human disposition before they can become au
 
 ### WF-022 — Keep project content local by default and make AI egress explicit
 
-**Status:** Approved
+**Status:** Validated
 
 **Priority:** P0
 
@@ -771,12 +771,12 @@ Local and hosted adapters SHOULD share the same domain-rule tests/contracts so p
 | WF-015 | Show draft outputs clearly in Records | P1 | Validated | Browser + artifact-model tests |
 | WF-016 | Review actionable draft artifacts without implying approval | P0 | Validated | Review-state model + Chromium interaction tests |
 
-| WF-017 | Reuse a stable local Wayfound Actor without requiring sign-in | P0 | Approved | Local Actor persistence/reopen tests |
-| WF-018 | Create and reopen a private durable local project through server authority | P0 | Approved | SQLite integration + reopen tests |
-| WF-019 | Persist accepted answers as immutable local revisions with traceable Records | P0 | Approved | Domain + SQLite integration tests |
-| WF-020 | Materialize a proposal against exact current local source revisions | P0 | Approved | Domain + SQLite integration tests |
-| WF-021 | Enforce Wayfound project authorization in local and optional hosted modes | P0 | Approved | Capability + adapter integration tests |
-| WF-022 | Keep project content local by default and make AI egress explicit | P0 | Approved | AI boundary + logging + no-cloud build tests |
+| WF-017 | Reuse a stable local Wayfound Actor without requiring sign-in | P0 | Validated | Local Actor persistence/reopen tests |
+| WF-018 | Create and reopen a private durable local project through server authority | P0 | Validated | SQLite integration + reopen tests |
+| WF-019 | Persist accepted answers as immutable local revisions with traceable Records | P0 | Validated | Domain + SQLite integration tests |
+| WF-020 | Materialize a proposal against exact current local source revisions | P0 | Validated | Domain + SQLite integration tests |
+| WF-021 | Enforce Wayfound project authorization in local and optional hosted modes | P0 | Validated | Capability + adapter integration tests |
+| WF-022 | Keep project content local by default and make AI egress explicit | P0 | Validated | AI boundary + logging + no-cloud build tests |
 
 ## 7. Validation record
 
@@ -835,6 +835,17 @@ The current slice is validated for its defined prototype scope. It is not releas
 - Browser interaction validation passed in headless Chromium using an isolated injected review harness after local URL navigation was blocked by environment policy. Propose, Set aside, Undo, explicit non-approval language, and same-ID content-change reset all passed.
 - Responsive validation passed at 1440 px and 390 px with no horizontal overflow; the review summary and artifact grid stack correctly at mobile width.
 - The browser harness exercised the exact review-state and review-rendering behavior without deploying Wayfound or adding a network/data boundary.
+
+**2026-09-17 — M2 local-first durable project slice**
+
+- GitHub Actions M2 local-first CI run #66 passed on commit `17148a0badef8a2dda0722f0e3b6857eaa4e3782`.
+- Sixteen domain, authorization, telemetry, concurrency, traceability, environment, and AI-provider boundary tests passed.
+- Two local SQLite integration tests passed, including stable local Actor reuse, project/database reopen, command idempotency, immutable Answer/Record revisions, exact trace links, proposal materialization, stale-source rejection, stale-write protection, and database rejection of an `approved` Artifact lifecycle value.
+- TypeScript checking and the optimized Next.js production build passed with local identity, local persistence, AI disabled, and no Clerk, Neon, Vercel, or external-model credentials.
+- Playwright Chromium passed the local browser flow: create project, save a decision, materialize an exact-source Proposed requirement, navigate away and reopen the durable project, submit an intentionally stale command and receive HTTP 409 `CONFLICT`, verify the rejected command did not mutate current state, and confirm no horizontal overflow at 390 px.
+- The separate optional PostgreSQL compatibility job passed migration, integration, schema-presence, rollback, and schema-removal checks. It remains compatibility evidence rather than a dependency of local M2.
+- M2 does not introduce formal Artifact approval, hosted synchronization, public sharing, or external AI by default.
+
 
 ## 8. Change rule
 
