@@ -137,7 +137,7 @@ Excluded from this objective: formal approval, persistent proposal state, accoun
 - Review-state model tests pass.
 - Browser interaction and responsive validation pass before the milestone is marked Validated.
 
-**Status:** Implemented — 7 review-state model tests pass; browser validation remains pending because the current execution environment blocks local browser targets.
+**Status:** Validated — 7 review-state model tests and the Chromium interaction/responsive browser gate pass.
 
 ### M1 — Production architecture baseline
 
@@ -189,7 +189,7 @@ Excluded from this objective: formal approval, persistent proposal state, accoun
 | Implement Records view for current session | WF-013 | Implementation | Validated | Record projection | Desktop + mobile browser review |
 | Derive draft build artifacts from Records | WF-014 | Implementation | Validated | Traceable Records | Artifact-model tests + browser review |
 | Show draft build artifacts in Records | WF-015 | Implementation | Validated | Draft artifact projection | Desktop + mobile browser review |
-| Review actionable draft artifacts | WF-016 | Implementation | Implemented | Validated Draft artifacts | 7 model tests pass; browser interaction pending |
+| Review actionable draft artifacts | WF-016 | Implementation | Validated | Validated Draft artifacts | 7 model tests + Chromium interaction/responsive gate |
 | Select production architecture | Architecture / future ADRs | Project owner | Blocked | Validated artifact-review slice and next production outcome | Architecture review |
 
 ## 5. Work item standard
