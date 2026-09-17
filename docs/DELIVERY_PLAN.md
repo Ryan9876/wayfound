@@ -60,7 +60,7 @@ Excluded from this objective: accounts, persistence, external AI, code generatio
 - Automated Interview model tests pass.
 - Manual browser review confirms layout, keyboard interaction, responsive behavior, and Wayfound visual consistency.
 
-**Status:** In progress — implementation and automated model validation complete; manual browser validation remains.
+**Status:** Validated — implementation, automated model validation, and browser interaction review are complete.
 
 ### M1 — Production architecture baseline
 
@@ -104,9 +104,9 @@ Excluded from this objective: accounts, persistence, external AI, code generatio
 | --- | --- | --- | --- | --- | --- |
 | Define current Wayfound product statement and broad users | Project charter | Project owner | Implemented | Current project-owner instruction | Charter review |
 | Define guided Interview requirements | WF-001 through WF-007 | Project owner | Implemented | Product definition | Requirements review |
-| Implement dependency-free Interview page | WF-001 through WF-007 | Implementation | Implemented | Requirements | Automated state tests + manual browser review |
+| Implement dependency-free Interview page | WF-001 through WF-007 | Implementation | Validated | Requirements | Automated state tests + browser interaction review |
 | Validate Interview state model | WF-002, WF-004, WF-005, WF-007 | Implementation | Validated | Interview model | `node --test tests/*.test.mjs` |
-| Validate Interview visual and interaction behavior | WF-001 through WF-007 | Project owner / reviewer | In progress | Implemented page | Manual browser review |
+| Validate Interview visual and interaction behavior | WF-001 through WF-007 | Project owner / reviewer | Validated | Implemented page | Headless Chromium interaction and responsive review |
 | Define adaptive question-selection behavior | Future requirement | Project owner | Proposed | Starter Interview validation | Requirement and UX review |
 | Select production architecture | Architecture / future ADRs | Project owner | Blocked | Validated Interview and next production outcome | Architecture review |
 
@@ -144,7 +144,7 @@ Do not use `blocked` for ordinary uncertainty that can be handled by a reversibl
 
 ## 7. Future work
 
-Potential next work after the starter Interview is validated:
+Next candidate work after the validated starter Interview:
 
 - adaptive question selection based on the idea and prior decisions
 - structured decision records that feed Requirements, Journey, Work, and Records
