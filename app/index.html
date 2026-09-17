@@ -6,6 +6,7 @@
   <meta name="description" content="Wayfound guided interview prototype">
   <title>Wayfound — Interview</title>
   <link rel="stylesheet" href="./styles.css">
+  <style>#nextBtn { margin-left: auto; }</style>
 </head>
 <body>
   <div class="app-shell">
@@ -32,7 +33,7 @@
 
       <div class="page-grid">
         <header class="page-header">
-          <div class="eyebrow">GUIDED PRODUCT DEFINITION</div>
+          <div class="eyebrow">GUIDED IDEA BUILDER</div>
           <h1>Turn an idea into something you can actually build.</h1>
           <p>Wayfound asks the next useful question, explains why it matters, and keeps track of what you decide. You do not need to know everything up front — that would be suspiciously convenient.</p>
         </header>
@@ -49,27 +50,27 @@
           </div>
         </section>
 
-        <aside class="panel project-state" aria-label="Project state">
-          <div class="side-title">Project state</div>
-          <div class="coverage"><strong id="coveragePct">0%</strong><span>Interview coverage</span></div>
+        <aside class="panel project-state" aria-label="What we know">
+          <div class="side-title">What we know</div>
+          <div class="coverage"><strong id="coveragePct">0%</strong><span>How much we know</span></div>
           <div class="mini-track" aria-hidden="true"><div class="mini-fill" id="miniFill"></div></div>
 
           <div class="state-list">
             <div class="state-row"><span>Idea</span><span class="state-value" id="sProblem">Open</span></div>
             <div class="state-row"><span>Outcome</span><span class="state-value" id="s-outcome">Open</span></div>
-            <div class="state-row"><span>Control level</span><span class="state-value" id="s-control">Open</span></div>
+            <div class="state-row"><span>What it can do</span><span class="state-value" id="s-control">Open</span></div>
             <div class="state-row"><span>Outside pieces</span><span class="state-value" id="s-dependencies">Open</span></div>
-            <div class="state-row"><span>Failure plan</span><span class="state-value" id="s-failure">Open</span></div>
+            <div class="state-row"><span>When things go wrong</span><span class="state-value" id="s-failure">Open</span></div>
             <div class="state-row"><span>Unknowns</span><span class="state-value" id="s-unknowns">Open</span></div>
-            <div class="state-row"><span>Done definition</span><span class="state-value" id="s-validation">Open</span></div>
+            <div class="state-row"><span>What counts as done</span><span class="state-value" id="s-validation">Open</span></div>
           </div>
 
           <div class="separator"></div>
           <div class="metric-grid">
-            <div class="metric"><strong id="decisionCount">0</strong><span>Decisions</span></div>
-            <div class="metric warning"><strong id="assumptionCount">0</strong><span>Assumptions</span></div>
-            <div class="metric danger"><strong id="blockerCount">0</strong><span>Blockers</span></div>
-            <div class="metric"><strong id="openQuestionCount">0</strong><span>Open questions</span></div>
+            <div class="metric"><strong id="decisionCount">0</strong><span>Choices</span></div>
+            <div class="metric warning"><strong id="assumptionCount">0</strong><span>Guesses</span></div>
+            <div class="metric danger"><strong id="blockerCount">0</strong><span>Things stopping us</span></div>
+            <div class="metric"><strong id="openQuestionCount">0</strong><span>Things to figure out</span></div>
           </div>
 
           <div id="decisionLog"></div>
