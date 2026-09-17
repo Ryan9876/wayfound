@@ -1,6 +1,6 @@
 # Wayfound Architecture
 
-**Status:** Draft
+**Status:** Approved production baseline; implementation pending
 
 ## Purpose
 
@@ -10,166 +10,245 @@ Use an Architecture Decision Record (ADR) for consequential decisions that expla
 
 ## 1. Architecture summary
 
-For the initial Interview vertical slice, Wayfound uses a dependency-free static browser application with separate presentation and interview-state modules. The browser owns temporary Interview state for the active page session. The prototype has no server, external service, production data store, identity provider, or external AI dependency.
+Wayfound has two intentionally distinct architectural states during the transition to production.
 
-This is a bounded prototype architecture. It does not select the final Wayfound production framework, backend, database, hosting platform, identity model, or AI provider.
+### Validated prototype
+
+The current validated Interview / Records / Draft-artifact experience is a dependency-free static browser application. It keeps temporary state in the browser and has no production server, persistent project store, hosted identity, or external AI dependency.
+
+### Accepted production target
+
+The accepted production architecture is a modular Next.js + TypeScript application deployed on Vercel, with server-side Wayfound domain/application code acting as the only authoritative transition boundary, Neon PostgreSQL holding durable relational project state, and Clerk authenticating users.
+
+Wayfound owns project authorization, lifecycle rules, revisions, traceability, and approval semantics. Clerk proves identity; it does not own Wayfound project authority. Neon stores the project model; it does not define domain transitions. Vercel hosts application builds; a deployment does not itself constitute a Wayfound release approval.
+
+External AI and tool providers, when introduced, execute through server-side adapters and remain non-authoritative.
+
+ADR-0007 is the acceptance record for the M1 architecture package described by ADR-0001 through ADR-0006.
 
 ## 2. System context
 
 ### Users and external actors
 
-The initial slice has one actor: a user who enters an idea and makes guided decisions in the browser.
+Wayfound supports users with varied technical experience and project types, including games, hobby projects, school projects, business applications, internal tools, and technical systems.
 
-The user can have different technical experience and can be working on a game, hobby project, school project, business application, internal tool, or technical system.
+Production actors include:
+
+- human users authenticated through the configured identity provider
+- internal Wayfound Actors mapped from external identities
+- future service or AI Actors that are explicitly distinguished from humans and do not receive approval authority by default
 
 ### External systems
 
-None in the initial slice.
+Accepted production dependencies are:
+
+- Vercel — application deployment and preview environments
+- Neon — hosted PostgreSQL
+- Clerk — authentication / external identity
+
+Future AI providers and external tools are optional adapter dependencies and are not required for the first hosted production slice.
 
 ### Trust boundaries
 
-The initial slice keeps all Interview content in browser memory. No Interview content crosses a network trust boundary.
+Production trust boundaries are:
 
-A future external AI call, persistence service, account system, or integration would introduce a new trust boundary and must be specified before implementation.
+1. browser ↔ Wayfound server/application boundary
+2. Wayfound server ↔ Clerk identity service
+3. Wayfound server ↔ Neon PostgreSQL
+4. later: Wayfound server ↔ external AI/tool providers
+
+Secrets, provider credentials, consequential authorization, and authoritative lifecycle transitions remain server-side.
 
 ## 3. Major components
 
 | Component | Responsibility | Owns | Depends on | Failure effect |
 | --- | --- | --- | --- | --- |
-| Wayfound shell | Provides navigation, layout, brand styling, and page framing | Presentation only | Browser standards | Page layout or navigation is degraded |
-| Interview renderer | Presents prompts, choices, recommendations, progress, and summary | Current rendered view | Interview model | User cannot complete the guided flow |
-| Idea classifier | Detects broad routing signals from the free-form idea | Temporary routing tags | JavaScript runtime | Wayfound can ask less-relevant questions |
-| Question registry | Defines possible questions, applicability rules, priority, recommendations, options, and tradeoffs | Interview question policy | Idea classifier and Interview state | Required decisions can be skipped or unnecessary questions can appear |
-| Question selector | Chooses the highest-priority unanswered required question that currently applies | Current question selection | Question registry and Interview state | Interview order or completion can become incorrect |
-| Interview model | Owns answers, history, applicability, derived state, progress, and completion rules | In-memory Interview state semantics | JavaScript runtime | Decisions or derived state become incorrect |
-| Project-state panel | Shows dynamic coverage, choices, guesses, blockers, and open questions | Presentation derived from Interview model | Interview model | User loses visibility into definition state |
-| Record projector | Converts applicable Interview choices and derived uncertainty into typed records with deterministic identifiers | Derived record view | Interview model | Traceability view can become incomplete or misleading |
-| Records renderer | Shows the current session record projection and record counts | Presentation only | Record projector | User cannot inspect the current traceability record |
-| Draft artifact projector | Converts current Records into a draft brief, Journey steps, requirement candidates, and follow-up work while preserving source record IDs | Derived draft artifacts | Current Records | Preview can become incomplete or misleading |
-| Draft artifact renderer | Shows generated artifacts behind an explicit draft-only boundary | Presentation only | Draft artifact projector | User cannot inspect possible next artifacts |
-| Artifact review model | Tracks session-only Draft / Proposed / Set aside dispositions for actionable draft requirements and work, bound to artifact content signatures | Derived review state | Draft artifact projector | Stale or misleading proposal state can survive artifact changes |
-| Artifact review renderer | Shows proposal controls and review counts without changing source Records or draft generation | Presentation only | Artifact review model | User cannot explicitly carry forward or set aside actionable drafts |
+| Wayfound shell | Navigation, layout, brand styling, and page framing | Presentation only | Browser / Next.js UI | Page layout or navigation is degraded |
+| Interview renderer | Prompts, choices, recommendations, progress, and summary | Current rendered view | Interview model | User cannot complete guided flow |
+| Idea classifier | Detects broad routing signals | Routing hints only | Interview/domain logic | Questions may be less relevant |
+| Question registry / selector | Defines and selects applicable questions | Interview question policy | Interview state | Required decisions can be skipped or unnecessary questions shown |
+| Interview domain model | Answers, history, applicability, derived state, progress, completion | Domain semantics | Server/client domain modules as appropriate | Decisions or derived state become incorrect |
+| Record projector | Projects accepted Interview state into typed trace records | Derived trace view | Interview domain model | Traceability becomes incomplete or misleading |
+| Draft artifact projector | Produces draft brief/Journey/requirement/work candidates | Derived previews | Current Records | Suggested next artifacts become incomplete or misleading |
+| Artifact review model | Draft / Proposed / Set aside review semantics | Review disposition semantics | Draft artifacts | Stale or misleading proposal state can persist |
+| Next.js server/application boundary | HTTP handling, commands, authorization orchestration, transactions | Authoritative write path | Clerk adapter, domain modules, persistence adapter | Authoritative mutations unavailable |
+| Wayfound domain/application layer | Lifecycle rules, concurrency checks, authorization checks, traceability, command semantics | Authoritative project rules | PostgreSQL adapter, identity adapter | Project state could become invalid if bypassed |
+| Clerk identity adapter | Maps authenticated external identity to Wayfound Actor | Identity mapping only | Clerk | Authenticated actions unavailable |
+| Wayfound authorization model | Project membership, roles/capabilities, approval authority | Project authorization truth | Wayfound Actor + project state | Protected actions may be denied or unsafe if incorrect |
+| Persistence adapter | Reads/writes relational current state, revisions, trace links, transition metadata | Persistence contract | Neon PostgreSQL | Durable project state unavailable |
+| AI/tool adapters | Encapsulate optional external model/tool calls | Provider integration only | External providers | Suggestions/integrations unavailable; project authority remains intact |
 
-The classifier and selector are intentionally local and deterministic in this slice. They prove adaptive behavior without selecting an external AI provider or creating a new data-processing boundary.
+The production implementation starts as one deployable modular application boundary. Do not split into microservices until measured scale, isolation, or operational requirements justify it.
 
 ## 4. Data model and authority
 
-For the initial slice, the authoritative runtime state is a JavaScript object in the active browser page.
+### Prototype authority
 
-Important fields are:
+The current validated static prototype keeps state in browser memory. That state remains valid as prototype/demo state only and is not the production system of record.
 
-- `idea` — the user's free-form starting description
-- `started` — whether the Interview has begun
-- `currentQuestionId` — the currently selected applicable question
-- `history` — the visited question identifiers used for review/back navigation
-- `complete` — whether the current adaptive pass is at its completion view
-- `answers` — selected option identifiers keyed by question identifier
-- derived routing tags
-- derived assumptions
-- derived blockers
-- derived open questions
+### Production authority
 
-Question definitions remain static configuration in `app/interview-model.js`, but each question now defines applicability, priority, required state, recommendation logic, and user-facing options. Progress and completion are calculated only from questions that currently apply.
+The Wayfound application/API is the only writer of authoritative project state.
 
-Records are a deterministic projection of Interview state, not an independent authority. Decision records use semantic identifiers such as `DEC-OUTCOME`; derived assumption, blocker, and open-question identifiers use deterministic content-based suffixes.
+The accepted persistence model uses:
 
-Draft build artifacts are a second-level projection of current Records. They remain `draft`, retain their source record identifiers, and do not become authoritative requirements, Journey state, or committed Work merely because they are generated.
+- normalized current logical objects
+- immutable content revisions
+- exact revision-to-revision trace links
+- append-only transition/audit metadata
+- optimistic concurrency for consequential writes
+- relational transactions that commit authoritative state, revision, trace, and required transition metadata together
 
-Artifact review state is a separate, session-only overlay on reviewable draft requirements and draft work. `Proposed` means carry forward for project-owner review; it does not mean approved. Review state is bound to an artifact content signature so a materially changed artifact returns to Draft instead of inheriting stale proposal state.
+Core logical objects include:
 
-The browser session is temporary. Refreshing or closing the page can discard Interview state and its derived records. Persistence is not an approved requirement for this slice.
+- Project
+- Interview Run
+- Answer + Answer Revision
+- Record + Record Revision
+- Artifact + Artifact Revision
+- Trace Link
+- State Transition
+- Actor and project membership/capability records
+
+Generated previews are not authoritative and are not persisted by default. A candidate becomes durable only after an explicit user disposition such as Propose or Set aside. A future approval must target an exact immutable Artifact Revision.
+
+Changing upstream source content must not silently preserve a stale proposal or approval against different content.
+
+Full event sourcing is not the initial persistence model. Current normalized state plus immutable revisions and a transition ledger provide the required traceability with less operational and privacy complexity.
 
 ## 5. Interfaces and contracts
 
-The initial component interface is local JavaScript function calls.
+### Browser/application contract
 
-The Interview model exposes deterministic functions for:
+Use versioned HTTP/JSON reads and explicit domain commands for consequential writes.
 
-- broad idea classification
-- initial state creation
-- question applicability and resolution
-- next-question selection
-- answer selection
-- adaptive advance, back, and review navigation
-- project-state derivation
-- dynamic progress calculation
-- completion determination
-- summary creation
-- structured record projection for decisions, assumptions, blockers, and open questions
-- draft artifact projection from Records into brief, Journey, requirement-candidate, and follow-up-work views
+Examples of domain commands include:
 
-There are no remote interfaces in the initial slice.
+- CreateProject
+- AcceptInterviewAnswer
+- ProposeArtifact
+- SetAsideArtifact
+- ReturnArtifactToDraft
+- future ApproveArtifact / RejectArtifact / SupersedeArtifact
+
+Consequential commands should include an expected version/revision or equivalent concurrency token and an idempotency key where retry duplication would be harmful.
+
+Clients do not write privileged lifecycle fields directly. A browser request equivalent to `status = approved` is invalid unless it is expressed as an authorized domain command that passes server-side rules.
+
+### Internal module boundaries
+
+Keep presentation, route/request handling, application commands/queries, domain rules, authorization, persistence, identity, and AI/tool adapters separate even though they live in one Next.js deployment initially.
+
+Domain logic should not require Next.js-specific request/page objects to express project rules.
 
 ## 6. Security architecture
 
-The initial slice:
+- Clerk authenticates external users.
+- Wayfound maps authenticated identities to internal Actors.
+- Wayfound owns project membership, roles/capabilities, and approval authority.
+- Human approval requires an identified human Actor with the required project capability.
+- AI/service Actors do not receive approval, membership-management, or destructive project authority by default.
+- Secrets and provider credentials stay server-side.
+- Consequential writes must be authorized in the Wayfound application boundary.
 
-- has no authentication or authorization
-- contains no secrets
-- performs no protected actions
-- sends no user content to external systems
-- stores no user content outside the active browser session
+Projects are private by default for the first hosted slice.
 
-Before Wayfound introduces hosted persistence, accounts, external AI processing, or integrations, the project must define the applicable identity, authorization, privacy, data-retention, and age-related controls.
+Ordinary telemetry/logs must not copy unrestricted project free text. Privacy, retention, deletion, consent, and younger-user eligibility requirements gate storage of real hosted content.
 
 ## 7. Reliability and failure model
 
-The initial slice has no remote dependency failures.
+Production behavior must include:
 
-Local failure behavior includes:
+- stale writes rejected through optimistic concurrency instead of silent last-write-wins
+- consequential state changes committed transactionally
+- failed transitions not recorded as successful audit events
+- provider failures isolated so loss of an optional AI/tool provider does not corrupt authoritative project state
+- explicit database migration and rollback procedures
+- backup/restore validation before production release
 
-- The user cannot advance from the idea step with empty input.
-- The user cannot advance from a decision step until an option is selected.
-- Derived state is calculated from explicit answers instead of hidden mutable flags.
-
-Browser refresh recovery is not included in the initial slice.
+Specific numeric SLO/RPO/RTO targets remain TBD until product requirements justify them.
 
 ## 8. Observability
 
-Production observability is not applicable to the static initial slice.
+The first production slice must provide enough structured telemetry to diagnose application/API, database, identity, and migration failures without logging unrestricted project content.
 
-Automated tests provide evidence for the Interview state model. The adaptive slice also has local headless-browser validation for visual and interaction behavior. A repeatable browser suite is not yet committed to CI.
+The observability vendor remains TBD.
+
+Correlation/request identifiers should connect consequential commands to transition metadata where useful without duplicating sensitive user content.
 
 ## 9. Deployment and environments
 
-The initial slice is a static web application under `app/` and can be served by any basic static HTTP server. Interview and Records are client-side views over the same in-memory state; switching views does not cross a network boundary.
+Accepted production deployment:
 
-No production hosting platform is selected. Deployment, environment promotion, secrets, migrations, rollout, and rollback remain `TBD` for a future production architecture decision.
+- Next.js / TypeScript application on Vercel
+- Neon PostgreSQL for persistent data
+- Clerk for authentication
+
+Use separated development/preview/production configuration and secrets. Preview deployments must not accidentally use production project data.
+
+Production changes require:
+
+- immutable build identity
+- explicit versioned database migrations
+- expand/contract schema evolution where needed to preserve rollback compatibility
+- migration evidence before promotion
+- defined application rollback behavior
+- tested backup/restore before real production data is relied upon
+
+A successful Vercel deployment is deployment evidence, not automatic release approval.
 
 ## 10. Performance and capacity
 
-No numeric targets are approved. The initial slice has a small static asset footprint and no server-side workload.
+No numeric production targets are approved yet.
+
+The first production slice should avoid architecture that requires distributed services or specialized infrastructure without measured need. PostgreSQL queries and trace relationships should be designed for ordinary indexed relational access and measured before adding caching/search infrastructure.
 
 ## 11. Technology choices
 
-The initial slice uses standards-based HTML, CSS, and JavaScript with no runtime dependencies.
+Accepted M1 production stack:
 
-This is a reversible prototype choice, not the final production framework selection. A future foundational framework, database, hosting platform, or external AI provider must meet the ADR triggers below.
+- **Language:** TypeScript
+- **Application framework:** Next.js
+- **Hosting:** Vercel
+- **Relational database:** Neon PostgreSQL
+- **Authentication:** Clerk
+- **Project authorization:** Wayfound-owned domain model
+- **AI/tool integration:** server-side adapters; provider TBD
+
+Still TBD until implementation requires them:
+
+- ORM/query library
+- AI/model provider
+- observability vendor
+- CI/CD details beyond the Vercel/Git integration and required release gates
+- numeric SLO/RPO/RTO targets
+
+The current dependency-free static prototype remains useful as a validated prototype/demo, but it is not the accepted production architecture.
 
 ## 12. Architecture decision triggers
 
 Create an ADR when a change:
 
 - changes a system or ownership boundary
-- selects or replaces a foundational framework, database, hosting platform, or major external service
-- changes the authentication or authorization model
+- selects or replaces a foundational framework, database, hosting platform, identity provider, or major external service
+- changes authentication or authorization
 - changes the authoritative data source
 - introduces a difficult migration
 - materially changes deployment or rollback behavior
-- accepts a significant security, reliability, cost, or maintainability tradeoff
+- accepts a significant security, privacy, reliability, cost, or maintainability tradeoff
 - is expensive to reverse
 
 ## 13. Known risks and technical debt
 
 | Item | Type | Impact | Mitigation | Owner | Status |
 | --- | --- | --- | --- | --- | --- |
-| Production architecture not yet selected | Open decision | Prototype cannot be treated as production architecture | Select production boundaries after the Interview slice is validated | Project owner | Open |
-| Local intent classification uses bounded keyword/rule signals | Known limitation | An idea can be under-tagged or over-tagged, which can make a question appear too early or be skipped | Keep routing hints visible and non-authoritative; validate representative idea types; consider richer semantic classification only after its trust and privacy boundaries are approved | Project owner | Open |
-| Browser-session state is temporary | Known limitation | Refresh or close can discard progress | Define persistence only after privacy and data authority are approved | Project owner | Open |
-| Records are derived, session-only views | Known limitation | Records cannot yet be shared, reopened, or referenced across sessions | Add persistence only after authoritative data ownership, identity, retention, and privacy are approved | Project owner | Open |
-| Draft artifacts are suggestions, not approved state | Governance boundary | Users could mistake generated candidates for approved requirements or committed work | Keep `draft` status and source IDs visible; require an explicit future promotion/approval workflow before authority changes | Project owner | Open |
-| Proposed artifact review state is session-only and non-authoritative | Governance boundary | A user could mistake Proposed for Approved or carry stale proposal state after source changes | Label Proposed as pending project-owner review; reject Approved in this layer; bind dispositions to artifact content signatures; reset changed artifacts to Draft | Project owner | Open |
-| Browser validation is not yet committed as a repeatable CI suite | Validation gap | Local browser review proves the current change but does not automatically protect every future UI change | Add browser-level automated interaction/accessibility tests when the project selects its production test tooling | Project owner | Open |
+| Production stack not yet implemented | Delivery gap | Validated prototype is not yet a persistent hosted application | Build the first production-capable vertical slice against ADR-0001 through ADR-0007 | Project owner | Open |
+| Privacy / retention / age policy details not yet finalized | Product/governance decision | Real hosted user content cannot safely be opened broadly until policy requirements are defined | Define retention, deletion, consent, guardian/age eligibility rules before relevant hosted use | Project owner | Open |
+| Local intent classification uses bounded keyword/rule signals | Known limitation | An idea can be under-tagged or over-tagged | Keep routing hints visible and non-authoritative; consider richer semantic classification only after trust/privacy boundaries are approved | Project owner | Open |
+| Prototype browser-session state is temporary | Known prototype limitation | Refresh or close can discard prototype progress | Production persistence will replace browser memory as authoritative state | Project owner | Open |
+| Draft artifacts are suggestions, not approved state | Governance boundary | Users could mistake generated candidates for project truth | Preserve explicit Draft/Proposed/Approved lifecycle and exact revision binding | Project owner | Open |
+| Browser validation is not yet committed as repeatable CI | Validation gap | Manual/local gates do not automatically protect every future UI change | Add browser-level automated interaction/accessibility testing in the production implementation | Project owner | Open |
+| Managed-service dependency | Operational risk | Vercel, Neon, or Clerk limits/outages can affect the hosted product | Keep domain/persistence/auth adapters provider-bounded; monitor cost/limits; define failure behavior and migration path | Project owner | Open |
 
 ## 14. Change rule
 

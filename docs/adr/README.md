@@ -1,49 +1,46 @@
-# Wayfound Architecture Decision Records
+# Architecture Decision Records
 
-Architecture Decision Records (ADRs) preserve consequential technical decisions and the reasoning behind them.
+Wayfound uses Architecture Decision Records (ADRs) for consequential technical decisions that change system boundaries, authoritative data ownership, security/identity, persistence, deployment, foundational technologies, or other expensive-to-reverse constraints.
 
-## When to create an ADR
+## Status model
 
-Create an ADR when a decision:
+ADR status values:
 
-- changes a system or ownership boundary
-- selects or replaces a foundational technology
-- changes authentication or authorization
-- changes the authoritative source for important data
-- introduces a significant external dependency
-- changes deployment, rollback, or migration behavior materially
-- accepts a consequential security, reliability, cost, or maintainability tradeoff
-- is expensive to reverse
+- **Proposed** — documented for review; not yet authoritative.
+- **Accepted** — approved architecture direction.
+- **Superseded** — replaced by a later ADR.
+- **Deprecated** — still present historically but no longer recommended for new work.
+- **Rejected** — considered and explicitly not selected.
 
-Do not create an ADR for ordinary implementation details that can change locally without affecting a durable project boundary.
+An ADR may remain as the original proposal document while a later accepted ADR records package-level acceptance or selection. In that case, the later ADR is the authoritative acceptance record and the earlier ADR's status history should link to it.
 
-## Naming
+## Current M1 production architecture
 
-Use four-digit sequential identifiers:
+ADR-0007 is the formal acceptance record for the Wayfound M1 production architecture. It accepts the architecture constraints and tradeoffs developed in ADR-0001 through ADR-0006 and selects the concrete initial stack:
 
-- `0001-short-decision-name.md`
-- `0002-short-decision-name.md`
+- Next.js + TypeScript
+- Vercel
+- Neon PostgreSQL
+- Clerk authentication
+- Wayfound-owned project authorization and domain rules
+- server-side, replaceable AI/tool adapters
 
-Copy `0000-template.md` when creating a new ADR.
+ADR-0001 through ADR-0006 remain part of the decision history and detailed rationale. Their constraints are authoritative through ADR-0007 unless a later ADR supersedes them.
 
-## Status
+## ADR rules
 
-Use:
+- State the decision first.
+- Record alternatives and material tradeoffs.
+- Preserve rejected options when they help explain why the accepted architecture exists.
+- Identify reversibility and reconsideration triggers.
+- Link affected requirements, architecture sections, and delivery milestones.
+- Do not hide unresolved product or legal policy inside an ADR; keep it explicit as a dependency or open decision.
+- Do not let framework/provider convenience silently redefine Wayfound's domain authority.
 
-- **Proposed** — under review
-- **Accepted** — approved and authoritative
-- **Superseded** — replaced by another ADR
-- **Rejected** — considered but not selected
-- **Deprecated** — still relevant temporarily but scheduled to stop governing new work
+## File naming
 
-Do not delete an accepted ADR because a later decision replaces it. Mark it `Superseded` and link the replacement.
+Use a four-digit sequence followed by a short kebab-case title, for example:
 
-## Index
+`0008-example-decision.md`
 
-| ADR | Decision | Status | Date | Superseded by |
-| --- | --- | --- | --- | --- |
-| — | No architecture decisions recorded yet | — | — | — |
-
-## Change rule
-
-When an ADR status changes, update this index in the same change.
+Use `0000-template.md` as the starting structure.

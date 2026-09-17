@@ -10,13 +10,13 @@ Do not use this file to redefine product scope or architecture. Update the autho
 
 ## 1. Current objective
 
-Implement and validate a bounded artifact-review step without turning a browser-session choice into formal approval.
+Prepare the first production-capable vertical slice using the accepted M1 production architecture.
 
-The artifact-review slice must let users explicitly propose or set aside actionable draft requirements and follow-up work while preserving source traceability, keeping formal approval separate, and resetting stale review state when artifact content changes.
+The next slice must prove that the selected stack can preserve Wayfound's validated governance model when project state becomes durable: authenticated Actor identity, server-side authoritative commands, relational revision/traceability persistence, explicit Draft → Proposed → future Approved separation, and safe deployment/migration boundaries.
 
-Included requirement: WF-016, while preserving WF-001 through WF-015.
+Accepted M1 stack: Next.js + TypeScript on Vercel, Neon PostgreSQL, Clerk authentication, and Wayfound-owned project authorization/domain rules.
 
-Excluded from this objective: formal approval, persistent proposal state, accounts, external AI or model calls, code generation, production integrations, and production deployment.
+Excluded from the next implementation until separately approved: external AI/model processing of user content, public project sharing, broad hosted access for younger users before age/consent requirements are defined, code-generation agents, and production integrations unrelated to the first vertical slice.
 
 ## 2. Delivery rules
 
@@ -26,6 +26,8 @@ Excluded from this objective: formal approval, persistent proposal state, accoun
 - Keep speculative future work out of the active milestone.
 - Do not mark work complete until required validation passes.
 - Record blockers with a named dependency or decision.
+- Do not bypass the accepted server-side authority boundary for convenience.
+- Do not treat deployment success as release approval.
 
 ## 3. Milestones
 
@@ -153,27 +155,42 @@ Excluded from this objective: formal approval, persistent proposal state, accoun
 - Security and privacy boundaries defined.
 - Deployment and rollback approach defined.
 - Foundational decisions recorded as ADRs.
+- Concrete production stack selected.
 - Validation approach defined.
 
-**Status:** Proposed
+**Status:** Accepted — ADR-0007 records project-owner approval of the M1 package and concrete stack. ADR-0001 through ADR-0006 preserve the detailed proposal/rationale that ADR-0007 accepted.
 
 ### M2 — First production-capable vertical slice
 
-**Goal:** Deliver one end-to-end Wayfound outcome using the approved production architecture.
+**Goal:** Deliver one end-to-end Wayfound outcome using the accepted production architecture.
 
-**Entry criteria:** Required M1 decisions approved.
+**Entry criteria:** M1 production architecture accepted and the M2 product requirements approved.
+
+**Initial target outcome:**
+
+Prove one durable project path that preserves the validated prototype's human-control model:
+
+1. user authenticates through Clerk and maps to a stable Wayfound Actor
+2. user creates/opens a project through Wayfound server-side commands
+3. accepted Interview/project state is persisted in Neon PostgreSQL using immutable revisions and trace links
+4. a generated candidate remains non-authoritative until explicitly proposed
+5. Propose persists an exact Artifact Revision and exact source-revision links
+6. a distinct authorized human action can later approve an exact revision once the approval requirement is defined
+7. stale/concurrent writes are rejected instead of silently overwriting project state
+8. preview/development environments cannot write production project data
+9. migration/rollback and backup/restore evidence exist before release
 
 **Exit criteria:**
 
-- Selected requirements implemented.
+- Selected production requirements implemented.
 - Acceptance criteria pass.
 - Required automated checks pass.
 - Important failure behavior is verified.
-- Required observability is present.
+- Required observability is present without unrestricted project-content logging.
 - Documentation matches implementation.
 - Release decision is explicit.
 
-**Status:** Proposed
+**Status:** Proposed — requirements and implementation slice still need to be defined before coding starts.
 
 ## 4. Active work
 
@@ -190,7 +207,12 @@ Excluded from this objective: formal approval, persistent proposal state, accoun
 | Derive draft build artifacts from Records | WF-014 | Implementation | Validated | Traceable Records | Artifact-model tests + browser review |
 | Show draft build artifacts in Records | WF-015 | Implementation | Validated | Draft artifact projection | Desktop + mobile browser review |
 | Review actionable draft artifacts | WF-016 | Implementation | Validated | Validated Draft artifacts | 7 model tests + Chromium interaction/responsive gate |
-| Select production architecture | Architecture / future ADRs | Project owner | Blocked | Validated artifact-review slice and next production outcome | Architecture review |
+| Accept production architecture boundaries | ADR-0001 through ADR-0006 via ADR-0007 | Project owner | Accepted | M0.9 | Architecture review |
+| Select production stack | ADR-0007 | Project owner | Accepted | M1 boundary decisions | Stack comparison + project-owner approval |
+| Define M2 production requirements | Future WF requirements | Project owner | Next | Accepted M1 | Requirements review |
+| Scaffold production Next.js/TypeScript application | ADR-0007 | Implementation | Blocked | M2 requirements approved | Build/test gate |
+| Define initial Neon relational schema/migrations | ADR-0002 / ADR-0007 | Implementation | Blocked | M2 requirements approved | Schema/integration tests |
+| Integrate Clerk identity → Wayfound Actor mapping | ADR-0003 / ADR-0007 | Implementation | Blocked | M2 requirements approved | Auth/authorization tests |
 
 ## 5. Work item standard
 
@@ -226,15 +248,23 @@ Do not use `blocked` for ordinary uncertainty that can be handled by a reversibl
 
 ## 7. Future work
 
-Next candidate work after the artifact-review slice:
+Near-term work after M2 requirements are approved:
+
+- production Next.js / TypeScript scaffold
+- application/domain module boundaries
+- Neon PostgreSQL schema, migrations, revision and traceability invariants
+- Clerk authentication and internal Actor mapping
+- project authorization/capabilities
+- production browser/integration tests
+- environment separation, preview-data isolation, migration and rollback evidence
+
+Later work, not committed to M2 by default:
 
 - richer semantic question routing if the deterministic classifier proves too limited
-- define formal project-owner approval/promotion behavior after identity and authoritative-state boundaries are selected
-- persistence with defined privacy and data authority
 - external AI assistance with explicit trust and data-processing boundaries
-- browser-level automated interaction and accessibility validation
-
-These items are not committed scope until their requirements are approved.
+- public/shared projects after privacy and authorization requirements are approved
+- code-generation/development-agent execution
+- additional integrations
 
 ## 8. Change rule
 
