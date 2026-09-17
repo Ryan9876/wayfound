@@ -45,6 +45,8 @@ A future external AI call, persistence service, account system, or integration w
 | Project-state panel | Shows dynamic coverage, choices, guesses, blockers, and open questions | Presentation derived from Interview model | Interview model | User loses visibility into definition state |
 | Record projector | Converts applicable Interview choices and derived uncertainty into typed records with deterministic identifiers | Derived record view | Interview model | Traceability view can become incomplete or misleading |
 | Records renderer | Shows the current session record projection and record counts | Presentation only | Record projector | User cannot inspect the current traceability record |
+| Draft artifact projector | Converts current Records into a draft brief, Journey steps, requirement candidates, and follow-up work while preserving source record IDs | Derived draft artifacts | Current Records | Preview can become incomplete or misleading |
+| Draft artifact renderer | Shows generated artifacts behind an explicit draft-only boundary | Presentation only | Draft artifact projector | User cannot inspect possible next artifacts |
 
 The classifier and selector are intentionally local and deterministic in this slice. They prove adaptive behavior without selecting an external AI provider or creating a new data-processing boundary.
 
@@ -69,6 +71,8 @@ Question definitions remain static configuration in `app/interview-model.js`, bu
 
 Records are a deterministic projection of Interview state, not an independent authority. Decision records use semantic identifiers such as `DEC-OUTCOME`; derived assumption, blocker, and open-question identifiers use deterministic content-based suffixes.
 
+Draft build artifacts are a second-level projection of current Records. They remain `draft`, retain their source record identifiers, and do not become authoritative requirements, Journey state, or committed Work merely because they are generated.
+
 The browser session is temporary. Refreshing or closing the page can discard Interview state and its derived records. Persistence is not an approved requirement for this slice.
 
 ## 5. Interfaces and contracts
@@ -88,6 +92,7 @@ The Interview model exposes deterministic functions for:
 - completion determination
 - summary creation
 - structured record projection for decisions, assumptions, blockers, and open questions
+- draft artifact projection from Records into brief, Journey, requirement-candidate, and follow-up-work views
 
 There are no remote interfaces in the initial slice.
 
@@ -158,6 +163,7 @@ Create an ADR when a change:
 | Local intent classification uses bounded keyword/rule signals | Known limitation | An idea can be under-tagged or over-tagged, which can make a question appear too early or be skipped | Keep routing hints visible and non-authoritative; validate representative idea types; consider richer semantic classification only after its trust and privacy boundaries are approved | Project owner | Open |
 | Browser-session state is temporary | Known limitation | Refresh or close can discard progress | Define persistence only after privacy and data authority are approved | Project owner | Open |
 | Records are derived, session-only views | Known limitation | Records cannot yet be shared, reopened, or referenced across sessions | Add persistence only after authoritative data ownership, identity, retention, and privacy are approved | Project owner | Open |
+| Draft artifacts are suggestions, not approved state | Governance boundary | Users could mistake generated candidates for approved requirements or committed work | Keep `draft` status and source IDs visible; require an explicit future promotion/approval workflow before authority changes | Project owner | Open |
 | Browser validation is not yet committed as a repeatable CI suite | Validation gap | Local browser review proves the current change but does not automatically protect every future UI change | Add browser-level automated interaction/accessibility tests when the project selects its production test tooling | Project owner | Open |
 
 ## 14. Change rule

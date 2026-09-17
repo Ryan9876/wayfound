@@ -59,6 +59,7 @@ For the initial delivery target:
 - visible interview progress and project state
 - explicit decisions, assumptions, blockers, and open questions
 - a session-only Records view that projects Interview decisions and unresolved state into traceable records
+- a draft-only preview that shows how traceable Records could become a build brief, Journey steps, requirement candidates, and follow-up work without silently approving them
 - a completion summary that identifies the next recommended action
 - adaptive question selection based on the user’s idea and prior choices so irrelevant questions can be skipped
 - a structured interview model that can later support richer semantic or AI-assisted question selection without replacing the user-facing workflow

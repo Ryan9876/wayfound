@@ -243,7 +243,6 @@ The Interview must begin from user intent instead of forcing the user to transla
 - Unit test for completion and summary behavior.
 - Manual browser review.
 
-
 ### WF-008 — Select questions adaptively
 
 **Status:** Validated
@@ -351,7 +350,6 @@ A useful Interview should spend the user’s attention on decisions that can cha
 - Automated history test.
 - Browser keyboard and back-navigation review.
 
-
 ### WF-012 — Project Interview state into structured records
 
 **Status:** Validated
@@ -408,6 +406,65 @@ A useful Interview should spend the user’s attention on decisions that can cha
 
 - Browser interaction review at desktop and mobile widths.
 - Automated model tests for the record projection consumed by the page.
+
+### WF-014 — Derive draft build artifacts from Records
+
+**Status:** Validated
+
+**Priority:** P0
+
+**User or system:** Wayfound
+
+**Requirement:**
+
+> When the current Records contain accepted decisions or unresolved state, Wayfound MUST derive draft build artifacts that preserve source-record traceability without treating the generated artifacts as approved project truth.
+
+**Acceptance criteria:**
+
+- A non-empty starting idea produces a draft build brief.
+- Accepted decisions produce draft Journey steps with source record identifiers.
+- Only mapped decisions that describe expected product or system behavior produce draft requirement candidates.
+- Outcome and audience decisions can inform the brief and Journey without automatically becoming requirements.
+- Assumptions, blockers, and open questions produce draft follow-up work rather than requirements.
+- An unresolved `not sure` answer does not become an approved or draft requirement merely because it exists in Records.
+- Every generated Journey step, requirement candidate, and work item carries the source record identifier that produced it.
+- All generated artifacts remain `draft`; generation MUST NOT change the status of a Record or approve an artifact.
+
+**Constraints:**
+
+- Draft artifacts are deterministic projections of current session Records.
+- Draft artifacts MUST NOT become a second authoritative source.
+- The initial slice MUST NOT persist, publish, approve, or execute generated artifacts.
+
+**Evidence / validation:**
+
+- Automated artifact-projection tests.
+- Browser review of representative completed and partial Interviews.
+
+### WF-015 — Show draft outputs clearly in Records
+
+**Status:** Validated
+
+**Priority:** P1
+
+**User or system:** User
+
+**Requirement:**
+
+> When draft artifacts can be derived from the current Records, Wayfound MUST show them with an unmistakable draft boundary so that the user can inspect possible next artifacts without confusing them with approved requirements or committed work.
+
+**Acceptance criteria:**
+
+- Records shows a visible `Draft only` label for generated outputs.
+- The preview separates the build brief, Journey, draft requirements, and draft work.
+- Generated requirement and work items show their source record identifiers.
+- A partial Interview does not invent unavailable outcome, audience, requirement, or work content.
+- The draft preview remains usable on desktop and mobile layouts.
+
+**Evidence / validation:**
+
+- Browser interaction and responsive review.
+- Artifact-model tests for empty, partial, and resolved record sets.
 
 ## 5. Non-functional requirements
 
@@ -472,6 +529,8 @@ The Interview decision model SHOULD remain separate from rendering logic so ques
 | WF-011 | Preserve choices during adaptive review | P1 | Validated | History + browser tests |
 | WF-012 | Project Interview state into structured records | P0 | Validated | Record-model + browser tests |
 | WF-013 | Show current Interview records in Wayfound Records | P1 | Validated | Browser + record-model tests |
+| WF-014 | Derive draft build artifacts from Records | P0 | Validated | Artifact-model + browser tests |
+| WF-015 | Show draft outputs clearly in Records | P1 | Validated | Browser + artifact-model tests |
 
 ## 7. Validation record
 
@@ -487,7 +546,6 @@ The Interview decision model SHOULD remain separate from rendering logic so ques
 
 The current slice is validated for its defined prototype scope. It is not released as a production service.
 
-
 **2026-09-17 — Adaptive Interview slice**
 
 - `node --test tests/*.test.mjs`: 12 tests passed.
@@ -499,7 +557,6 @@ The current slice is validated for its defined prototype scope. It is not releas
 - Keyboard selection, back-navigation, original-idea traceability, and responsive layouts down to 320 px were reviewed.
 - No external AI, persistence, account, or network dependency was introduced.
 
-
 **2026-09-17 — Interview Records slice**
 
 - `node --test tests/*.test.mjs`: 17 tests passed.
@@ -510,6 +567,15 @@ The current slice is validated for its defined prototype scope. It is not releas
 - Desktop and 390 px mobile layouts were reviewed with no horizontal overflow.
 - Mobile navigation was added so Interview and Records remain reachable after the desktop sidebar collapses.
 - Records remain session-only and derived from Interview state; no persistence or second data authority was introduced.
+
+**2026-09-17 — Draft artifact preview slice**
+
+- The complete model suite reached 23 passing tests before modularization; the isolated artifact module revalidation adds six passing artifact-projection tests with the adaptive Interview/Records core unchanged.
+- JavaScript syntax checks pass for the artifact model and renderer modules.
+- Browser review of the validated implementation showed a visible `Draft only` boundary, a first build brief, Journey steps, draft requirement candidates, and draft follow-up work with source record identifiers.
+- Representative partial state did not manufacture requirement candidates from outcome/audience-only decisions or unresolved `not sure` answers.
+- Desktop and 390 px mobile layouts were reviewed with no horizontal overflow.
+- Generated artifacts remain session-only projections. No persistence, approval, publishing, code generation, external AI, or execution behavior was introduced.
 
 ## 8. Change rule
 

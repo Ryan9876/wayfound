@@ -15,6 +15,8 @@ import {
   selectAnswer,
   startInterview
 } from './interview-model.js';
+import { getDraftArtifacts } from './artifact-model.js';
+import { renderArtifactPreview } from './artifact-renderer.js';
 
 let state = createInitialState();
 
@@ -55,6 +57,7 @@ function recordCountLabel(type, count) {
 
 function renderRecords() {
   const records = getInterviewRecords(state);
+  const artifacts = getDraftArtifacts(state, records);
   const counts = records.reduce((result, record) => {
     result[record.type] = (result[record.type] ?? 0) + 1;
     return result;
@@ -66,6 +69,8 @@ function renderRecords() {
       return `<span class="record-count"><strong>${count}</strong>${escapeHtml(recordCountLabel(type, count))}</span>`;
     })
     .join('');
+
+  renderArtifactPreview(document.querySelector('#artifactPreview'), artifacts);
 
   const body = document.querySelector('#recordsBody');
   if (!records.length) {
