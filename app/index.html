@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Wayfound guided interview prototype">
+  <title>Wayfound — Interview</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Wayfound navigation">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span>Wayfound</span></div>
+      <div class="nav-label">Workspace</div>
+      <nav class="nav">
+        <a href="#"><span aria-hidden="true">◫</span><span>Overview</span></a>
+        <a href="#"><span aria-hidden="true">⌁</span><span>Journey</span></a>
+        <a href="#" class="active" aria-current="page"><span aria-hidden="true">◇</span><span>Interview</span></a>
+        <a href="#"><span aria-hidden="true">□</span><span>Work</span></a>
+        <a href="#"><span aria-hidden="true">↔</span><span>Handoffs</span></a>
+        <a href="#"><span aria-hidden="true">≡</span><span>Records</span></a>
+        <a href="#"><span aria-hidden="true">✓</span><span>Release &amp; Care</span></a>
+      </nav>
+      <div class="sidebar-footer"><span class="status-dot" aria-hidden="true"></span><span>Evidence synced</span></div>
+    </aside>
+
+    <main class="main-content">
+      <div class="topbar">
+        <div class="breadcrumb">Wayfound / <strong>Interview</strong></div>
+        <div class="stage-pill">Stage 1 · Understand</div>
+      </div>
+
+      <div class="page-grid">
+        <header class="page-header">
+          <div class="eyebrow">GUIDED PRODUCT DEFINITION</div>
+          <h1>Turn an idea into something you can actually build.</h1>
+          <p>Wayfound asks the next useful question, explains why it matters, and keeps track of what you decide. You do not need to know everything up front — that would be suspiciously convenient.</p>
+        </header>
+
+        <section class="panel interview-panel" aria-live="polite">
+          <div class="progress-wrap">
+            <div class="progress-meta"><span id="progressLabel">Start</span><span id="progressCount">0 of 6 decisions</span></div>
+            <div class="progress-track" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
+          </div>
+          <div class="question-body" id="questionBody"></div>
+          <div class="actions">
+            <button class="button ghost" id="backBtn" type="button">Back</button>
+            <button class="button primary" id="nextBtn" type="button" disabled>Continue</button>
+          </div>
+        </section>
+
+        <aside class="panel project-state" aria-label="Project state">
+          <div class="side-title">Project state</div>
+          <div class="coverage"><strong id="coveragePct">0%</strong><span>Interview coverage</span></div>
+          <div class="mini-track" aria-hidden="true"><div class="mini-fill" id="miniFill"></div></div>
+
+          <div class="state-list">
+            <div class="state-row"><span>Idea</span><span class="state-value" id="sProblem">Open</span></div>
+            <div class="state-row"><span>Outcome</span><span class="state-value" id="s-outcome">Open</span></div>
+            <div class="state-row"><span>Control level</span><span class="state-value" id="s-control">Open</span></div>
+            <div class="state-row"><span>Outside pieces</span><span class="state-value" id="s-dependencies">Open</span></div>
+            <div class="state-row"><span>Failure plan</span><span class="state-value" id="s-failure">Open</span></div>
+            <div class="state-row"><span>Unknowns</span><span class="state-value" id="s-unknowns">Open</span></div>
+            <div class="state-row"><span>Done definition</span><span class="state-value" id="s-validation">Open</span></div>
+          </div>
+
+          <div class="separator"></div>
+          <div class="metric-grid">
+            <div class="metric"><strong id="decisionCount">0</strong><span>Decisions</span></div>
+            <div class="metric warning"><strong id="assumptionCount">0</strong><span>Assumptions</span></div>
+            <div class="metric danger"><strong id="blockerCount">0</strong><span>Blockers</span></div>
+            <div class="metric"><strong id="openQuestionCount">0</strong><span>Open questions</span></div>
+          </div>
+
+          <div id="decisionLog"></div>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="./interview.js"></script>
+</body>
+</html>
