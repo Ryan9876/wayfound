@@ -10,13 +10,13 @@ Do not use this file to redefine product scope or architecture. Update the autho
 
 ## 1. Current objective
 
-Deliver and validate the first Wayfound Interview vertical slice.
+Deliver and validate adaptive Interview question selection without introducing an external AI dependency.
 
-The slice must let a user describe an idea in plain language, make a small set of guided decisions, understand recommendations and tradeoffs, see project state, and finish with a usable summary and next action.
+The adaptive slice must use the starting idea and accepted choices to ask relevant questions, skip irrelevant questions, reveal new material decisions when prior answers make them applicable, and calculate readiness from the current required question set.
 
-Included requirements: WF-001 through WF-007.
+Included requirements: WF-008 through WF-011, while preserving WF-001 through WF-007.
 
-Excluded from this objective: accounts, persistence, external AI, code generation, integrations, and production deployment.
+Excluded from this objective: external AI or model calls, accounts, persistence, code generation, production integrations, and production deployment.
 
 ## 2. Delivery rules
 
@@ -62,11 +62,30 @@ Excluded from this objective: accounts, persistence, external AI, code generatio
 
 **Status:** Validated — implementation, automated model validation, and browser interaction review are complete.
 
+### M0.6 — Adaptive Interview
+
+**Goal:** Make the Interview choose its next useful question from the current idea and prior decisions while keeping the routing mechanism local, transparent, and reversible.
+
+**Entry criteria:** M0.5 guided Interview slice validated.
+
+**Exit criteria:**
+
+- Different representative idea types produce different applicable question sets.
+- The same state produces the same next question.
+- Accepted answers can make later material questions appear or disappear.
+- Progress and completion use only currently applicable required questions.
+- `I am not sure yet` remains a visible open question without becoming a blocker by default.
+- Back/review preserves applicable choices.
+- Automated adaptive model tests pass.
+- Browser review confirms adaptive paths, keyboard behavior, summary traceability, and responsive layout.
+
+**Status:** Validated
+
 ### M1 — Production architecture baseline
 
 **Goal:** Select the minimum production architecture required after the Interview experience is validated.
 
-**Entry criteria:** M0.5 user experience validated and next production outcome approved.
+**Entry criteria:** M0.6 adaptive Interview validated and next production outcome approved.
 
 **Exit criteria:**
 
@@ -102,13 +121,13 @@ Excluded from this objective: accounts, persistence, external AI, code generatio
 
 | Work item | Source | Owner | Status | Dependency | Validation |
 | --- | --- | --- | --- | --- | --- |
-| Define current Wayfound product statement and broad users | Project charter | Project owner | Implemented | Current project-owner instruction | Charter review |
-| Define guided Interview requirements | WF-001 through WF-007 | Project owner | Implemented | Product definition | Requirements review |
-| Implement dependency-free Interview page | WF-001 through WF-007 | Implementation | Validated | Requirements | Automated state tests + browser interaction review |
-| Validate Interview state model | WF-002, WF-004, WF-005, WF-007 | Implementation | Validated | Interview model | `node --test tests/*.test.mjs` |
-| Validate Interview visual and interaction behavior | WF-001 through WF-007 | Project owner / reviewer | Validated | Implemented page | Headless Chromium interaction and responsive review |
-| Define adaptive question-selection behavior | Future requirement | Project owner | Proposed | Starter Interview validation | Requirement and UX review |
-| Select production architecture | Architecture / future ADRs | Project owner | Blocked | Validated Interview and next production outcome | Architecture review |
+| Preserve validated guided Interview baseline | WF-001 through WF-007 | Implementation | Validated | M0.5 | Existing model + browser evidence |
+| Define adaptive Interview behavior | WF-008 through WF-011 | Project owner | Validated | Guided Interview baseline | Requirements review |
+| Implement local idea classifier and question registry | WF-008 | Implementation | Validated | Adaptive requirements | Model + browser tests |
+| Implement answer-driven question applicability | WF-009 | Implementation | Validated | Question registry | Applicability tests |
+| Implement dynamic progress and completion | WF-010 | Implementation | Validated | Applicability model | Completion tests + browser flow |
+| Preserve adaptive back/review history | WF-011 | Implementation | Validated | Adaptive navigation | History + browser tests |
+| Select production architecture | Architecture / future ADRs | Project owner | Blocked | Validated adaptive Interview and next production outcome | Architecture review |
 
 ## 5. Work item standard
 
@@ -144,9 +163,9 @@ Do not use `blocked` for ordinary uncertainty that can be handled by a reversibl
 
 ## 7. Future work
 
-Next candidate work after the validated starter Interview:
+Next candidate work after the validated adaptive Interview:
 
-- adaptive question selection based on the idea and prior decisions
+- richer semantic question routing if the deterministic classifier proves too limited
 - structured decision records that feed Requirements, Journey, Work, and Records
 - persistence with defined privacy and data authority
 - external AI assistance with explicit trust and data-processing boundaries
