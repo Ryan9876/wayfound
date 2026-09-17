@@ -20,7 +20,7 @@ jobs:
     env:
       WAYFOUND_IDENTITY_MODE: local
       WAYFOUND_PERSISTENCE_MODE: local
-      WAYFOUND_AI_PROVIDER: off
+      WAYFOUND_AI_PROVIDER: 'off'
       WAYFOUND_LOCAL_DB: ${{ runner.temp }}/wayfound-e2e.sqlite
     defaults:
       run:
