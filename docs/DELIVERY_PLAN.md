@@ -190,6 +190,24 @@ Excluded from M2 until separately approved: formal Artifact approval, public pro
 
 **Status:** Validated — model parity, SQLite revision/reopen behavior, server-side applicability validation, no-cloud build, adaptive Chromium flow, answer revision, stale-conflict, and 390 px responsive gates pass.
 
+### M2.2 — Durable Records
+
+**Goal:** Project the validated Records model from durable local Interview state and show it with exact evidence links without creating a second authority.
+
+**Entry criteria:** M2.1 validated; WF-025 and WF-026 approved.
+
+**Exit criteria:**
+
+- Durable Records use the validated Records projection semantics.
+- Answer-backed records link to exact current Answer/Record revisions.
+- Derived assumptions/blockers/open questions remain read-only projections and disappear when no longer implied.
+- Opening/refreshing Records does not mutate Project version or create revisions.
+- Interview ↔ Records navigation preserves durable state.
+- Model/integration/TypeScript/build/Chromium/390 px gates pass.
+- No cloud account or LLM is required.
+
+**Status:** In progress.
+
 ## 4. Active work
 
 | Work item | Source | Owner | Status | Dependency | Validation |
@@ -205,6 +223,7 @@ Excluded from M2 until separately approved: formal Artifact approval, public pro
 | Make local runtime build without hosted credentials | ADR-0009 | Implementation | Validated | Next.js + SQLite native package | Typecheck + production build + Chromium |
 | Retain PostgreSQL/Clerk hosted adapters as optional compatibility paths | ADR-0008 / ADR-0009 | Implementation | PostgreSQL compatibility validated; Clerk retained, non-blocking | Hosted mode requirements later | Optional compatibility tests |
 | Migrate validated adaptive Interview onto local durable answer state | WF-023 / WF-024 | Implementation | Validated | M2 validated | Model parity + SQLite + Chromium |
+| Migrate validated Records view onto durable Interview state | WF-025 / WF-026 | Implementation | In progress | M2.1 validated | Projection parity + SQLite + Chromium |
 
 ## 5. Work item standard
 

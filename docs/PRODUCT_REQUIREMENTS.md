@@ -771,6 +771,75 @@ Generated drafts need an intentional human disposition before they can become au
 - Browser refresh/reopen test for persisted selected choices and adaptive resume.
 - Browser review/edit test proving a changed choice creates the new current state without losing prior revision history.
 
+### WF-025 — Reconstruct validated Records from durable Interview state
+
+**Status:** Approved
+
+**Priority:** P0
+
+**User or system:** Wayfound
+
+**Requirement:**
+
+> When a durable local project has current Interview answers, Wayfound MUST reconstruct the same current Records projection produced by the validated Interview model without creating a second authoritative source.
+
+**Acceptance criteria:**
+
+- The durable runtime uses the validated `getInterviewRecords` projection semantics for current decision, assumption, blocker, and open-question records.
+- The same starting idea and current answer set produce the same projected record identifiers, types, titles, statements, details, and applicability behavior as the validated model.
+- An accepted answer projects as a decision; `not-sure` projects as an open question rather than a decision.
+- Derived assumptions, blockers, and open questions appear only while the current durable Interview state implies them.
+- Answers that become non-applicable do not appear in the current Records projection.
+- Answer-backed projected records expose the exact current durable Answer Revision and trace Record Revision that support them.
+- Derived records without a materialized source revision are explicitly identified as derived current-state projections.
+- Recomputing Records MUST NOT write new authoritative rows merely because the Records view was opened.
+
+**Constraints:**
+
+- Durable Interview answers and revisions remain authoritative; the Records projection remains derived.
+- M2.2 MUST NOT materialize derived assumptions/blockers/open questions as independent durable truth solely for display.
+- Draft artifact generation/promotion from the durable Records view remains a later slice.
+
+**Evidence / validation:**
+
+- Automated parity tests against the validated Records projector.
+- SQLite integration tests proving answer-backed evidence and derived-record appearance/disappearance.
+- Read-only check proving opening/recomputing Records does not advance Project version or create revisions.
+
+### WF-026 — Show durable current Records with trace evidence
+
+**Status:** Approved
+
+**Priority:** P1
+
+**User or system:** User
+
+**Requirement:**
+
+> When the local user opens Records for a durable project, Wayfound MUST show the current Records projection and enough trace evidence to distinguish saved answer-backed records from derived current-state records.
+
+**Acceptance criteria:**
+
+- Records is reachable from the durable project Interview and returns to the same project without losing saved state.
+- Records shows counts for decisions, assumptions, blockers, and open questions.
+- Each record shows its validated record identifier, friendly type/title, statement, source, and supporting detail when available.
+- Answer-backed records indicate that they are backed by saved Interview revisions and expose their durable revision identifiers for traceability.
+- Derived records clearly say that they are derived from current Interview state and are not separately stored as project truth.
+- Refreshing Records produces the same current projection for the same durable Interview state.
+- Revising the Interview and returning to Records updates the projection rather than preserving stale derived records.
+- The Records page remains usable at desktop and 390 px widths with no horizontal overflow.
+
+**Constraints:**
+
+- M2.2 is a read/projection slice; it does not add Record editing, approval, artifact generation, or external AI.
+- Friendly labels remain primary while stable identifiers and revision evidence remain available for traceability.
+
+**Evidence / validation:**
+
+- Chromium navigation/refresh/revision flow.
+- Responsive browser check at 390 px.
+- Integration tests for counts and trace evidence.
+
 ## 5. Non-functional requirements
 
 Do not invent numeric targets. Establish targets only when the product context supports them.
@@ -848,6 +917,8 @@ Local and hosted adapters SHOULD share the same domain-rule tests/contracts so p
 | WF-022 | Keep project content local by default and make AI egress explicit | P0 | Validated | AI boundary + logging + no-cloud build tests |
 | WF-023 | Preserve validated adaptive Interview semantics in the durable runtime | P0 | Validated | Model parity + adaptive durable tests |
 | WF-024 | Persist and restore the current adaptive Interview answer state | P0 | Validated | SQLite revision/reopen + Chromium tests |
+| WF-025 | Reconstruct validated Records from durable Interview state | P0 | Approved | Records parity + SQLite projection tests |
+| WF-026 | Show durable current Records with trace evidence | P1 | Approved | Chromium + responsive + trace evidence |
 
 ## 7. Validation record
 
