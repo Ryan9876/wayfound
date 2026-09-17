@@ -43,6 +43,8 @@ A future external AI call, persistence service, account system, or integration w
 | Question selector | Chooses the highest-priority unanswered required question that currently applies | Current question selection | Question registry and Interview state | Interview order or completion can become incorrect |
 | Interview model | Owns answers, history, applicability, derived state, progress, and completion rules | In-memory Interview state semantics | JavaScript runtime | Decisions or derived state become incorrect |
 | Project-state panel | Shows dynamic coverage, choices, guesses, blockers, and open questions | Presentation derived from Interview model | Interview model | User loses visibility into definition state |
+| Record projector | Converts applicable Interview choices and derived uncertainty into typed records with deterministic identifiers | Derived record view | Interview model | Traceability view can become incomplete or misleading |
+| Records renderer | Shows the current session record projection and record counts | Presentation only | Record projector | User cannot inspect the current traceability record |
 
 The classifier and selector are intentionally local and deterministic in this slice. They prove adaptive behavior without selecting an external AI provider or creating a new data-processing boundary.
 
@@ -65,7 +67,9 @@ Important fields are:
 
 Question definitions remain static configuration in `app/interview-model.js`, but each question now defines applicability, priority, required state, recommendation logic, and user-facing options. Progress and completion are calculated only from questions that currently apply.
 
-The browser session is temporary. Refreshing or closing the page can discard state. Persistence is not an approved requirement for this slice.
+Records are a deterministic projection of Interview state, not an independent authority. Decision records use semantic identifiers such as `DEC-OUTCOME`; derived assumption, blocker, and open-question identifiers use deterministic content-based suffixes.
+
+The browser session is temporary. Refreshing or closing the page can discard Interview state and its derived records. Persistence is not an approved requirement for this slice.
 
 ## 5. Interfaces and contracts
 
@@ -83,6 +87,7 @@ The Interview model exposes deterministic functions for:
 - dynamic progress calculation
 - completion determination
 - summary creation
+- structured record projection for decisions, assumptions, blockers, and open questions
 
 There are no remote interfaces in the initial slice.
 
@@ -118,7 +123,7 @@ Automated tests provide evidence for the Interview state model. The adaptive sli
 
 ## 9. Deployment and environments
 
-The initial slice is a static web application under `app/` and can be served by any basic static HTTP server.
+The initial slice is a static web application under `app/` and can be served by any basic static HTTP server. Interview and Records are client-side views over the same in-memory state; switching views does not cross a network boundary.
 
 No production hosting platform is selected. Deployment, environment promotion, secrets, migrations, rollout, and rollback remain `TBD` for a future production architecture decision.
 
@@ -152,6 +157,7 @@ Create an ADR when a change:
 | Production architecture not yet selected | Open decision | Prototype cannot be treated as production architecture | Select production boundaries after the Interview slice is validated | Project owner | Open |
 | Local intent classification uses bounded keyword/rule signals | Known limitation | An idea can be under-tagged or over-tagged, which can make a question appear too early or be skipped | Keep routing hints visible and non-authoritative; validate representative idea types; consider richer semantic classification only after its trust and privacy boundaries are approved | Project owner | Open |
 | Browser-session state is temporary | Known limitation | Refresh or close can discard progress | Define persistence only after privacy and data authority are approved | Project owner | Open |
+| Records are derived, session-only views | Known limitation | Records cannot yet be shared, reopened, or referenced across sessions | Add persistence only after authoritative data ownership, identity, retention, and privacy are approved | Project owner | Open |
 | Browser validation is not yet committed as a repeatable CI suite | Validation gap | Local browser review proves the current change but does not automatically protect every future UI change | Add browser-level automated interaction/accessibility tests when the project selects its production test tooling | Project owner | Open |
 
 ## 14. Change rule

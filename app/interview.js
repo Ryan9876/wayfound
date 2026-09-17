@@ -5,6 +5,7 @@ import {
   deriveProjectState,
   getApplicableQuestions,
   getProgress,
+  getInterviewRecords,
   getResolvedQuestion,
   getSelectedOption,
   getSummary,
@@ -20,6 +21,10 @@ let state = createInitialState();
 const questionBody = document.querySelector('#questionBody');
 const nextButton = document.querySelector('#nextBtn');
 const backButton = document.querySelector('#backBtn');
+const interviewPage = document.querySelector('#interviewPage');
+const recordsPage = document.querySelector('#recordsPage');
+const pageName = document.querySelector('#pageName');
+const stagePill = document.querySelector('#stagePill');
 
 const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (character) => ({
   '&': '&amp;',
@@ -28,6 +33,78 @@ const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (character) => (
   '"': '&quot;',
   "'": '&#039;'
 }[character]));
+
+function recordTypeLabel(type) {
+  return {
+    decision: 'Decision',
+    assumption: 'Guess to verify',
+    blocker: 'Blocker',
+    'open-question': 'Open question'
+  }[type] ?? type;
+}
+
+function recordCountLabel(type, count) {
+  const labels = {
+    decision: ['Decision', 'Decisions'],
+    assumption: ['Guess to verify', 'Guesses to verify'],
+    blocker: ['Blocker', 'Blockers'],
+    'open-question': ['Open question', 'Open questions']
+  }[type];
+  return labels ? labels[count === 1 ? 0 : 1] : type;
+}
+
+function renderRecords() {
+  const records = getInterviewRecords(state);
+  const counts = records.reduce((result, record) => {
+    result[record.type] = (result[record.type] ?? 0) + 1;
+    return result;
+  }, {});
+
+  document.querySelector('#recordCounts').innerHTML = ['decision', 'assumption', 'blocker', 'open-question']
+    .map((type) => {
+      const count = counts[type] ?? 0;
+      return `<span class="record-count"><strong>${count}</strong>${escapeHtml(recordCountLabel(type, count))}</span>`;
+    })
+    .join('');
+
+  const body = document.querySelector('#recordsBody');
+  if (!records.length) {
+    body.innerHTML = `<div class="records-empty"><strong>No records yet.</strong>Finish a few Interview choices and Wayfound will keep the important parts here.</div>`;
+    return;
+  }
+
+  body.innerHTML = records.map((record) => `
+    <article class="record-card">
+      <div class="record-top">
+        <div class="record-meta">
+          <span class="record-badge ${escapeHtml(record.type)}">${escapeHtml(recordTypeLabel(record.type))}</span>
+          <span class="record-id">${escapeHtml(record.id)}</span>
+          ${record.recommended === true ? '<span class="recommended">Recommended choice</span>' : ''}
+        </div>
+        <span class="record-source">From ${escapeHtml(record.source)}</span>
+      </div>
+      <h3>${escapeHtml(record.title)}</h3>
+      <p class="record-statement">${escapeHtml(record.statement)}</p>
+      ${record.detail ? `<p class="record-detail">${escapeHtml(record.detail)}</p>` : ''}
+    </article>`).join('');
+}
+
+function showPage(page) {
+  const records = page === 'records';
+  interviewPage.hidden = records;
+  recordsPage.hidden = !records;
+  pageName.textContent = records ? 'Records' : 'Interview';
+  stagePill.textContent = records ? 'Project memory' : 'Stage 1 · Understand';
+
+  document.querySelectorAll('[data-page]').forEach((link) => {
+    const active = link.dataset.page === page;
+    link.classList.toggle('active', active);
+    if (active) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
+  });
+
+  if (records) renderRecords();
+}
 
 function renderIdeaHints() {
   const hints = document.querySelector('#ideaHints');
@@ -174,8 +251,14 @@ function renderComplete() {
       <div class="why-box"><strong>Traceability preview</strong><br>Each answer is tied to the question that created it. Future requirements, design choices, tasks, tests, and releases can point back to that decision.</div>
 
       ${derived.blockers.length ? `<div class="warning-box"><strong>Something is stopping dependent work</strong><br>${escapeHtml(derived.blockers[0])}</div>` : ''}
+      <div class="view-records-row"><button class="button" id="viewRecordsBtn" type="button">View records</button></div>
     </div>
   `;
+
+  document.querySelector('#viewRecordsBtn').addEventListener('click', () => {
+    window.location.hash = 'records';
+    showPage('records');
+  });
 
   backButton.hidden = false;
   nextButton.textContent = 'Review choices';
@@ -238,4 +321,17 @@ function render() {
 
 nextButton.addEventListener('click', continueInterview);
 backButton.addEventListener('click', goBack);
+document.querySelector('#returnInterviewBtn').addEventListener('click', () => {
+  window.location.hash = 'interview';
+  showPage('interview');
+});
+document.querySelectorAll('[data-page]').forEach((link) => {
+  link.addEventListener('click', (event) => {
+    event.preventDefault();
+    window.location.hash = link.dataset.page;
+    showPage(link.dataset.page);
+  });
+});
+window.addEventListener('hashchange', () => showPage(window.location.hash === '#records' ? 'records' : 'interview'));
 render();
+showPage(window.location.hash === '#records' ? 'records' : 'interview');

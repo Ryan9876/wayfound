@@ -10,13 +10,13 @@ Do not use this file to redefine product scope or architecture. Update the autho
 
 ## 1. Current objective
 
-Deliver and validate adaptive Interview question selection without introducing an external AI dependency.
+Deliver and validate traceable Interview records without introducing persistence or a second data authority.
 
-The adaptive slice must use the starting idea and accepted choices to ask relevant questions, skip irrelevant questions, reveal new material decisions when prior answers make them applicable, and calculate readiness from the current required question set.
+The records slice must project accepted Interview choices and derived uncertainty into structured records, show those records in Wayfound Records, and preserve the current session when the user moves between Interview and Records.
 
-Included requirements: WF-008 through WF-011, while preserving WF-001 through WF-007.
+Included requirements: WF-012 through WF-013, while preserving WF-001 through WF-011.
 
-Excluded from this objective: external AI or model calls, accounts, persistence, code generation, production integrations, and production deployment.
+Excluded from this objective: persistence, accounts, external AI or model calls, code generation, production integrations, and production deployment.
 
 ## 2. Delivery rules
 
@@ -81,11 +81,31 @@ Excluded from this objective: external AI or model calls, accounts, persistence,
 
 **Status:** Validated
 
+
+### M0.7 — Traceable Interview records
+
+**Goal:** Turn current Interview state into explicit records that Wayfound can show and later reference without creating a second authority.
+
+**Entry criteria:** M0.6 adaptive Interview validated.
+
+**Exit criteria:**
+
+- Accepted applicable answers produce deterministic decision records.
+- `Not sure` answers produce open-question records instead of accepted decisions.
+- Derived assumptions and blockers produce distinct records.
+- Records excludes stale answers that are no longer applicable.
+- Records page shows an empty state and current session records.
+- Switching between Interview and Records preserves the active in-memory state.
+- Records is usable on desktop and mobile layouts.
+- Automated record-model tests and browser review pass.
+
+**Status:** Validated
+
 ### M1 — Production architecture baseline
 
 **Goal:** Select the minimum production architecture required after the Interview experience is validated.
 
-**Entry criteria:** M0.6 adaptive Interview validated and next production outcome approved.
+**Entry criteria:** M0.7 traceable Interview records validated and next production outcome approved.
 
 **Exit criteria:**
 
@@ -127,7 +147,9 @@ Excluded from this objective: external AI or model calls, accounts, persistence,
 | Implement answer-driven question applicability | WF-009 | Implementation | Validated | Question registry | Applicability tests |
 | Implement dynamic progress and completion | WF-010 | Implementation | Validated | Applicability model | Completion tests + browser flow |
 | Preserve adaptive back/review history | WF-011 | Implementation | Validated | Adaptive navigation | History + browser tests |
-| Select production architecture | Architecture / future ADRs | Project owner | Blocked | Validated adaptive Interview and next production outcome | Architecture review |
+| Implement structured Interview record projection | WF-012 | Implementation | Validated | Adaptive Interview state | Record-model tests |
+| Implement Records view for current session | WF-013 | Implementation | Validated | Record projection | Desktop + mobile browser review |
+| Select production architecture | Architecture / future ADRs | Project owner | Blocked | Validated Interview Records slice and next production outcome | Architecture review |
 
 ## 5. Work item standard
 
@@ -163,10 +185,10 @@ Do not use `blocked` for ordinary uncertainty that can be handled by a reversibl
 
 ## 7. Future work
 
-Next candidate work after the validated adaptive Interview:
+Next candidate work after the validated Interview Records slice:
 
 - richer semantic question routing if the deterministic classifier proves too limited
-- structured decision records that feed Requirements, Journey, Work, and Records
+- promote selected records into draft Requirements, Journey, and Work artifacts
 - persistence with defined privacy and data authority
 - external AI assistance with explicit trust and data-processing boundaries
 - browser-level automated interaction and accessibility validation
