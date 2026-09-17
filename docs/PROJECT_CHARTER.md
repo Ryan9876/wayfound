@@ -59,7 +59,8 @@ For the initial delivery target:
 - visible interview progress and project state
 - explicit decisions, assumptions, blockers, and open questions
 - a completion summary that identifies the next recommended action
-- a structured interview model that can later support adaptive or AI-selected questions
+- adaptive question selection based on the user’s idea and prior choices so irrelevant questions can be skipped
+- a structured interview model that can later support richer semantic or AI-assisted question selection without replacing the user-facing workflow
 
 ### Out of scope
 

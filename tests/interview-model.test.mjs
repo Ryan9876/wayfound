@@ -1,53 +1,135 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  QUESTION_BANK,
+  advanceInterview,
+  classifyIdea,
   createInitialState,
   deriveProjectState,
-  getCoveragePercent,
+  getApplicableQuestions,
+  getNextQuestion,
+  getProgress,
   getSummary,
+  goBackInterview,
   isInterviewComplete,
-  selectAnswer
+  selectAnswer,
+  startInterview
 } from '../app/interview-model.js';
 
-test('blank interview starts with no coverage and is incomplete', () => {
+const withIdea = (idea) => ({ ...createInitialState(), idea });
+
+function answerUntilComplete(initial, chooser = () => 0) {
+  let state = startInterview(initial);
+  let guard = 0;
+  while (!state.complete && guard < 30) {
+    const q = getApplicableQuestions(state).find((item) => item.id === state.currentQuestionId);
+    const option = q.options[chooser(q, state)] ?? q.options[0];
+    state = selectAnswer(state, q.id, option.id);
+    state = advanceInterview(state);
+    guard += 1;
+  }
+  return state;
+}
+
+test('blank interview does not start', () => {
   const state = createInitialState();
-  assert.equal(getCoveragePercent(state), 0);
-  assert.equal(isInterviewComplete(state), false);
+  assert.equal(startInterview(state).started, false);
+  assert.equal(getProgress(state).percent, 0);
 });
 
-test('idea alone starts interview coverage', () => {
-  const state = { ...createInitialState(), idea: 'Build a puzzle game.' };
-  assert.equal(getCoveragePercent(state), 12);
+test('idea classifier detects broad project signals', () => {
+  assert.deepEqual(classifyIdea('A puzzle game for my friends'), ['game', 'collaboration']);
+  const tags = classifyIdea('AI network assistant that connects to an API');
+  assert.ok(tags.includes('automation'));
+  assert.ok(tags.includes('integration'));
+  assert.ok(tags.includes('technical'));
 });
 
-test('answer selection is immutable and creates a decision', () => {
-  const initial = { ...createInitialState(), idea: 'Build a puzzle game.' };
-  const next = selectAnswer(initial, 'outcome', 'clear-progress');
-  assert.equal(initial.answers.outcome, undefined);
-  assert.equal(next.answers.outcome, 'clear-progress');
+test('game gets a game question and skips automation questions', () => {
+  const state = withIdea('A puzzle game on a strange planet');
+  const ids = getApplicableQuestions(state).map((q) => q.id);
+  assert.ok(ids.includes('game-loop'));
+  assert.ok(!ids.includes('control'));
+  assert.ok(!ids.includes('dependencies'));
 });
 
-test('dependency assumption is visible as an assumption and blocker', () => {
-  let state = { ...createInitialState(), idea: 'Build a connected game.' };
+test('AI network tool gets control and dependency questions', () => {
+  const state = withIdea('An AI assistant that helps network engineers investigate incidents using APIs');
+  const ids = getApplicableQuestions(state).map((q) => q.id);
+  assert.ok(ids.includes('control'));
+  assert.ok(ids.includes('dependencies'));
+  assert.ok(ids.includes('failure'));
+  assert.ok(!ids.includes('game-loop'));
+});
+
+test('same state produces the same next question', () => {
+  let state = startInterview(withIdea('A tiny gardening helper'));
+  assert.equal(state.currentQuestionId, 'outcome');
+  assert.equal(getNextQuestion({ ...state, currentQuestionId: null }).id, 'outcome');
+  state = selectAnswer(state, 'outcome', 'easier');
+  state = advanceInterview(state);
+  assert.equal(state.currentQuestionId, 'audience');
+});
+
+test('an answer can make a new question applicable', () => {
+  let state = withIdea('An AI writing helper');
+  let ids = getApplicableQuestions(state).map((q) => q.id);
+  assert.ok(ids.includes('control'));
+  assert.ok(!ids.includes('failure'));
+  state = selectAnswer(state, 'control', 'risk-based');
+  ids = getApplicableQuestions(state).map((q) => q.id);
+  assert.ok(ids.includes('failure'));
+});
+
+test('not-sure answers become visible open questions without forcing a blocker', () => {
+  let state = withIdea('A puzzle game');
+  state = selectAnswer(state, 'game-loop', 'not-sure');
+  const derived = deriveProjectState(state);
+  assert.ok(derived.openQuestions.some((text) => text.includes('spend most of their time')));
+  assert.equal(derived.blockers.length, 0);
+});
+
+test('dependency assumption produces an assumption and blocker', () => {
+  let state = withIdea('A tool that connects to an API');
   state = selectAnswer(state, 'dependencies', 'assume-normal');
   const derived = deriveProjectState(state);
   assert.equal(derived.assumptions.length, 1);
   assert.equal(derived.blockers.length, 1);
 });
 
-test('interview is complete only when all questions are answered', () => {
-  let state = { ...createInitialState(), idea: 'Build something useful.' };
-  for (const question of QUESTION_BANK) {
-    state = selectAnswer(state, question.id, question.options[0].id);
-  }
+test('completion depends only on questions that apply to the idea and answers', () => {
+  const state = answerUntilComplete(withIdea('A puzzle game about ducks'));
+  assert.equal(state.complete, true);
   assert.equal(isInterviewComplete(state), true);
-  assert.equal(getCoveragePercent(state), 100);
+  const ids = getApplicableQuestions(state).map((q) => q.id);
+  assert.ok(ids.includes('game-loop'));
+  assert.ok(!ids.includes('control'));
 });
 
-test('summary returns user-facing labels', () => {
-  let state = { ...createInitialState(), idea: 'Build something useful.' };
-  state = selectAnswer(state, 'outcome', 'good-answer-faster');
+test('back navigation preserves answers and returns to the prior question', () => {
+  let state = startInterview(withIdea('A puzzle game'));
+  state = selectAnswer(state, state.currentQuestionId, 'enjoy');
+  state = advanceInterview(state);
+  assert.equal(state.currentQuestionId, 'audience');
+  state = goBackInterview(state);
+  assert.equal(state.currentQuestionId, 'outcome');
+  assert.equal(state.answers.outcome, 'enjoy');
+});
+
+test('summary contains only applicable answered decisions', () => {
+  const state = answerUntilComplete(withIdea('A study helper for science class'));
   const summary = getSummary(state);
-  assert.equal(summary.outcome, 'Help people reach a good answer faster');
+  assert.equal(summary.idea, 'A study helper for science class');
+  assert.ok(summary.decisions.some((d) => d.id === 'learning-mode'));
+  assert.ok(!summary.decisions.some((d) => d.id === 'game-loop'));
+});
+
+test('privacy becomes applicable when collaboration becomes shared', () => {
+  let state = { ...createInitialState(), idea: 'A puzzle game for my friends' };
+  let ids = getApplicableQuestions(state).map((question) => question.id);
+  assert.ok(ids.includes('collaboration'));
+  assert.ok(!ids.includes('privacy'));
+
+  state = selectAnswer(state, 'collaboration', 'small-shared');
+  ids = getApplicableQuestions(state).map((question) => question.id);
+  assert.ok(ids.includes('privacy'));
 });
