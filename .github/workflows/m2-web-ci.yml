@@ -1,0 +1,34 @@
+name: M2 web CI
+
+on:
+  pull_request:
+    paths:
+      - 'web/**'
+      - '.github/workflows/m2-web-ci.yml'
+      - 'docs/PRODUCT_REQUIREMENTS.md'
+      - 'docs/DELIVERY_PLAN.md'
+      - 'docs/M2_REQUIREMENTS.md'
+      - 'docs/adr/0008-m2-postgres-access.md'
+
+permissions:
+  contents: read
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+      - name: Domain tests
+        run: npm test
+      - name: Type check
+        run: npm run typecheck
+      - name: Production build
+        run: npm run build
