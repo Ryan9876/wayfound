@@ -506,7 +506,7 @@ Generated drafts need an intentional human disposition before they can become au
 - Seven automated artifact-review model tests pass, including invalid-approval rejection and stale-content reset.
 - Chromium browser validation passed for Propose, Set aside, Undo, explicit non-approval language, stale-content reset, and responsive behavior at 1440 px and 390 px with no horizontal overflow.
 
-### WF-017 — Map authenticated users to stable Wayfound Actors
+### WF-017 — Reuse a stable local Wayfound Actor without requiring sign-in
 
 **Status:** Approved
 
@@ -516,28 +516,28 @@ Generated drafts need an intentional human disposition before they can become au
 
 **Requirement:**
 
-> When a hosted project action requires identity, Wayfound MUST authenticate the user through the configured identity provider and map that external identity to one stable internal Wayfound Actor before project authority is evaluated.
+> When Wayfound runs in default local mode, Wayfound MUST create or reuse one stable local human Actor without requiring an external account so that local project authority and transition history have a durable human identity.
 
 **Acceptance criteria:**
 
-- An unauthenticated request for a protected project action is rejected.
-- The same Clerk subject maps to the same Wayfound Actor across requests.
+- Local mode starts without Clerk or another external identity provider.
+- Repeated requests and database reopen reuse the same local Wayfound Actor.
 - Wayfound uses the internal Actor identifier for project membership and transition metadata.
-- Clerk roles or organization roles do not replace Wayfound project authorization.
-- The initial mapping stores only the external subject and provider information required for identity mapping; it does not copy profile free text into the project store.
+- The local Actor is human and does not grant AI/service Actors project authority.
+- Enabling a future hosted identity adapter does not change Wayfound-owned project authorization rules.
 
 **Constraints:**
 
-- Clerk is the accepted M1 authentication provider.
-- M2 supports human Actors only for interactive project actions.
-- Formal age, guardian, and consent behavior for hosted younger users remains a release gate and is not invented by this requirement.
+- M2 is single-user local mode by default.
+- Hosted identity is optional and outside the M2 merge gate.
+- Formal hosted age, guardian, and consent behavior remains a later release gate.
 
 **Evidence / validation:**
 
-- Authentication/Actor mapping integration tests.
-- Unauthorized-request tests.
+- Local Actor persistence/reopen integration tests.
+- Optional hosted Actor mapping compatibility tests may remain non-blocking.
 
-### WF-018 — Create and reopen a private durable project through server authority
+### WF-018 — Create and reopen a private durable local project through server authority
 
 **Status:** Approved
 
@@ -547,30 +547,29 @@ Generated drafts need an intentional human disposition before they can become au
 
 **Requirement:**
 
-> When an authenticated user creates a project, Wayfound MUST create the project through the authoritative server command path, make the creator an owner, keep the project private by default, and persist enough state to reopen the project after browser or session loss.
+> When the local user creates a project, Wayfound MUST create the project through the local authoritative server command path, make the local Actor an owner, keep the project private on the computer by default, and persist enough state to reopen the project after process/database reopen.
 
 **Acceptance criteria:**
 
-- Create Project requires an authenticated Wayfound Actor.
-- The server creates an application-owned Project identifier and a project-owner membership in one authoritative transaction.
-- The project title and starting idea are durable project state.
-- A later authenticated request by the project owner can reopen the project after a new browser session.
-- A nonmember cannot read the project.
-- Repeating the same create command with the same Actor, operation, and idempotency key returns the original command result rather than creating a second project.
+- Create Project requires a resolved Wayfound Actor, which defaults to the stable local Actor.
+- The local server creates an application-owned Project identifier and owner membership in one transaction.
+- Project title and starting idea are durable local project state.
+- The owner can reopen the project after the database/server is closed and reopened.
+- Repeating the same create command with the same Actor, operation, and idempotency key returns the original result rather than creating a second project.
 - The browser does not write project rows directly.
+- No Clerk, Neon, Vercel, or external AI credential is required for this behavior.
 
 **Constraints:**
 
-- The first hosted project is private by default.
-- M2 does not add public sharing or invitations.
-- Real hosted user content MUST NOT be released until the applicable retention, deletion, age, and consent requirements are approved.
+- M2 does not add public sharing, invitations, or synchronization.
+- The default database remains local/private unless the user deliberately enables a future hosted/sync feature.
 
 **Evidence / validation:**
 
-- Project command integration tests against PostgreSQL.
-- Browser/session reopen validation in a non-production environment.
+- SQLite integration and reopen tests.
+- Local browser flow when the UI gate is added.
 
-### WF-019 — Persist accepted answers as immutable revisions with traceable Records
+### WF-019 — Persist accepted answers as immutable local revisions with traceable Records
 
 **Status:** Approved
 
@@ -580,7 +579,7 @@ Generated drafts need an intentional human disposition before they can become au
 
 **Requirement:**
 
-> When an authenticated project member accepts a material Interview answer, Wayfound MUST persist a new immutable Answer Revision and its current trace Record through one server-side transaction so history and source traceability are preserved.
+> When the local project owner accepts a material Interview answer, Wayfound MUST persist a new immutable Answer Revision and its current trace Record through one local server-side transaction so history and exact source traceability are preserved.
 
 **Acceptance criteria:**
 
@@ -589,20 +588,20 @@ Generated drafts need an intentional human disposition before they can become au
 - The same transaction creates or advances the corresponding Record Revision and links it to the exact Answer Revision that produced it.
 - The Project version advances with the accepted change.
 - A command based on a stale expected Project version is rejected as a conflict instead of silently overwriting current state.
-- Repeating the same accepted-answer command with the same Actor, operation, and idempotency key returns the original command result without duplicating revisions.
+- Repeating the same command with the same Actor, operation, and idempotency key returns the original result without duplicate revisions.
 - Transition metadata does not duplicate unrestricted project free text.
 
 **Constraints:**
 
-- M2 proves one decision/Record path; it does not yet migrate every prototype question into hosted production behavior.
-- The current validated prototype remains the UX reference while the production persistence path is introduced incrementally.
+- M2 proves one decision/Record path before migrating the complete validated Interview experience.
+- The validated static prototype remains the UX reference during incremental migration.
 
 **Evidence / validation:**
 
-- Domain tests for optimistic concurrency and semantic identifiers.
-- PostgreSQL integration tests for atomic revision, Record, trace-link, and transition writes.
+- Domain tests for concurrency and semantic identifiers.
+- SQLite integration tests for revision, Record, trace-link, transition, and reopen behavior.
 
-### WF-020 — Materialize a proposal against exact current source revisions
+### WF-020 — Materialize a proposal against exact current local source revisions
 
 **Status:** Approved
 
@@ -612,30 +611,30 @@ Generated drafts need an intentional human disposition before they can become au
 
 **Requirement:**
 
-> When an authorized user chooses Propose for a draft requirement or work item, Wayfound MUST materialize the exact proposed content and exact current source Record Revisions without treating the proposal as Approved.
+> When the local project owner chooses Propose for a draft requirement or work item, Wayfound MUST materialize the exact proposed content and exact current source Record Revisions without treating the proposal as Approved.
 
 **Acceptance criteria:**
 
 - Rendering a generated candidate does not persist an Artifact by itself.
 - Propose requires the `artifact.propose` project capability.
-- Propose snapshots the title, statement, content hash, and immutable Artifact Revision.
-- The proposal stores Trace Links to the exact current Record Revisions supplied as sources.
-- If any supplied source revision is no longer current, the command is rejected and the user must rebuild or review the draft.
+- Propose snapshots title, statement, content hash, and immutable Artifact Revision.
+- Trace Links target the exact current Record Revisions supplied as sources.
+- If any supplied source revision is no longer current, the command is rejected.
 - The Project version advances transactionally with the proposal.
 - The resulting lifecycle state is `proposed`.
-- M2 exposes no command or database lifecycle state that can turn the proposal into `approved`.
+- M2 exposes no command or local database lifecycle value that can turn the proposal into `approved`.
 
 **Constraints:**
 
-- Formal approval is outside M2 and requires a separately approved product requirement.
-- Proposal persistence does not mutate the source Records.
+- Formal approval is outside M2 and requires a separately approved requirement.
+- Proposal persistence does not mutate source Records.
 
 **Evidence / validation:**
 
 - Domain tests for exact source-revision checks and content hashing.
-- PostgreSQL integration tests for Artifact Revision, Trace Link, transition, and Project-version atomicity.
+- SQLite integration tests for Artifact Revision, Trace Link, transition, lifecycle constraint, and Project-version atomicity.
 
-### WF-021 — Enforce Wayfound project authorization for project data and commands
+### WF-021 — Enforce Wayfound project authorization in local and optional hosted modes
 
 **Status:** Approved
 
@@ -645,29 +644,29 @@ Generated drafts need an intentional human disposition before they can become au
 
 **Requirement:**
 
-> When an Actor reads or changes durable project state, Wayfound MUST evaluate project membership and Wayfound-owned capabilities at the server authority boundary before returning project data or committing the command.
+> When an Actor reads or changes durable project state, Wayfound MUST evaluate Wayfound-owned project membership and capabilities at the server authority boundary before returning project data or committing the command, regardless of whether identity/persistence are local or hosted adapters.
 
 **Acceptance criteria:**
 
 - The project creator receives the M2 `owner` role.
-- The M2 owner role can read the project, change accepted project state, and propose an artifact.
+- The M2 owner can read project state, change accepted state, and propose an Artifact.
 - An Actor without project membership cannot read or change the project.
-- Authorization uses Wayfound membership/capability records rather than Clerk organization or role data as project truth.
-- AI or service Actors do not receive interactive project authority in M2.
+- Authorization uses Wayfound membership/capability records rather than provider roles as project truth.
+- AI/service Actors do not receive interactive project authority in M2.
 - The browser cannot bypass authorization by submitting a lifecycle value directly.
 
 **Constraints:**
 
-- M2 defines only the owner role required by the first vertical slice.
+- M2 defines only the owner role required by the first durable slice.
 - Additional roles and formal approval authority require later approved requirements.
 
 **Evidence / validation:**
 
-- Capability unit tests.
-- Server-route authorization tests.
-- PostgreSQL integration tests using member and nonmember Actors.
+- Capability tests.
+- SQLite integration tests using member/nonmember Actors where applicable.
+- Optional hosted adapter tests remain compatibility evidence, not local M2 prerequisites.
 
-### WF-022 — Keep the first hosted-data slice isolated and content-minimal
+### WF-022 — Keep project content local by default and make AI egress explicit
 
 **Status:** Approved
 
@@ -677,28 +676,31 @@ Generated drafts need an intentional human disposition before they can become au
 
 **Requirement:**
 
-> When Wayfound runs the M2 hosted-data slice, Wayfound MUST keep development, preview, and production data boundaries explicit and MUST avoid sending project content to external AI or ordinary telemetry so incomplete production policy cannot silently become data practice.
+> When Wayfound runs locally, Wayfound MUST keep project content on the local computer by default, keep AI disabled unless configured, support local model endpoints without external-content permission, and fail closed before sending project content to a non-loopback AI endpoint unless external AI processing has been deliberately enabled.
 
 **Acceptance criteria:**
 
-- The configured Wayfound data environment is explicitly `development`, `preview`, or `production`.
-- A Vercel environment cannot start durable data operations when its environment label conflicts with the configured Wayfound data environment.
-- Preview and development configuration do not use production project credentials by design.
-- Ordinary command telemetry records identifiers, operation/result metadata, and error codes without copying project titles, starting ideas, answers, or artifact statements.
-- M2 makes no external AI/model call with project content.
-- Production release with real hosted user content remains blocked until retention, deletion, consent, and age-related requirements for the intended users are approved.
+- AI is disabled by default.
+- Ollama resolves to a loopback OpenAI-compatible endpoint by default.
+- LM Studio resolves to a loopback OpenAI-compatible endpoint by default.
+- A loopback OpenAI-compatible endpoint does not require external-AI opt-in.
+- A non-loopback AI endpoint is rejected unless explicit external-AI permission is enabled.
+- An external OpenAI-compatible provider requires its configured credential without placing the credential in project records, browser state, Git, or ordinary telemetry.
+- AI/model output remains non-authoritative and cannot directly approve or mutate project state.
+- Ordinary command telemetry excludes project titles, starting ideas, answers, and artifact statements.
+- Hosted persistence/identity/deployment are optional and do not become requirements for local use.
 
 **Constraints:**
 
-- Synthetic or development-only project content MAY be used to validate M2 before the hosted-data policy is approved.
-- This requirement does not define numeric retention windows, age thresholds, guardian behavior, or legal policy.
+- M2 does not require an LLM to use core project functions.
+- Provider-specific adapters beyond the initial local/OpenAI-compatible boundary may be added later.
+- A future user-facing provider/settings screen is separate work; M2 may configure providers through local environment/settings plumbing.
 
 **Evidence / validation:**
 
-- Environment-isolation unit tests.
-- Configuration review for Vercel environment separation.
-- Logging/content review.
-- Release-gate review before real hosted user data is accepted.
+- AI provider-boundary tests.
+- Logging/content-minimization tests.
+- Next.js build and local project tests with no hosted credentials.
 
 ## 5. Non-functional requirements
 
@@ -708,13 +710,13 @@ Do not invent numeric targets. Establish targets only when the product context s
 
 The initial Interview slice MUST run without secrets, credentials, protected actions, or external service calls.
 
-Production authentication and authority boundaries are defined by ADR-0003, ADR-0005, and ADR-0007. M2 MUST enforce those boundaries through WF-017 and WF-021 before durable project commands are accepted.
+The durable runtime authority boundaries are defined by ADR-0003, ADR-0005, and ADR-0009. M2 MUST enforce Wayfound-owned Actor/project authority before durable project commands are accepted. Local operation MUST NOT require an external identity provider.
 
 ### 5.2 Reliability
 
 The initial Interview slice MUST keep its derived state deterministic for the same idea and selected answers.
 
-M2 durable project persistence MUST survive browser/session loss for the bounded project state defined by WF-018 through WF-020. Stale consequential writes MUST fail rather than use silent last-write-wins behavior.
+M2 local durable persistence MUST survive database/process reopen for the bounded project state defined by WF-018 through WF-020. Stale consequential writes MUST fail rather than use silent last-write-wins behavior.
 
 ### 5.3 Performance
 
@@ -724,27 +726,29 @@ No numeric target is approved for the initial slice.
 
 The initial Interview slice MUST support keyboard navigation for interactive controls and MUST expose selection state through standard accessible control semantics where practical for the static prototype.
 
-The production accessibility standard remains `TBD` and must be selected before production release.
+The durable accessibility standard remains `TBD` and must be selected before a broad release.
 
 ### 5.5 Privacy and data governance
 
 The initial Interview slice MUST NOT send or persist Interview content outside the current browser session.
 
-M2 MAY use synthetic/development content to validate hosted persistence. Production release with real hosted user content remains blocked until retention, deletion, consent, and age-related requirements for the intended users are approved. External AI processing of project content is outside M2.
+M2 durable project content is local by default. AI is optional. Project content MUST NOT be sent to a non-loopback AI endpoint unless external AI processing is deliberately enabled for that configuration/feature. Hosted release with real user content remains separately gated by retention, deletion, consent, and age-related requirements.
 
 ### 5.6 Observability
 
-M2 MUST produce content-minimal structured command telemetry sufficient to diagnose command, identity, database, and migration failures without copying unrestricted project text. The observability vendor remains `TBD`.
+M2 MUST produce content-minimal structured command telemetry sufficient to diagnose command, local persistence, optional identity-adapter, and AI-adapter failures without copying unrestricted project text. Local operation MUST NOT require an external observability service.
 
 ### 5.7 Compatibility
 
-The prototype uses standards-based HTML, CSS, and JavaScript. Formal supported-browser targets remain `TBD`.
+The prototype uses standards-based HTML, CSS, and JavaScript. Formal supported-browser and desktop-packaging targets remain `TBD`.
 
 ### 5.8 Maintainability
 
 Consequential Interview behavior must be represented in repository documentation and must have a practical validation path.
 
 The Interview decision model SHOULD remain separate from rendering logic so question-routing rules or a future approved semantic classifier can evolve without requiring a complete UI rewrite.
+
+Local and hosted adapters SHOULD share the same domain-rule tests/contracts so provider differences do not redefine project semantics.
 
 ## 6. Requirement index
 
@@ -767,12 +771,12 @@ The Interview decision model SHOULD remain separate from rendering logic so ques
 | WF-015 | Show draft outputs clearly in Records | P1 | Validated | Browser + artifact-model tests |
 | WF-016 | Review actionable draft artifacts without implying approval | P0 | Validated | Review-state model + Chromium interaction tests |
 
-| WF-017 | Map authenticated users to stable Wayfound Actors | P0 | Approved | Auth/Actor integration tests |
-| WF-018 | Create and reopen a private durable project through server authority | P0 | Approved | Project/PostgreSQL integration + browser reopen |
-| WF-019 | Persist accepted answers as immutable revisions with traceable Records | P0 | Approved | Domain + PostgreSQL integration tests |
-| WF-020 | Materialize a proposal against exact current source revisions | P0 | Approved | Domain + PostgreSQL integration tests |
-| WF-021 | Enforce Wayfound project authorization for project data and commands | P0 | Approved | Capability + route/integration tests |
-| WF-022 | Keep the first hosted-data slice isolated and content-minimal | P0 | Approved | Environment/config/logging/release-gate review |
+| WF-017 | Reuse a stable local Wayfound Actor without requiring sign-in | P0 | Approved | Local Actor persistence/reopen tests |
+| WF-018 | Create and reopen a private durable local project through server authority | P0 | Approved | SQLite integration + reopen tests |
+| WF-019 | Persist accepted answers as immutable local revisions with traceable Records | P0 | Approved | Domain + SQLite integration tests |
+| WF-020 | Materialize a proposal against exact current local source revisions | P0 | Approved | Domain + SQLite integration tests |
+| WF-021 | Enforce Wayfound project authorization in local and optional hosted modes | P0 | Approved | Capability + adapter integration tests |
+| WF-022 | Keep project content local by default and make AI egress explicit | P0 | Approved | AI boundary + logging + no-cloud build tests |
 
 ## 7. Validation record
 
