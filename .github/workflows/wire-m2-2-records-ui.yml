@@ -1,0 +1,33 @@
+name: Wire M2.2 Records UI
+
+on:
+  push:
+    branches:
+      - feature/m2.2-durable-records
+    paths:
+      - '.github/scripts/wire_m2_2_records_ui.py'
+      - '.github/workflows/wire-m2-2-records-ui.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  wire:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/m2.2-durable-records
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Wire Records navigation and styles
+        run: python .github/scripts/wire_m2_2_records_ui.py
+      - name: Commit UI wiring
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add web/src/app/projects/'[projectId]'/durable-interview.tsx web/src/app/globals.css
+          git commit -m 'Wire M2.2 Records navigation and styles'
+          git push origin HEAD:feature/m2.2-durable-records
