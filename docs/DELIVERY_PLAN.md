@@ -10,15 +10,13 @@ Do not use this file to redefine product scope or architecture. Update the autho
 
 ## 1. Current objective
 
-**TBD — define the first bounded delivery outcome.**
+Deliver and validate the first Wayfound Interview vertical slice.
 
-A good objective identifies:
+The slice must let a user describe an idea in plain language, make a small set of guided decisions, understand recommendations and tradeoffs, see project state, and finish with a usable summary and next action.
 
-- user or system outcome
-- included requirements
-- excluded work
-- validation method
-- completion condition
+Included requirements: WF-001 through WF-007.
+
+Excluded from this objective: accounts, persistence, external AI, code generation, integrations, and production deployment.
 
 ## 2. Delivery rules
 
@@ -33,40 +31,58 @@ A good objective identifies:
 
 ### M0 — Product definition
 
-**Goal:** Establish enough approved product context to select an architecture and define the first build slice.
+**Goal:** Establish enough approved product context to support the first Interview slice without inventing production boundaries.
 
 **Exit criteria:**
 
-- Product statement approved.
-- Primary users and core problem approved.
-- In-scope and out-of-scope boundaries approved.
-- Initial delivery target approved.
-- Initial functional requirements approved.
-- Key non-functional constraints identified or explicitly deferred.
+- Product statement defined for current scope.
+- Primary users and core problem defined for current scope.
+- Initial in-scope and out-of-scope boundaries defined.
+- Initial delivery target defined.
+- WF-001 through WF-007 approved.
+- Production-only unknowns remain explicit rather than assumed.
 
-**Status:** In progress
+**Status:** Implemented; charter remains Draft pending broader product review.
 
-### M1 — Architecture baseline
+### M0.5 — Guided Interview vertical slice
 
-**Goal:** Select the minimum architecture required for the first delivery target.
+**Goal:** Deliver the first interactive Wayfound behavior while keeping the production architecture reversible.
 
-**Entry criteria:** M0 exit criteria met.
+**Entry criteria:** WF-001 through WF-007 approved.
+
+**Exit criteria:**
+
+- User can enter a free-form idea.
+- User can complete the starter guided decision flow.
+- Recommendations, rationale, and tradeoffs are visible.
+- Project state shows decisions, assumptions, blockers, and open questions.
+- Completion produces a summary and next action.
+- Automated Interview model tests pass.
+- Manual browser review confirms layout, keyboard interaction, responsive behavior, and Wayfound visual consistency.
+
+**Status:** In progress — implementation and automated model validation complete; manual browser validation remains.
+
+### M1 — Production architecture baseline
+
+**Goal:** Select the minimum production architecture required after the Interview experience is validated.
+
+**Entry criteria:** M0.5 user experience validated and next production outcome approved.
 
 **Exit criteria:**
 
 - System context defined.
 - Major component boundaries defined.
 - Data authority defined.
-- Security boundaries defined.
+- Security and privacy boundaries defined.
 - Deployment and rollback approach defined.
 - Foundational decisions recorded as ADRs.
 - Validation approach defined.
 
 **Status:** Proposed
 
-### M2 — First working vertical slice
+### M2 — First production-capable vertical slice
 
-**Goal:** Deliver one end-to-end user or system outcome with production-quality engineering practices appropriate to the target environment.
+**Goal:** Deliver one end-to-end Wayfound outcome using the approved production architecture.
 
 **Entry criteria:** Required M1 decisions approved.
 
@@ -86,11 +102,13 @@ A good objective identifies:
 
 | Work item | Source | Owner | Status | Dependency | Validation |
 | --- | --- | --- | --- | --- | --- |
-| Define Wayfound product statement | Project charter | Project owner | Proposed | None | Charter review |
-| Define primary users and core problem | Project charter | Project owner | Proposed | None | Charter review |
-| Define first delivery outcome | Project charter / requirements | Project owner | Proposed | Product statement | Scope review |
-| Create initial approved requirements | Product requirements | TBD | Blocked | Product definition | Acceptance criteria review |
-| Select architecture baseline | Architecture / ADRs | TBD | Blocked | Approved initial requirements | Architecture review |
+| Define current Wayfound product statement and broad users | Project charter | Project owner | Implemented | Current project-owner instruction | Charter review |
+| Define guided Interview requirements | WF-001 through WF-007 | Project owner | Implemented | Product definition | Requirements review |
+| Implement dependency-free Interview page | WF-001 through WF-007 | Implementation | Implemented | Requirements | Automated state tests + manual browser review |
+| Validate Interview state model | WF-002, WF-004, WF-005, WF-007 | Implementation | Validated | Interview model | `node --test tests/*.test.mjs` |
+| Validate Interview visual and interaction behavior | WF-001 through WF-007 | Project owner / reviewer | In progress | Implemented page | Manual browser review |
+| Define adaptive question-selection behavior | Future requirement | Project owner | Proposed | Starter Interview validation | Requirement and UX review |
+| Select production architecture | Architecture / future ADRs | Project owner | Blocked | Validated Interview and next production outcome | Architecture review |
 
 ## 5. Work item standard
 
@@ -126,9 +144,15 @@ Do not use `blocked` for ordinary uncertainty that can be handled by a reversibl
 
 ## 7. Future work
 
-**TBD**
+Potential next work after the starter Interview is validated:
 
-Record future ideas here only after they are sufficiently clear to preserve. Future work is not committed scope.
+- adaptive question selection based on the idea and prior decisions
+- structured decision records that feed Requirements, Journey, Work, and Records
+- persistence with defined privacy and data authority
+- external AI assistance with explicit trust and data-processing boundaries
+- browser-level automated interaction and accessibility validation
+
+These items are not committed scope until their requirements are approved.
 
 ## 8. Change rule
 
