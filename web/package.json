@@ -10,7 +10,10 @@
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test tests/domain-rules.test.mjs",
     "test:integration": "tsx --test tests/postgres-integration.test.mjs",
-    "migrate": "node scripts/migrate.mjs"
+    "test:schema": "node --test tests/schema-state.test.mjs",
+    "test:restore": "node --test tests/restore-smoke.test.mjs",
+    "migrate": "node scripts/migrate.mjs",
+    "rollback": "node scripts/migrate.mjs db/migrations/0001_m2_durable_project.rollback.sql"
   },
   "dependencies": {
     "@clerk/nextjs": "7.9.4",
