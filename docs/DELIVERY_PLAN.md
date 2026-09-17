@@ -171,6 +171,25 @@ Excluded from M2 until separately approved: formal Artifact approval, public pro
 
 **Status:** Validated — M2 local-first CI run #66 passes the complete local gate: domain/AI tests, SQLite integration and reopen behavior, TypeScript, production build without hosted credentials, Chromium create/reopen/save/propose/stale-conflict flow, 390 px responsive check, and optional PostgreSQL compatibility.
 
+### M2.1 — Durable Adaptive Interview
+
+**Goal:** Move the validated adaptive Interview behavior onto the validated local M2 authority/persistence path without changing the question policy.
+
+**Entry criteria:** M2 validated; WF-023 and WF-024 approved.
+
+**Exit criteria:**
+
+- The durable project UI uses the validated adaptive question model and recommendations.
+- Accepted choices persist through local authoritative commands as immutable Answer Revisions.
+- Refresh/reopen reconstructs current answers from SQLite and resumes the correct adaptive question.
+- Review/back preserves persisted selections and revisions can be changed without overwriting history.
+- `not sure` remains unresolved and does not become an accepted decision Record.
+- Stale writes remain rejected.
+- Model-parity, integration, TypeScript/build, and Chromium adaptive/reopen gates pass.
+- No cloud account or LLM is required.
+
+**Status:** Validated — model parity, SQLite revision/reopen behavior, server-side applicability validation, no-cloud build, adaptive Chromium flow, answer revision, stale-conflict, and 390 px responsive gates pass.
+
 ## 4. Active work
 
 | Work item | Source | Owner | Status | Dependency | Validation |
@@ -185,7 +204,7 @@ Excluded from M2 until separately approved: formal Artifact approval, public pro
 | Add local/provider-optional AI adapter boundary | WF-022 / ADR-0009 | Implementation | Validated | Provider configuration | AI boundary tests + no-cloud build |
 | Make local runtime build without hosted credentials | ADR-0009 | Implementation | Validated | Next.js + SQLite native package | Typecheck + production build + Chromium |
 | Retain PostgreSQL/Clerk hosted adapters as optional compatibility paths | ADR-0008 / ADR-0009 | Implementation | PostgreSQL compatibility validated; Clerk retained, non-blocking | Hosted mode requirements later | Optional compatibility tests |
-| Migrate validated Interview UX onto local durable state | WF-001 through WF-016 | Implementation | Planned after M2 authority slice | Validated local durable project | Browser E2E |
+| Migrate validated adaptive Interview onto local durable answer state | WF-023 / WF-024 | Implementation | Validated | M2 validated | Model parity + SQLite + Chromium |
 
 ## 5. Work item standard
 

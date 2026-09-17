@@ -1,62 +1,92 @@
 import { expect, test } from '@playwright/test';
 
-test('local project survives navigation, saves a decision, proposes exact-source work, and rejects stale writes', async ({ page }) => {
+test('durable adaptive Interview persists, resumes, revises, and rejects stale writes', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Your project stays here unless you choose otherwise.' })).toBeVisible();
   await expect(page.getByText('No sign-in required. This installation owns its local projects.')).toBeVisible();
 
   await page.getByRole('link', { name: 'Open projects' }).click();
-  await page.getByLabel('Project name').fill('Local browser proof');
-  await page.getByLabel('Starting idea').fill('Keep a traceable project on this computer and choose whether AI is local or external.');
+  await page.getByLabel('Project name').fill('Durable puzzle Interview');
+  await page.getByLabel('Starting idea').fill('I want to make a puzzle game for friends.');
   await page.getByRole('button', { name: 'Create project' }).click();
   await page.waitForURL(/\/projects\/[0-9a-f-]+$/);
 
   const projectId = page.url().split('/').at(-1)!;
   await expect(page.getByText('Project version 1')).toBeVisible();
-  await expect(page.getByText('Keep a traceable project on this computer and choose whether AI is local or external.')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'If this works really well, what would make you happiest about it?' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Back' })).toBeDisabled();
+  await expect(page.getByText('People enjoy using it', { exact: true })).toBeVisible();
+  await page.locator('input[value="enjoy"]').check();
+  await page.getByRole('button', { name: 'Save and continue' }).click();
 
-  await page.getByRole('button', { name: 'Save decision' }).click();
   await expect(page.getByText('Project version 2')).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Current records' })).toBeVisible();
-  await expect(page.getByText('DEC-OUTCOME')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Who is this for first?' })).toBeVisible();
+  await page.locator('input[value="small-group"]').check();
+  await page.getByRole('button', { name: 'Save and continue' }).click();
 
-  await page.getByRole('button', { name: 'Propose requirement' }).click();
   await expect(page.getByText('Project version 3')).toBeVisible();
-  await expect(page.getByText(/REQ-DECISION-SPEED · proposed/)).toBeVisible();
-  await expect(page.getByText('Proposal saves an exact revision and source link. M2 has no Approve button.')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'What will someone spend most of their time doing in the game?' })).toBeVisible();
+  await expect(page.getByText('Solve puzzles or overcome challenges', { exact: true })).toBeVisible();
+  await page.locator('input[value="solve"]').check();
+  await page.getByRole('button', { name: 'Save and continue' }).click();
 
-  // Reopen through the saved-project list to prove navigation/session loss is not the authority.
-  await page.getByRole('link', { name: 'Projects' }).click();
-  await expect(page.getByText('Local browser proof')).toBeVisible();
-  await page.getByRole('link', { name: /Local browser proof/ }).click();
-  await expect(page.getByText('Project version 3')).toBeVisible();
-  await expect(page.getByText(/REQ-DECISION-SPEED · proposed/)).toBeVisible();
+  await expect(page.getByText('Project version 4')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Will more than one person share or change things?' })).toBeVisible();
 
-  // A command from an old view must fail rather than overwrite project version 3.
-  const stale = await page.request.post(`/api/v1/projects/${projectId}/answers`, {
+  // Refresh proves browser memory is not the source of truth.
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Will more than one person share or change things?' })).toBeVisible();
+  await page.getByRole('button', { name: 'Back' }).click();
+  await expect(page.getByRole('heading', { name: 'What will someone spend most of their time doing in the game?' })).toBeVisible();
+  await expect(page.locator('input[value="solve"]')).toBeChecked();
+
+  // Revising a persisted answer creates a new current revision and returns to the adaptive next question.
+  await page.locator('input[value="explore"]').check();
+  await page.getByRole('button', { name: 'Save and continue' }).click();
+  await expect(page.getByText('Project version 5')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Will more than one person share or change things?' })).toBeVisible();
+
+  const snapshotResponse = await page.request.get(`/api/v1/projects/${projectId}/interview`);
+  expect(snapshotResponse.ok()).toBe(true);
+  const snapshotBody = await snapshotResponse.json();
+  const gameLoop = snapshotBody.interview.answers.find((answer: { questionKey: string }) => answer.questionKey === 'game-loop');
+  expect(gameLoop.optionKey).toBe('explore');
+  expect(gameLoop.revisionNumber).toBe(2);
+
+  // Not-sure is durable unresolved state, not an accepted decision.
+  await page.locator('input[value="not-sure"]').check();
+  await page.getByRole('button', { name: 'Save and continue' }).click();
+  await expect(page.getByText('Project version 6')).toBeVisible();
+  const detailResponse = await page.request.get(`/api/v1/projects/${projectId}`);
+  const detailBody = await detailResponse.json();
+  const collaborationRecord = detailBody.project.records.find((record: { key: string }) => record.key === 'INT-COLLABORATION');
+  expect(collaborationRecord.type).toBe('open-question');
+
+  // A command from an old view must fail rather than overwrite current project version 6.
+  const stale = await page.request.post(`/api/v1/projects/${projectId}/interview`, {
     headers: { 'Idempotency-Key': crypto.randomUUID() },
     data: {
       expectedVersion: 1,
-      questionKey: 'audience',
-      optionKey: 'small-group',
-      recordTitle: 'Initial audience',
-      recordStatement: 'Start with a small group.',
+      questionKey: 'outcome',
+      optionKey: 'easier',
     },
   });
   expect(stale.status()).toBe(409);
   const staleBody = await stale.json();
   expect(staleBody.error.code).toBe('CONFLICT');
 
-  // The rejected command must not change current authoritative state.
   await page.reload();
-  await expect(page.getByText('Project version 3')).toBeVisible();
-  await expect(page.getByText('DEC-AUDIENCE')).toHaveCount(0);
+  await expect(page.getByText('Project version 6')).toBeVisible();
 });
 
-test('local project checkpoint remains usable at phone width', async ({ page }) => {
+test('durable Interview remains usable at phone width', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/projects');
-  await expect(page.getByRole('heading', { name: 'What are you making?' })).toBeVisible();
+  await page.getByLabel('Project name').fill('Pocket Interview');
+  await page.getByLabel('Starting idea').fill('I want to make a simple study helper.');
+  await page.getByRole('button', { name: 'Create project' }).click();
+  await page.waitForURL(/\/projects\/[0-9a-f-]+$/);
+  await expect(page.getByRole('heading', { name: 'If this works really well, what would make you happiest about it?' })).toBeVisible();
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
   expect(overflow).toBe(false);
 });
