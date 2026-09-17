@@ -99,6 +99,7 @@ test('local revision, traceability, proposal, and stale-write rules match the do
 
   const db = getLocalDatabase();
   const traces = db.prepare(`SELECT COUNT(*) AS count FROM trace_links WHERE project_id = ?`).get(created.projectId);
-  assert.equal(Number(traces.count), 2);
+  // answer1→record1, record1→proposal1, answer2→record2
+  assert.equal(Number(traces.count), 3);
   assert.throws(() => db.prepare(`UPDATE artifacts SET lifecycle_state = 'approved' WHERE id = ?`).run(proposal.artifactId));
 });
