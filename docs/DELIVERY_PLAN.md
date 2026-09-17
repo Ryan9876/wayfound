@@ -149,7 +149,7 @@ Excluded from this objective: persistence, accounts, external AI or model calls,
 | Preserve adaptive back/review history | WF-011 | Implementation | Validated | Adaptive navigation | History + browser tests |
 | Implement structured Interview record projection | WF-012 | Implementation | Validated | Adaptive Interview state | Record-model tests |
 | Implement Records view for current session | WF-013 | Implementation | Validated | Record projection | Desktop + mobile browser review |
-| Select production architecture | Architecture / future ADRs | Project owner | Blocked | Validated adaptive Interview and next production outcome | Architecture review |
+| Select production architecture | Architecture / future ADRs | Project owner | Blocked | Validated Interview Records slice and next production outcome | Architecture review |
 
 ## 5. Work item standard
 
