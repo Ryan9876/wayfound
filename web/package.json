@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test tests/domain-rules.test.mjs tests/observability.test.mjs tests/ai-provider.test.mjs",
     "test:local": "tsx --test tests/local-integration.test.mjs",
+    "test:e2e": "playwright test",
     "test:integration": "tsx --test tests/actor-mapping.integration.test.mjs tests/postgres-integration.test.mjs",
     "test:schema": "node --test tests/schema-state.test.mjs",
     "test:restore": "node --test tests/restore-smoke.test.mjs",
@@ -25,6 +26,7 @@
     "react-dom": "19.3.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
     "@types/better-sqlite3": "9.6.0",
     "@types/node": "^24.0.0",
     "@types/pg": "8.23.1",
