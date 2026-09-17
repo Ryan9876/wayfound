@@ -177,9 +177,11 @@ Revisit this decision if:
 - Requirement: WF-016 — Review actionable draft artifacts without implying approval
 - Architecture section: Data model and authority; Security architecture; Deployment and environments
 - Delivery milestone: M1 — Production architecture baseline
+- Acceptance record: ADR-0007 — Production stack selection
 
 ## Status history
 
 | Date | Status | Reason |
 | --- | --- | --- |
 | 2026-09-17 | Proposed | Initial production-boundary proposal after the validated Interview → Records → Draft artifacts → review flow |
+| 2026-09-17 | Accepted by ADR-0007 | Project owner accepted the M1 architecture package and concrete stack; ADR-0007 is the formal acceptance record |
