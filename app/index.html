@@ -40,7 +40,7 @@
 
         <section class="panel interview-panel" aria-live="polite">
           <div class="progress-wrap">
-            <div class="progress-meta"><span id="progressLabel">Start</span><span id="progressCount">0 of 6 decisions</span></div>
+            <div class="progress-meta"><span id="progressLabel">Start</span><span id="progressCount">0 choices made</span></div>
             <div class="progress-track" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
           </div>
           <div class="question-body" id="questionBody"></div>
@@ -55,15 +55,7 @@
           <div class="coverage"><strong id="coveragePct">0%</strong><span>How much we know</span></div>
           <div class="mini-track" aria-hidden="true"><div class="mini-fill" id="miniFill"></div></div>
 
-          <div class="state-list">
-            <div class="state-row"><span>Idea</span><span class="state-value" id="sProblem">Open</span></div>
-            <div class="state-row"><span>Outcome</span><span class="state-value" id="s-outcome">Open</span></div>
-            <div class="state-row"><span>What it can do</span><span class="state-value" id="s-control">Open</span></div>
-            <div class="state-row"><span>Outside pieces</span><span class="state-value" id="s-dependencies">Open</span></div>
-            <div class="state-row"><span>When things go wrong</span><span class="state-value" id="s-failure">Open</span></div>
-            <div class="state-row"><span>Unknowns</span><span class="state-value" id="s-unknowns">Open</span></div>
-            <div class="state-row"><span>What counts as done</span><span class="state-value" id="s-validation">Open</span></div>
-          </div>
+          <div class="state-list" id="stateList"></div>
 
           <div class="separator"></div>
           <div class="metric-grid">
