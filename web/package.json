@@ -9,7 +9,7 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test tests/domain-rules.test.mjs",
-    "test:integration": "node --experimental-strip-types --test tests/postgres-integration.test.mjs",
+    "test:integration": "tsx --test tests/postgres-integration.test.mjs",
     "migrate": "node scripts/migrate.mjs"
   },
   "dependencies": {
@@ -24,6 +24,7 @@
     "@types/pg": "8.23.1",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "tsx": "4.23.13",
     "typescript": "5.8.3"
   }
 }
