@@ -1,11 +1,20 @@
-import { getArtifactDisposition, getArtifactReviewSummary } from './artifact-review-model.js';
+import {
+  createArtifactReviewState,
+  getArtifactDisposition,
+  getArtifactReviewSummary,
+  reconcileArtifactReviewState,
+  setArtifactDisposition
+} from './artifact-review-model.js';
 
 const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (character) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
 }[character]));
 
-export function renderArtifactReview(preview, artifacts, reviewState, onDispositionChange) {
+let reviewState = createArtifactReviewState();
+
+export function renderArtifactReview(preview, artifacts) {
   if (!preview || !artifacts?.brief) return;
+  reviewState = reconcileArtifactReviewState(reviewState, artifacts);
 
   let summary = preview.querySelector('.artifact-review-summary');
   if (!summary) {
@@ -57,7 +66,10 @@ export function renderArtifactReview(preview, artifacts, reviewState, onDisposit
     }
 
     controls.querySelectorAll('[data-review-action]').forEach((button) => {
-      button.addEventListener('click', () => onDispositionChange?.(artifact, button.dataset.reviewAction));
+      button.addEventListener('click', () => {
+        reviewState = setArtifactDisposition(reviewState, artifact, button.dataset.reviewAction);
+        renderArtifactReview(preview, artifacts);
+      });
     });
   });
 }
