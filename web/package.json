@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test tests/domain-rules.test.mjs tests/observability.test.mjs",
+    "test": "node --experimental-strip-types --test tests/domain-rules.test.mjs tests/observability.test.mjs tests/ai-provider.test.mjs",
+    "test:local": "tsx --test tests/local-integration.test.mjs",
     "test:integration": "tsx --test tests/*integration.test.mjs",
     "test:schema": "node --test tests/schema-state.test.mjs",
     "test:restore": "node --test tests/restore-smoke.test.mjs",
@@ -17,12 +18,14 @@
   },
   "dependencies": {
     "@clerk/nextjs": "7.9.4",
+    "better-sqlite3": "13.0.3",
     "next": "16.3.5",
     "pg": "8.23.0",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "9.6.0",
     "@types/node": "^24.0.0",
     "@types/pg": "8.23.1",
     "@types/react": "19.3.0",
