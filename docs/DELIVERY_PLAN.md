@@ -10,13 +10,15 @@ Do not use this file to redefine product scope or architecture. Update the autho
 
 ## 1. Current objective
 
-Prepare the first production-capable vertical slice using the accepted M1 production architecture.
+Complete the first **local-first durable Wayfound vertical slice** using ADR-0009.
 
-The next slice must prove that the selected stack can preserve Wayfound's validated governance model when project state becomes durable: authenticated Actor identity, server-side authoritative commands, relational revision/traceability persistence, explicit Draft → Proposed → future Approved separation, and safe deployment/migration boundaries.
+M2 must prove that Wayfound can preserve its validated governance model while running privately on one computer: stable local Actor identity, local server-side authoritative commands, local relational revision/traceability persistence, explicit Draft → Proposed → future Approved separation, stale-write protection, and provider-optional AI.
 
-Accepted M1 stack: Next.js + TypeScript on Vercel, Neon PostgreSQL, Clerk authentication, and Wayfound-owned project authorization/domain rules.
+Current runtime target: Next.js + TypeScript running locally, SQLite for default durable project state, a stable local human Actor with no sign-in requirement, AI off by default, Ollama/LM Studio as first-class local AI options, and explicitly opt-in external AI adapters.
 
-Excluded from the next implementation until separately approved: external AI/model processing of user content, public project sharing, broad hosted access for younger users before age/consent requirements are defined, code-generation agents, and production integrations unrelated to the first vertical slice.
+Vercel, PostgreSQL/Neon, and Clerk remain optional hosted-mode adapters and are not M2 merge gates.
+
+Excluded from M2 until separately approved: formal Artifact approval, public project sharing, hosted collaboration, automatic cloud synchronization, broad hosted access for younger users before age/consent requirements are defined, autonomous destructive tool actions, and production integrations unrelated to the local vertical slice.
 
 ## 2. Delivery rules
 
@@ -27,7 +29,9 @@ Excluded from the next implementation until separately approved: external AI/mod
 - Do not mark work complete until required validation passes.
 - Record blockers with a named dependency or decision.
 - Do not bypass the accepted server-side authority boundary for convenience.
-- Do not treat deployment success as release approval.
+- Local mode must not silently require a hosted provider.
+- Project content must not leave the computer unless an approved feature and explicit user/provider choice allows it.
+- Do not treat a build, hosted deployment, or model response as release/approval authority.
 
 ## 3. Milestones
 
@@ -62,158 +66,126 @@ Excluded from the next implementation until separately approved: external AI/mod
 - Automated Interview model tests pass.
 - Manual browser review confirms layout, keyboard interaction, responsive behavior, and Wayfound visual consistency.
 
-**Status:** Validated — implementation, automated model validation, and browser interaction review are complete.
+**Status:** Validated.
 
 ### M0.6 — Adaptive Interview
 
-**Goal:** Make the Interview choose its next useful question from the current idea and prior decisions while keeping the routing mechanism local, transparent, and reversible.
+**Goal:** Make the Interview choose its next useful question from the current idea and prior decisions while keeping routing local, transparent, and reversible.
 
-**Entry criteria:** M0.5 guided Interview slice validated.
+**Entry criteria:** M0.5 validated.
 
 **Exit criteria:**
 
-- Different representative idea types produce different applicable question sets.
+- Representative idea types produce different applicable question sets.
 - The same state produces the same next question.
-- Accepted answers can make later material questions appear or disappear.
-- Progress and completion use only currently applicable required questions.
-- `I am not sure yet` remains a visible open question without becoming a blocker by default.
+- Accepted answers can make material later questions appear/disappear.
+- Progress/completion use only applicable required questions.
+- `I am not sure yet` remains an open question without becoming a blocker by default.
 - Back/review preserves applicable choices.
-- Automated adaptive model tests pass.
-- Browser review confirms adaptive paths, keyboard behavior, summary traceability, and responsive layout.
+- Automated model and browser validation pass.
 
-**Status:** Validated
+**Status:** Validated.
 
 ### M0.7 — Traceable Interview records
 
 **Goal:** Turn current Interview state into explicit records that Wayfound can show and later reference without creating a second authority.
 
-**Entry criteria:** M0.6 adaptive Interview validated.
+**Entry criteria:** M0.6 validated.
 
-**Exit criteria:**
+**Exit criteria:** deterministic typed records, stale/non-applicable answer exclusion, responsive Records view, automated record tests, and browser review.
 
-- Accepted applicable answers produce deterministic decision records.
-- `Not sure` answers produce open-question records instead of accepted decisions.
-- Derived assumptions and blockers produce distinct records.
-- Records excludes stale answers that are no longer applicable.
-- Records page shows an empty state and current session records.
-- Switching between Interview and Records preserves the active in-memory state.
-- Records is usable on desktop and mobile layouts.
-- Automated record-model tests and browser review pass.
-
-**Status:** Validated
+**Status:** Validated.
 
 ### M0.8 — Draft build artifacts
 
 **Goal:** Show how traceable Records can become useful build artifacts without confusing generated suggestions with approved state.
 
-**Entry criteria:** M0.7 traceable Interview records validated.
+**Entry criteria:** M0.7 validated.
 
-**Exit criteria:**
+**Exit criteria:** draft brief/Journey/requirements/work are traceable, unresolved state does not become requirements, Draft boundary is explicit, and model/browser validation passes.
 
-- Current Records can produce a draft build brief.
-- Accepted decisions produce traceable draft Journey steps.
-- Only mapped behavior decisions produce draft requirement candidates.
-- Assumptions, blockers, and open questions produce draft follow-up work.
-- `Not sure` and unresolved state do not become requirements.
-- Every generated artifact retains source Record IDs.
-- Records displays an unmistakable `Draft only` boundary.
-- Desktop and mobile browser review passes.
-- Artifact projection tests pass.
-
-**Status:** Validated
+**Status:** Validated.
 
 ### M0.9 — Review actionable draft artifacts
 
 **Goal:** Let users explicitly carry actionable drafts forward for project-owner review, or set them aside, without confusing that review state with approval.
 
-**Entry criteria:** M0.8 draft build artifacts validated.
+**Entry criteria:** M0.8 validated.
 
-**Exit criteria:**
+**Exit criteria:** Draft/Proposed/Set aside/Undo semantics, stale-content reset, explicit non-approval language, and model/browser validation pass.
 
-- Draft requirements and draft follow-up work can remain Draft, be marked Proposed, or be Set aside.
-- Build brief and Journey preview remain descriptive and are not promotion targets in this slice.
-- Proposed is visibly explained as pending project-owner review and never as approval.
-- The review model rejects an Approved disposition.
-- Undo returns Proposed or Set aside items to Draft.
-- Review state for an artifact is discarded if the artifact disappears or its content/source signature changes.
-- Review-state model tests pass.
-- Browser interaction and responsive validation pass before the milestone is marked Validated.
+**Status:** Validated.
 
-**Status:** Validated — 7 review-state model tests and the Chromium interaction/responsive browser gate pass.
+### M1 — Durable architecture baseline
 
-### M1 — Production architecture baseline
+**Goal:** Establish the durable domain, authority, persistence, identity, AI/tool, and deployment boundaries needed after the Interview experience is validated.
 
-**Goal:** Select the minimum production architecture required after the Interview experience is validated.
-
-**Entry criteria:** M0.9 artifact review validated and next production outcome approved.
+**Entry criteria:** M0.9 validated.
 
 **Exit criteria:**
 
 - System context defined.
 - Major component boundaries defined.
 - Data authority defined.
-- Security and privacy boundaries defined.
-- Deployment and rollback approach defined.
-- Foundational decisions recorded as ADRs.
-- Concrete production stack selected.
+- Security/privacy boundaries defined.
+- Deployment/rollback approach defined.
+- Foundational ADRs recorded.
+- Default runtime selected.
 - Validation approach defined.
 
-**Status:** Accepted — ADR-0007 records project-owner approval of the M1 package and concrete stack. ADR-0001 through ADR-0006 preserve the detailed proposal/rationale that ADR-0007 accepted.
+**Status:** Accepted, with architecture corrected by ADR-0009. ADR-0001 through ADR-0006 preserve the durable authority model. ADR-0007 records the prior hosted-first interpretation; ADR-0009 is the current runtime authority and makes local operation the default.
 
-### M2 — First production-capable vertical slice
+### M2 — Local durable project vertical slice
 
-**Goal:** Deliver one end-to-end Wayfound outcome using the accepted production architecture.
+**Goal:** Deliver one end-to-end Wayfound outcome locally without requiring a cloud account or external model.
 
-**Entry criteria:** M1 production architecture accepted and the M2 product requirements approved.
+**Entry criteria:** ADR-0009 accepted and local-first M2 product requirements approved.
 
 **Initial target outcome:**
 
-Prove one durable project path that preserves the validated prototype's human-control model:
-
-1. user authenticates through Clerk and maps to a stable Wayfound Actor
-2. user creates/opens a project through Wayfound server-side commands
-3. accepted Interview/project state is persisted in Neon PostgreSQL using immutable revisions and trace links
-4. a generated candidate remains non-authoritative until explicitly proposed
-5. Propose persists an exact Artifact Revision and exact source-revision links
-6. a distinct authorized human action can later approve an exact revision once the approval requirement is defined
-7. stale/concurrent writes are rejected instead of silently overwriting project state
-8. preview/development environments cannot write production project data
-9. migration/rollback and backup/restore evidence exist before release
+1. Wayfound starts locally with no Clerk/Neon/Vercel requirement.
+2. The installation creates/reuses one stable local human Actor.
+3. The user creates/opens a project through local Wayfound server-side commands.
+4. Project state is persisted in local SQLite using immutable revisions and exact trace links.
+5. A generated candidate remains non-authoritative until explicitly proposed.
+6. Propose persists an exact Artifact Revision and exact source-revision links.
+7. stale/concurrent writes are rejected rather than silently overwriting current state.
+8. the M2 database cannot store `approved` as an Artifact lifecycle state.
+9. AI is off by default.
+10. Ollama and LM Studio can be selected as local model endpoints without an external-content opt-in.
+11. a non-loopback OpenAI-compatible endpoint is blocked until outbound AI is deliberately enabled.
+12. the production build and local runtime work without hosted-service credentials.
 
 **Exit criteria:**
 
-- Selected production requirements implemented.
-- Acceptance criteria pass.
-- Required automated checks pass.
+- Local-first M2 requirements implemented.
+- Local SQLite integration tests pass.
+- Existing domain/concurrency/traceability checks pass.
+- AI provider-boundary tests pass.
+- TypeScript and Next.js production build pass.
+- Project survives local database/process reopen.
 - Important failure behavior is verified.
-- Required observability is present without unrestricted project-content logging.
 - Documentation matches implementation.
+- Hosted adapters, if retained, do not become required dependencies for local operation.
 - Release decision is explicit.
 
-**Status:** In progress — WF-017 through WF-022 are approved. Application/domain CI, PostgreSQL integration, backup/restore, migration rollback, and managed Neon preview-schema validation pass. Remaining validation is non-production Clerk authentication plus the hosted Vercel Preview browser flow described in `docs/M2_HOSTED_VALIDATION.md`.
+**Status:** In progress — local SQLite/Actor/AI provider adapters are being integrated and CI is being converted to make local operation the primary M2 gate.
 
 ## 4. Active work
 
 | Work item | Source | Owner | Status | Dependency | Validation |
 | --- | --- | --- | --- | --- | --- |
-| Preserve validated guided Interview baseline | WF-001 through WF-007 | Implementation | Validated | M0.5 | Existing model + browser evidence |
-| Define adaptive Interview behavior | WF-008 through WF-011 | Project owner | Validated | Guided Interview baseline | Requirements review |
-| Implement local idea classifier and question registry | WF-008 | Implementation | Validated | Adaptive requirements | Model + browser tests |
-| Implement answer-driven question applicability | WF-009 | Implementation | Validated | Question registry | Applicability tests |
-| Implement dynamic progress and completion | WF-010 | Implementation | Validated | Applicability model | Completion tests + browser flow |
-| Preserve adaptive back/review history | WF-011 | Implementation | Validated | Adaptive navigation | History + browser tests |
-| Implement structured Interview record projection | WF-012 | Implementation | Validated | Adaptive Interview state | Record-model tests |
-| Implement Records view for current session | WF-013 | Implementation | Validated | Record projection | Desktop + mobile browser review |
-| Derive draft build artifacts from Records | WF-014 | Implementation | Validated | Traceable Records | Artifact-model tests + browser review |
-| Show draft build artifacts in Records | WF-015 | Implementation | Validated | Draft artifact projection | Desktop + mobile browser review |
-| Review actionable draft artifacts | WF-016 | Implementation | Validated | Validated Draft artifacts | 7 model tests + Chromium interaction/responsive gate |
-| Accept production architecture boundaries | ADR-0001 through ADR-0006 via ADR-0007 | Project owner | Accepted | M0.9 | Architecture review |
-| Select production stack | ADR-0007 | Project owner | Accepted | M1 boundary decisions | Stack comparison + project-owner approval |
-| Define M2 production requirements | WF-017 through WF-022 | Project owner | Approved | Accepted M1 | Requirements review |
-| Scaffold production Next.js/TypeScript application | ADR-0007 / WF-017 through WF-022 | Implementation | Implemented; automated gate passing | Approved M2 requirements | CI build/type/test gate |
-| Define initial Neon relational schema/migrations | ADR-0002 / ADR-0007 / WF-018 through WF-020 | Implementation | Validated for M2 preview scope | Approved M2 requirements | PostgreSQL integration + managed Neon + rollback/restore gates |
-| Integrate Clerk identity → Wayfound Actor mapping | ADR-0003 / ADR-0007 / WF-017 | Implementation | Implemented; hosted validation pending | Clerk development resource + M2 Vercel Preview | Stable-Actor integration + real Clerk sign-in validation |
-| Validate hosted M2 browser path | WF-017 through WF-022 | Implementation | Blocked | Separate `wayfound-m2-preview` Vercel project + Clerk Marketplace resource + secure preview env | Sign in → create → reopen → save → propose → conflict browser flow |
+| Preserve validated guided/adaptive Interview baseline | WF-001 through WF-011 | Implementation | Validated | M0.5/M0.6 | Existing model + browser evidence |
+| Preserve traceable Records and Draft artifact/review behavior | WF-012 through WF-016 | Implementation | Validated | M0.7-M0.9 | Existing model + browser evidence |
+| Preserve durable domain/command/revision boundaries | ADR-0001 through ADR-0006 | Implementation | Accepted | M1 | Architecture + domain tests |
+| Correct runtime to local-first | ADR-0009 | Project owner | Accepted | Project-owner decision | ADR + architecture reconciliation |
+| Implement stable local human Actor | WF-017 / ADR-0009 | Implementation | Implemented; validation pending | Local SQLite | Local integration test |
+| Implement local SQLite project store | WF-018 through WF-021 / ADR-0009 | Implementation | Implemented; validation pending | SQLite schema | Local integration + reopen tests |
+| Preserve exact revisions, trace links, idempotency, and stale-write checks locally | WF-019 through WF-021 | Implementation | Implemented; validation pending | Local project store | Local integration tests |
+| Add local/provider-optional AI adapter boundary | WF-022 / ADR-0009 | Implementation | Implemented; validation pending | Provider configuration | AI boundary tests |
+| Make local runtime build without hosted credentials | ADR-0009 | Implementation | Implemented; CI pending | Next.js + SQLite native package | Typecheck + production build |
+| Retain PostgreSQL/Clerk hosted adapters as optional compatibility paths | ADR-0008 / ADR-0009 | Implementation | Implemented; non-blocking | Hosted mode requirements later | Optional compatibility tests |
+| Migrate validated Interview UX onto local durable state | WF-001 through WF-016 | Implementation | Planned after M2 authority slice | Validated local durable project | Browser E2E |
 
 ## 5. Work item standard
 
@@ -249,10 +221,13 @@ Do not use `blocked` for ordinary uncertainty that can be handled by a reversibl
 
 ## 7. Future work
 
-Near-term work after M2 hosted validation:
+Near-term work after M2 local validation:
 
-- migrate the validated Interview experience onto the durable project model incrementally
-- select the production accessibility target
-- define retention, deletion, consent, and age-related product requirements before real hosted user-content release
+- migrate the validated adaptive Interview experience onto the local durable project model incrementally
+- add a user-facing AI/provider settings screen instead of environment-only configuration
+- add local project backup/export/import and migration/recovery UX
+- evaluate one-click desktop packaging/installer options
 - define the separate formal Artifact approval requirement and authorized project-owner workflow
-- evaluate external AI adapters only after privacy/consent boundaries are approved
+- add provider-specific adapters beyond OpenAI-compatible endpoints when useful
+- define hosted synchronization/collaboration only if approved as a separate product capability
+- define hosted retention, deletion, consent, and age-related requirements before real hosted user-content release
