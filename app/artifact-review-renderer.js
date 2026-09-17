@@ -27,9 +27,14 @@ export function renderArtifactReview(preview, artifacts, reviewState, onDisposit
       <span><strong>${counts.draft.length}</strong> still draft</span>
     </div>`;
 
+  const reviewable = new Map(
+    [...(artifacts.requirements ?? []), ...(artifacts.work ?? [])].map((artifact) => [artifact.id, artifact])
+  );
+
   preview.querySelectorAll('[data-reviewable-artifact]').forEach((item) => {
-    const artifactId = item.dataset.artifactId;
-    const disposition = getArtifactDisposition(reviewState, artifactId);
+    const artifact = reviewable.get(item.dataset.artifactId);
+    if (!artifact) return;
+    const disposition = getArtifactDisposition(reviewState, artifact);
     item.classList.toggle('is-proposed', disposition === 'proposed');
     item.classList.toggle('is-set-aside', disposition === 'set-aside');
 
@@ -52,7 +57,7 @@ export function renderArtifactReview(preview, artifacts, reviewState, onDisposit
     }
 
     controls.querySelectorAll('[data-review-action]').forEach((button) => {
-      button.addEventListener('click', () => onDispositionChange?.(artifactId, button.dataset.reviewAction));
+      button.addEventListener('click', () => onDispositionChange?.(artifact, button.dataset.reviewAction));
     });
   });
 }
