@@ -12,26 +12,32 @@ ADR status values:
 - **Deprecated** — still present historically but no longer recommended for new work.
 - **Rejected** — considered and explicitly not selected.
 
-An ADR may remain as the original proposal document while a later accepted ADR records package-level acceptance or selection. In that case, the later ADR is the authoritative acceptance record and the earlier ADR's status history should link to it.
+An ADR may remain as the original proposal document while a later accepted ADR records package-level acceptance or selection. In that case, the later ADR is the authoritative acceptance record and the earlier ADR remains decision history.
 
-## Current M1 production architecture
+## Current Wayfound runtime architecture
 
-ADR-0007 is the formal acceptance record for the Wayfound M1 production architecture. It accepts the architecture constraints and tradeoffs developed in ADR-0001 through ADR-0006 and selects the concrete initial stack:
+**ADR-0009 is the current authoritative runtime decision.**
 
-- Next.js + TypeScript
-- Vercel
-- Neon PostgreSQL
-- Clerk authentication
-- Wayfound-owned project authorization and domain rules
-- server-side, replaceable AI/tool adapters
+Wayfound is local-first by default:
 
-ADR-0001 through ADR-0006 remain part of the decision history and detailed rationale. Their constraints are authoritative through ADR-0007 unless a later ADR supersedes them.
+- Next.js + TypeScript local application/server boundary
+- stable local human Actor; no account required for normal local use
+- local SQLite durable project store
+- Ollama and LM Studio as first-class local AI adapters
+- external AI providers optional and explicitly opt-in
+- Wayfound-owned project authorization and lifecycle rules
+- immutable revisions, exact trace links, optimistic concurrency, and explicit domain commands
+- hosted Vercel/PostgreSQL/Neon/Clerk adapters optional for future hosted/team mode
+
+ADR-0009 supersedes ADR-0007 for the default hosting, persistence, identity, and AI-runtime choices. ADR-0007 remains the historical record of the prior hosted-first interpretation. The architecture boundaries developed in ADR-0001 through ADR-0006 remain authoritative where ADR-0009 does not replace their infrastructure assumptions.
+
+ADR-0008 remains useful as the explicit PostgreSQL access decision for optional hosted compatibility; it does not define the default local M2 store.
 
 ## ADR rules
 
 - State the decision first.
 - Record alternatives and material tradeoffs.
-- Preserve rejected options when they help explain why the accepted architecture exists.
+- Preserve rejected/superseded options when they help explain why the accepted architecture exists.
 - Identify reversibility and reconsideration triggers.
 - Link affected requirements, architecture sections, and delivery milestones.
 - Do not hide unresolved product or legal policy inside an ADR; keep it explicit as a dependency or open decision.
@@ -41,6 +47,6 @@ ADR-0001 through ADR-0006 remain part of the decision history and detailed ratio
 
 Use a four-digit sequence followed by a short kebab-case title, for example:
 
-`0008-example-decision.md`
+`0009-local-first-runtime.md`
 
 Use `0000-template.md` as the starting structure.
