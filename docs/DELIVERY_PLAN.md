@@ -188,7 +188,7 @@ Excluded from M2 until separately approved: formal Artifact approval, public pro
 - Model-parity, integration, TypeScript/build, and Chromium adaptive/reopen gates pass.
 - No cloud account or LLM is required.
 
-**Status:** In progress.
+**Status:** Validated — model parity, SQLite revision/reopen behavior, server-side applicability validation, no-cloud build, adaptive Chromium flow, answer revision, stale-conflict, and 390 px responsive gates pass.
 
 ## 4. Active work
 
@@ -204,7 +204,7 @@ Excluded from M2 until separately approved: formal Artifact approval, public pro
 | Add local/provider-optional AI adapter boundary | WF-022 / ADR-0009 | Implementation | Validated | Provider configuration | AI boundary tests + no-cloud build |
 | Make local runtime build without hosted credentials | ADR-0009 | Implementation | Validated | Next.js + SQLite native package | Typecheck + production build + Chromium |
 | Retain PostgreSQL/Clerk hosted adapters as optional compatibility paths | ADR-0008 / ADR-0009 | Implementation | PostgreSQL compatibility validated; Clerk retained, non-blocking | Hosted mode requirements later | Optional compatibility tests |
-| Migrate validated adaptive Interview onto local durable answer state | WF-023 / WF-024 | Implementation | In progress | M2 validated | Model parity + SQLite + Chromium |
+| Migrate validated adaptive Interview onto local durable answer state | WF-023 / WF-024 | Implementation | Validated | M2 validated | Model parity + SQLite + Chromium |
 
 ## 5. Work item standard
 

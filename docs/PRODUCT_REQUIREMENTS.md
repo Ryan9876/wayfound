@@ -704,7 +704,7 @@ Generated drafts need an intentional human disposition before they can become au
 
 ### WF-023 — Preserve validated adaptive Interview semantics in the durable runtime
 
-**Status:** Approved
+**Status:** Validated
 
 **Priority:** P0
 
@@ -737,7 +737,7 @@ Generated drafts need an intentional human disposition before they can become au
 
 ### WF-024 — Persist and restore the current adaptive Interview answer state
 
-**Status:** Approved
+**Status:** Validated
 
 **Priority:** P0
 
@@ -846,8 +846,8 @@ Local and hosted adapters SHOULD share the same domain-rule tests/contracts so p
 | WF-020 | Materialize a proposal against exact current local source revisions | P0 | Validated | Domain + SQLite integration tests |
 | WF-021 | Enforce Wayfound project authorization in local and optional hosted modes | P0 | Validated | Capability + adapter integration tests |
 | WF-022 | Keep project content local by default and make AI egress explicit | P0 | Validated | AI boundary + logging + no-cloud build tests |
-| WF-023 | Preserve validated adaptive Interview semantics in the durable runtime | P0 | Approved | Model parity + adaptive durable tests |
-| WF-024 | Persist and restore the current adaptive Interview answer state | P0 | Approved | SQLite revision/reopen + Chromium tests |
+| WF-023 | Preserve validated adaptive Interview semantics in the durable runtime | P0 | Validated | Model parity + adaptive durable tests |
+| WF-024 | Persist and restore the current adaptive Interview answer state | P0 | Validated | SQLite revision/reopen + Chromium tests |
 
 ## 7. Validation record
 
@@ -916,6 +916,19 @@ The current slice is validated for its defined prototype scope. It is not releas
 - Playwright Chromium passed the local browser flow: create project, save a decision, materialize an exact-source Proposed requirement, navigate away and reopen the durable project, submit an intentionally stale command and receive HTTP 409 `CONFLICT`, verify the rejected command did not mutate current state, and confirm no horizontal overflow at 390 px.
 - The separate optional PostgreSQL compatibility job passed migration, integration, schema-presence, rollback, and schema-removal checks. It remains compatibility evidence rather than a dependency of local M2.
 - M2 does not introduce formal Artifact approval, hosted synchronization, public sharing, or external AI by default.
+
+
+**2026-09-17 — M2.1 Durable Adaptive Interview**
+
+- GitHub Actions M2 local-first CI run #79 passed on the M2.1 branch after the request-context fix.
+- The durable runtime Interview model is byte-for-byte identical to the validated `app/interview-model.js` source.
+- Seventeen model/domain/authorization/telemetry/AI-boundary tests passed, including the model parity gate.
+- Four local SQLite integration tests passed, including adaptive applicability/option rejection, immutable Answer Revision history, database reopen, `not-sure` unresolved projection, and stale-write rejection.
+- TypeScript checking and the optimized Next.js production build passed without hosted credentials.
+- Playwright Chromium passed the durable adaptive flow: create a puzzle-game project, answer the adaptive Interview, reach the game-specific question, refresh, use Back with the persisted selection restored, revise the answer to create revision 2, save `not-sure` as an open question, reject a stale write with HTTP 409, and retain authoritative state.
+- The 390 px browser gate passed with no horizontal overflow.
+- The optional PostgreSQL compatibility job remained green and non-blocking.
+- M2.1 adds no LLM requirement, hosted dependency, starting-idea editing, formal approval, or full durable Records/artifact migration.
 
 
 ## 8. Change rule

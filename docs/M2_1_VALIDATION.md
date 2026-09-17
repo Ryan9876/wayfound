@@ -1,6 +1,6 @@
 # M2.1 Durable Adaptive Interview Validation
 
-**Status:** In progress
+**Status:** Validated
 
 ## Scope
 
@@ -33,3 +33,14 @@ Before WF-023, WF-024, or M2.1 can be marked Validated:
 - formal Artifact approval
 - desktop packaging
 - hosted/team mode
+
+## Validation evidence
+
+- CI run #79: local-wayfound success.
+- Model parity: exact source equality.
+- 17 model/domain/AI tests passed.
+- 4 local SQLite integration tests passed.
+- TypeScript and production build passed.
+- Chromium adaptive/reopen/revise/unresolved/stale-write flow passed.
+- 390 px no-horizontal-overflow gate passed.
+- Optional PostgreSQL compatibility remained green.
