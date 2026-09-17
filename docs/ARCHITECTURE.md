@@ -10,138 +10,117 @@ Use an Architecture Decision Record (ADR) for consequential decisions that expla
 
 ## 1. Architecture summary
 
-**TBD — define after the product charter and initial requirements are approved.**
+For the initial Interview vertical slice, Wayfound uses a dependency-free static browser application with separate presentation and interview-state modules. The browser owns temporary Interview state for the active page session. The prototype has no server, external service, production data store, identity provider, or external AI dependency.
 
-Preferred format:
-
-> Wayfound uses **[architecture style]** with **[major components]**. **[component]** owns **[data or behavior]**. Components communicate through **[interfaces]**. The system is deployed to **[environment]** and relies on **[external dependencies]**.
+This is a bounded prototype architecture. It does not select the final Wayfound production framework, backend, database, hosting platform, identity model, or AI provider.
 
 ## 2. System context
 
 ### Users and external actors
 
-**TBD**
+The initial slice has one actor: a user who enters an idea and makes guided decisions in the browser.
+
+The user can have different technical experience and can be working on a game, hobby project, school project, business application, internal tool, or technical system.
 
 ### External systems
 
-**TBD**
+None in the initial slice.
 
 ### Trust boundaries
 
-**TBD**
+The initial slice keeps all Interview content in browser memory. No Interview content crosses a network trust boundary.
+
+A future external AI call, persistence service, account system, or integration would introduce a new trust boundary and must be specified before implementation.
 
 ## 3. Major components
 
 | Component | Responsibility | Owns | Depends on | Failure effect |
 | --- | --- | --- | --- | --- |
-| TBD | TBD | TBD | TBD | TBD |
+| Wayfound shell | Provides navigation, layout, brand styling, and page framing | Presentation only | Browser standards | Page layout or navigation is degraded |
+| Interview renderer | Presents prompts, choices, recommendations, progress, and summary | Current rendered view | Interview model | User cannot complete the guided flow |
+| Interview model | Defines starter questions, options, state transitions, derived state, and completion rules | In-memory Interview state semantics | JavaScript runtime | Decisions or derived state become incorrect |
+| Project-state panel | Shows coverage, decisions, assumptions, blockers, and open questions | Presentation derived from Interview model | Interview model | User loses visibility into definition state |
 
-A component must have one clear primary responsibility. Do not create a component only to mirror an implementation framework.
+The Interview model is intentionally separate from rendering logic so later adaptive question selection can replace the starter question bank without rebuilding the page shell.
 
 ## 4. Data model and authority
 
-**TBD**
+For the initial slice, the authoritative runtime state is a JavaScript object in the active browser page.
 
-For each important data domain, define:
+Important fields are:
 
-- authoritative owner
-- storage location
-- creation and update path
-- lifecycle and retention
-- access rules
-- integrity constraints
-- replication or caching behavior
+- `idea` — the user's free-form starting description
+- `step` — the current Interview position
+- `answers` — selected option identifiers keyed by question identifier
+- derived assumptions
+- derived blockers
+- derived open questions
 
-Do not create two authorities for the same data without an explicit reconciliation rule.
+Question definitions are static configuration in `app/interview-model.js`.
+
+The browser session is temporary. Refreshing or closing the page can discard state. Persistence is not an approved requirement for this slice.
 
 ## 5. Interfaces and contracts
 
-**TBD**
+The initial component interface is local JavaScript function calls.
 
-For each interface, define:
+The Interview model exposes deterministic functions for:
 
-- caller and provider
-- protocol or mechanism
-- request and response contract
-- authentication and authorization
-- timeout and retry behavior
-- idempotency behavior where relevant
-- versioning and compatibility expectations
-- failure behavior
+- initial state creation
+- answer selection
+- selected-option lookup
+- project-state derivation
+- coverage calculation
+- completion determination
+- summary creation
+
+There are no remote interfaces in the initial slice.
 
 ## 6. Security architecture
 
-**TBD**
+The initial slice:
 
-At minimum, define:
+- has no authentication or authorization
+- contains no secrets
+- performs no protected actions
+- sends no user content to external systems
+- stores no user content outside the active browser session
 
-- identities and principals
-- authentication boundaries
-- authorization model
-- secret storage
-- sensitive-data classification
-- encryption requirements
-- audit requirements
-- untrusted-input boundaries
-- external-service trust assumptions
+Before Wayfound introduces hosted persistence, accounts, external AI processing, or integrations, the project must define the applicable identity, authorization, privacy, data-retention, and age-related controls.
 
 ## 7. Reliability and failure model
 
-**TBD**
+The initial slice has no remote dependency failures.
 
-For each critical dependency or component, define:
+Local failure behavior includes:
 
-- expected failure modes
-- detection method
-- degraded behavior
-- retry policy
-- data-integrity protection
-- recovery procedure
-- user-visible effect
+- The user cannot advance from the idea step with empty input.
+- The user cannot advance from a decision step until an option is selected.
+- Derived state is calculated from explicit answers instead of hidden mutable flags.
+
+Browser refresh recovery is not included in the initial slice.
 
 ## 8. Observability
 
-**TBD**
+Production observability is not applicable to the static initial slice.
 
-Define required:
-
-- health checks
-- structured logs
-- metrics
-- traces where justified
-- correlation identifiers
-- alerts
-- operational dashboards
-- diagnostic data retained for support
-
-Important failures must be visible without reproducing them manually.
+Automated tests provide evidence for the Interview state model. Manual browser review is required for visual and interaction behavior until browser automation is added.
 
 ## 9. Deployment and environments
 
-**TBD**
+The initial slice is a static web application under `app/` and can be served by any basic static HTTP server.
 
-Define:
-
-- environments
-- deployment mechanism
-- configuration sources
-- secret injection
-- schema or data migrations
-- rollout strategy
-- rollback strategy
-- release verification
+No production hosting platform is selected. Deployment, environment promotion, secrets, migrations, rollout, and rollback remain `TBD` for a future production architecture decision.
 
 ## 10. Performance and capacity
 
-**TBD**
-
-Document only justified targets and known constraints. Do not invent scale requirements.
+No numeric targets are approved. The initial slice has a small static asset footprint and no server-side workload.
 
 ## 11. Technology choices
 
-No foundational technology choices are approved in this baseline.
+The initial slice uses standards-based HTML, CSS, and JavaScript with no runtime dependencies.
 
-Record consequential choices in ADRs before treating them as project constraints.
+This is a reversible prototype choice, not the final production framework selection. A future foundational framework, database, hosting platform, or external AI provider must meet the ADR triggers below.
 
 ## 12. Architecture decision triggers
 
@@ -160,7 +139,10 @@ Create an ADR when a change:
 
 | Item | Type | Impact | Mitigation | Owner | Status |
 | --- | --- | --- | --- | --- | --- |
-| Architecture not yet selected | Open decision | Implementation should not begin from assumed platform choices | Complete product definition, then evaluate architecture options | Project owner | Open |
+| Production architecture not yet selected | Open decision | Prototype cannot be treated as production architecture | Select production boundaries after the Interview slice is validated | Project owner | Open |
+| Interview question selection is a starter sequence | Planned evolution | The current flow is guided but not yet dynamically adaptive to free-form intent | Preserve question model separately and add adaptive selection in a later requirement | Project owner | Open |
+| Browser-session state is temporary | Known limitation | Refresh or close can discard progress | Define persistence only after privacy and data authority are approved | Project owner | Open |
+| Manual visual validation is still required | Validation gap | Automated state tests do not prove visual fidelity or interaction quality | Add browser-level test tooling in a later architecture decision or bounded test change | Project owner | Open |
 
 ## 14. Change rule
 
