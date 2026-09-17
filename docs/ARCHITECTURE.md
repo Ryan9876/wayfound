@@ -38,10 +38,13 @@ A future external AI call, persistence service, account system, or integration w
 | --- | --- | --- | --- | --- |
 | Wayfound shell | Provides navigation, layout, brand styling, and page framing | Presentation only | Browser standards | Page layout or navigation is degraded |
 | Interview renderer | Presents prompts, choices, recommendations, progress, and summary | Current rendered view | Interview model | User cannot complete the guided flow |
-| Interview model | Defines starter questions, options, state transitions, derived state, and completion rules | In-memory Interview state semantics | JavaScript runtime | Decisions or derived state become incorrect |
-| Project-state panel | Shows coverage, decisions, assumptions, blockers, and open questions | Presentation derived from Interview model | Interview model | User loses visibility into definition state |
+| Idea classifier | Detects broad routing signals from the free-form idea | Temporary routing tags | JavaScript runtime | Wayfound can ask less-relevant questions |
+| Question registry | Defines possible questions, applicability rules, priority, recommendations, options, and tradeoffs | Interview question policy | Idea classifier and Interview state | Required decisions can be skipped or unnecessary questions can appear |
+| Question selector | Chooses the highest-priority unanswered required question that currently applies | Current question selection | Question registry and Interview state | Interview order or completion can become incorrect |
+| Interview model | Owns answers, history, applicability, derived state, progress, and completion rules | In-memory Interview state semantics | JavaScript runtime | Decisions or derived state become incorrect |
+| Project-state panel | Shows dynamic coverage, choices, guesses, blockers, and open questions | Presentation derived from Interview model | Interview model | User loses visibility into definition state |
 
-The Interview model is intentionally separate from rendering logic so later adaptive question selection can replace the starter question bank without rebuilding the page shell.
+The classifier and selector are intentionally local and deterministic in this slice. They prove adaptive behavior without selecting an external AI provider or creating a new data-processing boundary.
 
 ## 4. Data model and authority
 
@@ -50,13 +53,17 @@ For the initial slice, the authoritative runtime state is a JavaScript object in
 Important fields are:
 
 - `idea` — the user's free-form starting description
-- `step` — the current Interview position
+- `started` — whether the Interview has begun
+- `currentQuestionId` — the currently selected applicable question
+- `history` — the visited question identifiers used for review/back navigation
+- `complete` — whether the current adaptive pass is at its completion view
 - `answers` — selected option identifiers keyed by question identifier
+- derived routing tags
 - derived assumptions
 - derived blockers
 - derived open questions
 
-Question definitions are static configuration in `app/interview-model.js`.
+Question definitions remain static configuration in `app/interview-model.js`, but each question now defines applicability, priority, required state, recommendation logic, and user-facing options. Progress and completion are calculated only from questions that currently apply.
 
 The browser session is temporary. Refreshing or closing the page can discard state. Persistence is not an approved requirement for this slice.
 
@@ -66,11 +73,14 @@ The initial component interface is local JavaScript function calls.
 
 The Interview model exposes deterministic functions for:
 
+- broad idea classification
 - initial state creation
+- question applicability and resolution
+- next-question selection
 - answer selection
-- selected-option lookup
+- adaptive advance, back, and review navigation
 - project-state derivation
-- coverage calculation
+- dynamic progress calculation
 - completion determination
 - summary creation
 
@@ -104,7 +114,7 @@ Browser refresh recovery is not included in the initial slice.
 
 Production observability is not applicable to the static initial slice.
 
-Automated tests provide evidence for the Interview state model. Manual browser review is required for visual and interaction behavior until browser automation is added.
+Automated tests provide evidence for the Interview state model. The adaptive slice also has local headless-browser validation for visual and interaction behavior. A repeatable browser suite is not yet committed to CI.
 
 ## 9. Deployment and environments
 
@@ -140,9 +150,9 @@ Create an ADR when a change:
 | Item | Type | Impact | Mitigation | Owner | Status |
 | --- | --- | --- | --- | --- | --- |
 | Production architecture not yet selected | Open decision | Prototype cannot be treated as production architecture | Select production boundaries after the Interview slice is validated | Project owner | Open |
-| Interview question selection is a starter sequence | Planned evolution | The current flow is guided but not yet dynamically adaptive to free-form intent | Preserve question model separately and add adaptive selection in a later requirement | Project owner | Open |
+| Local intent classification uses bounded keyword/rule signals | Known limitation | An idea can be under-tagged or over-tagged, which can make a question appear too early or be skipped | Keep routing hints visible and non-authoritative; validate representative idea types; consider richer semantic classification only after its trust and privacy boundaries are approved | Project owner | Open |
 | Browser-session state is temporary | Known limitation | Refresh or close can discard progress | Define persistence only after privacy and data authority are approved | Project owner | Open |
-| Manual visual validation is still required | Validation gap | Automated state tests do not prove visual fidelity or interaction quality | Add browser-level test tooling in a later architecture decision or bounded test change | Project owner | Open |
+| Browser validation is not yet committed as a repeatable CI suite | Validation gap | Local browser review proves the current change but does not automatically protect every future UI change | Add browser-level automated interaction/accessibility tests when the project selects its production test tooling | Project owner | Open |
 
 ## 14. Change rule
 
