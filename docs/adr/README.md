@@ -12,7 +12,7 @@ ADR status values:
 - **Deprecated** — still present historically but no longer recommended for new work.
 - **Rejected** — considered and explicitly not selected.
 
-An ADR may also remain as the original proposal document while a later accepted ADR records package-level acceptance or selection. In that case, the later ADR is the authoritative acceptance record and the earlier ADR's status history should link to it.
+An ADR may remain as the original proposal document while a later accepted ADR records package-level acceptance or selection. In that case, the later ADR is the authoritative acceptance record and the earlier ADR's status history should link to it.
 
 ## Current M1 production architecture
 
