@@ -1,0 +1,33 @@
+name: Final architecture reconciliation
+
+on:
+  push:
+    branches:
+      - feature/m2-durable-project-slice
+    paths:
+      - '.github/scripts/final_architecture_reconcile.py'
+      - '.github/workflows/final-architecture-reconcile.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/m2-durable-project-slice
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Reconcile architecture status and risks
+        run: python .github/scripts/final_architecture_reconcile.py
+      - name: Commit architecture reconciliation
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/ARCHITECTURE.md
+          git commit -m 'Reconcile architecture after M2 validation'
+          git push origin HEAD:feature/m2-durable-project-slice
