@@ -17,6 +17,11 @@ permissions:
 jobs:
   local-wayfound:
     runs-on: ubuntu-latest
+    env:
+      WAYFOUND_IDENTITY_MODE: local
+      WAYFOUND_PERSISTENCE_MODE: local
+      WAYFOUND_AI_PROVIDER: off
+      WAYFOUND_LOCAL_DB: ${{ runner.temp }}/wayfound-e2e.sqlite
     defaults:
       run:
         working-directory: web
@@ -35,6 +40,10 @@ jobs:
         run: npm run typecheck
       - name: Production build
         run: npm run build
+      - name: Install Chromium for local browser validation
+        run: npx playwright install --with-deps chromium
+      - name: Local browser flow
+        run: npm run test:e2e
 
   optional-postgres-compatibility:
     runs-on: ubuntu-latest
