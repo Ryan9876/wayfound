@@ -14,6 +14,7 @@ test('durable adaptive Interview persists, resumes, revises, and rejects stale w
   const projectId = page.url().split('/').at(-1)!;
   await expect(page.getByText('Project version 1')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'If this works really well, what would make you happiest about it?' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Back' })).toBeDisabled();
   await expect(page.getByText('People enjoy using it', { exact: true })).toBeVisible();
   await page.locator('input[value="enjoy"]').check();
   await page.getByRole('button', { name: 'Save and continue' }).click();

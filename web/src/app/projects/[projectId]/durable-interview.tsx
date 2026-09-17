@@ -131,7 +131,7 @@ export function DurableInterview({ projectId }: { projectId: string }): React.Re
     return <main className="shell"><section className="card"><p>{message}</p></section></main>;
   }
 
-  if (state.complete || !question) {
+  if (state.complete) {
     const summary = getSummary(state);
     return (
       <main className="shell">
@@ -150,6 +150,21 @@ export function DurableInterview({ projectId }: { projectId: string }): React.Re
           </div>
           <div className="actions">
             <button className="button primary" type="button" onClick={() => { setState(reviewInterview(state)); setMessage(''); }}>Review choices</button>
+            <Link className="button" href="/projects">Back to projects</Link>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  if (!question) {
+    return (
+      <main className="shell">
+        <section className="card">
+          <h1>Wayfound lost its place for a moment.</h1>
+          <p className="muted">Your saved answers are still local. Reload the Interview to reconstruct the current step.</p>
+          <div className="actions">
+            <button className="button primary" type="button" onClick={() => void load()}>Reload Interview</button>
             <Link className="button" href="/projects">Back to projects</Link>
           </div>
         </section>
@@ -209,7 +224,7 @@ export function DurableInterview({ projectId }: { projectId: string }): React.Re
         </fieldset>
 
         <div className="actions interview-actions">
-          <button className="button" type="button" onClick={() => setState(goBackInterview(state))}>Back</button>
+          <button className="button" type="button" disabled={state.history.length === 0} onClick={() => setState(goBackInterview(state))}>Back</button>
           <button className="button primary" type="button" disabled={saving || !selected} onClick={() => void saveAndContinue()}>
             {saving ? 'Saving…' : 'Save and continue'}
           </button>
