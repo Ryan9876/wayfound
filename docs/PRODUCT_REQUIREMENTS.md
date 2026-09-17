@@ -702,6 +702,75 @@ Generated drafts need an intentional human disposition before they can become au
 - Logging/content-minimization tests.
 - Next.js build and local project tests with no hosted credentials.
 
+### WF-023 — Preserve validated adaptive Interview semantics in the durable runtime
+
+**Status:** Approved
+
+**Priority:** P0
+
+**User or system:** Wayfound
+
+**Requirement:**
+
+> When a local durable project runs the Interview, Wayfound MUST use the validated adaptive Interview question, applicability, recommendation, tradeoff, progress, and completion semantics rather than introducing a separate durable-mode question flow.
+
+**Acceptance criteria:**
+
+- The durable runtime uses the same question identifiers, option identifiers, applicability rules, priorities, recommendations, help text, rationale, and tradeoffs as the validated Interview model.
+- The same starting idea and current answer set produce the same applicable required questions and next unanswered question as the validated model.
+- An answer can make later questions appear or disappear using the existing applicability rules.
+- `I am not sure yet` remains a valid unresolved answer and does not become a blocker or accepted decision merely because it is durable.
+- Progress and completion use only currently applicable required questions.
+- M2.1 does not introduce an LLM requirement or a second semantic classifier.
+
+**Constraints:**
+
+- The validated static Interview remains the behavior reference during this migration.
+- M2.1 MUST NOT silently rewrite the question bank or recommendation policy.
+- Full durable projection of assumptions, blockers, open questions, and downstream build artifacts remains separate follow-on work unless required to preserve current-answer semantics.
+
+**Evidence / validation:**
+
+- Automated parity check against the validated Interview model source.
+- Durable-model tests across representative general, game, learning, collaboration, integration, automation, and technical ideas.
+- Local Chromium flow confirms adaptive question changes in the durable project UI.
+
+### WF-024 — Persist and restore the current adaptive Interview answer state
+
+**Status:** Approved
+
+**Priority:** P0
+
+**User or system:** User
+
+**Requirement:**
+
+> When the local project owner accepts or revises an Interview choice, Wayfound MUST persist the current answer as an immutable local revision and reconstruct the adaptive Interview from those current revisions after refresh, navigation, or database/process reopen.
+
+**Acceptance criteria:**
+
+- Saving an Interview choice uses the authoritative local server command path and the current Project version.
+- The server validates that the question is currently applicable and that the option belongs to that question before persistence.
+- Accepted changes create immutable Answer Revisions and advance Project version through the existing M2 transaction boundary.
+- Revising an already answered question creates a later Answer Revision instead of overwriting history.
+- Reopening the project reconstructs current answers from persisted current Answer Revisions rather than browser-only state.
+- The reconstructed Interview resumes at the first currently applicable unanswered required question, or shows completion when all currently applicable required questions are answered.
+- Review/back interaction preserves already persisted selections and allows a revised choice to be saved as a new revision.
+- A stale browser version is rejected instead of silently overwriting a newer answer.
+- `not-sure` persists as unresolved Interview state and MUST NOT be materialized as an accepted decision Record in M2.1.
+
+**Constraints:**
+
+- M2.1 remains local-first and requires no account, hosted database, or model provider.
+- Changing the starting idea is not added in this slice; when idea editing is introduced it must explicitly reconcile applicability and prior answers.
+- Full durable Records parity, including derived assumptions/blockers/open questions, is a subsequent migration slice.
+
+**Evidence / validation:**
+
+- SQLite integration tests for answer revision/reopen/stale-write behavior.
+- Browser refresh/reopen test for persisted selected choices and adaptive resume.
+- Browser review/edit test proving a changed choice creates the new current state without losing prior revision history.
+
 ## 5. Non-functional requirements
 
 Do not invent numeric targets. Establish targets only when the product context supports them.
@@ -777,6 +846,8 @@ Local and hosted adapters SHOULD share the same domain-rule tests/contracts so p
 | WF-020 | Materialize a proposal against exact current local source revisions | P0 | Validated | Domain + SQLite integration tests |
 | WF-021 | Enforce Wayfound project authorization in local and optional hosted modes | P0 | Validated | Capability + adapter integration tests |
 | WF-022 | Keep project content local by default and make AI egress explicit | P0 | Validated | AI boundary + logging + no-cloud build tests |
+| WF-023 | Preserve validated adaptive Interview semantics in the durable runtime | P0 | Approved | Model parity + adaptive durable tests |
+| WF-024 | Persist and restore the current adaptive Interview answer state | P0 | Approved | SQLite revision/reopen + Chromium tests |
 
 ## 7. Validation record
 
