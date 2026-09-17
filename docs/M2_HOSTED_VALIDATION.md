@@ -36,27 +36,52 @@ This Neon project is validation infrastructure only. Its 6-hour Neon history-ret
 
 The connected Vercel project `wayfound-preview` currently serves the earlier Borrow Desk / overview prototype with fixture data. Its current project metadata does not record a Git repository link, and its latest deployment is not the M2 application.
 
-Do not treat `wayfound-preview.vercel.app` as M2 validation evidence and do not overwrite it casually. Before M2 deployment, explicitly confirm whether this project should be repurposed or whether M2 should use a separate preview project, and configure the application root for `web/`.
+Preserve that deployment as a visual/prototype reference. M2 hosted validation will use a separate Vercel project named `wayfound-m2-preview`, connected to the `Ryan9876/wayfound` repository with **Root Directory = `web`**. The M2 branch must deploy as a Preview environment; the preview project does not authorize production release.
+
+## Clerk setup decision
+
+Use Clerk's native Vercel Marketplace integration for M2 instead of manually copying Clerk keys through chat or committing them to Git.
+
+For the `wayfound-m2-preview` Vercel project:
+
+- provision a Clerk application/resource through the Vercel Marketplace
+- use Clerk's development instance for Vercel Development and Preview environments
+- allow the integration to sync `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` into the Vercel project
+- do not use production Clerk credentials for M2 validation
+- keep Wayfound project authorization application-owned; Clerk proves identity only
+
+The current M2 code already expects exactly those two Clerk variables and maps the authenticated Clerk `userId` to a stable internal Wayfound Actor.
 
 ## Remaining validation sequence
 
-1. **Clerk development identity**
-   - Create or select a non-production Clerk application.
-   - Configure the Clerk publishable and secret keys through the deployment environment, not Git or chat.
-   - Sign in with a development test user.
+1. **Create the M2 Vercel project**
+   - Create `wayfound-m2-preview` as a separate Vercel project.
+   - Connect it to `Ryan9876/wayfound`.
+   - Set Root Directory to `web`.
+   - Preserve the existing `wayfound-preview` fixture project unchanged.
+
+2. **Provision Clerk through Vercel Marketplace**
+   - Install/provision a non-production Clerk application/resource for `wayfound-m2-preview`.
+   - Confirm the Clerk development instance is connected to Vercel Preview/Development.
+   - Confirm Vercel has `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` without exposing either value in Git or chat.
+
+3. **Configure preview-only data values**
+   - Set `WAYFOUND_DATA_ENV=preview` for the Vercel Preview environment.
+   - Set `DATABASE_URL` to the dedicated Neon preview database using Vercel's secure environment-variable storage.
+   - Do not expose the connection string in Git, PR comments, or chat.
+   - Do not configure any production project database for this validation project.
+
+4. **Deploy the M2 branch as Preview**
+   - Deploy `feature/m2-durable-project-slice` through the `wayfound-m2-preview` project.
+   - Confirm the runtime sees Vercel Preview and `WAYFOUND_DATA_ENV=preview` as matching environments.
+   - Confirm a configuration mismatch fails closed before durable project operations.
+
+5. **Hosted identity checks**
+   - Sign in with a Clerk development test user.
    - Confirm repeated requests for the same Clerk subject map to one stable Wayfound Actor.
-   - Confirm unauthenticated project commands are rejected.
+   - Confirm unauthenticated protected project commands are rejected.
 
-2. **Vercel M2 preview**
-   - Confirm whether to repurpose `wayfound-preview` or use a separate M2 preview project.
-   - Confirm the deployment root/build configuration targets `web/`.
-   - Configure preview-only values for `DATABASE_URL`, `WAYFOUND_DATA_ENV=preview`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, and `CLERK_SECRET_KEY`.
-   - Use the dedicated Neon preview database above; do not use production database credentials.
-   - Confirm preview configuration cannot access production project data.
-   - Deploy the M2 branch as a preview; deployment success is not release approval.
-
-3. **Hosted browser flow**
-   - Sign in through Clerk.
+6. **Hosted browser flow**
    - Create a private project.
    - Close/reopen or start a new browser session and reopen the project.
    - Save one accepted decision.
@@ -65,7 +90,7 @@ Do not treat `wayfound-preview.vercel.app` as M2 validation evidence and do not 
    - Confirm the result is `Proposed`, not `Approved`.
    - Attempt a stale write and confirm Wayfound reports a conflict instead of overwriting current state.
 
-4. **Reconcile evidence**
+7. **Reconcile evidence**
    - Record hosted validation evidence in `docs/PRODUCT_REQUIREMENTS.md`.
    - Change WF-017 through WF-022 to `Validated` only where all acceptance criteria actually passed.
    - Update `docs/DELIVERY_PLAN.md` and PR #9.
@@ -102,9 +127,10 @@ The Neon preview validation additionally proves:
 
 | Blocker | Dependency | Owner | Next action |
 | --- | --- | --- | --- |
-| Real Clerk authentication not exercised | Clerk development application and secure keys | Project owner | Configure Clerk development credentials in the preview deployment environment |
-| Hosted end-to-end browser path not exercised | Clerk + Vercel M2 preview configuration | Implementation | Deploy and run the hosted validation sequence after Clerk is configured |
-| Existing Vercel preview is the older fixture prototype | Preview project/root decision | Project owner / implementation | Preserve it and create a separate M2 preview, or explicitly approve repurposing it |
+| Separate M2 preview project not provisioned | Vercel project connected to `Ryan9876/wayfound` with root `web` | Project owner | Create `wayfound-m2-preview` and connect the repository |
+| Real Clerk authentication not exercised | Clerk Marketplace resource connected to the M2 preview project | Project owner | Provision Clerk through Vercel Marketplace |
+| Secure preview runtime values not configured | Vercel Preview environment | Project owner | Store `DATABASE_URL` and `WAYFOUND_DATA_ENV=preview`; Clerk integration supplies Clerk keys |
+| Hosted end-to-end browser path not exercised | Clerk + Vercel M2 preview configuration | Implementation | Deploy and run the hosted validation sequence after the above dependencies are available |
 
 ## Authority rule
 
