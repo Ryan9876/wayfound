@@ -190,7 +190,7 @@ Prove one durable project path that preserves the validated prototype's human-co
 - Documentation matches implementation.
 - Release decision is explicit.
 
-**Status:** In progress — WF-017 through WF-022 are approved and implementation is active in PR #9. Automated build, PostgreSQL, backup/restore, and migration rollback gates run in CI; live Clerk/preview browser validation remains pending.
+**Status:** In progress — WF-017 through WF-022 are approved. Application/domain CI, PostgreSQL integration, backup/restore, migration rollback, and managed Neon preview-schema validation pass. Remaining validation is non-production Clerk authentication plus the hosted Vercel Preview browser flow described in `docs/M2_HOSTED_VALIDATION.md`.
 
 ## 4. Active work
 
@@ -210,9 +210,10 @@ Prove one durable project path that preserves the validated prototype's human-co
 | Accept production architecture boundaries | ADR-0001 through ADR-0006 via ADR-0007 | Project owner | Accepted | M0.9 | Architecture review |
 | Select production stack | ADR-0007 | Project owner | Accepted | M1 boundary decisions | Stack comparison + project-owner approval |
 | Define M2 production requirements | WF-017 through WF-022 | Project owner | Approved | Accepted M1 | Requirements review |
-| Scaffold production Next.js/TypeScript application | ADR-0007 / WF-017 through WF-022 | Implementation | In progress | Approved M2 requirements | CI build/type/test gate |
-| Define initial Neon relational schema/migrations | ADR-0002 / ADR-0007 / WF-018 through WF-020 | Implementation | In progress | Approved M2 requirements | PostgreSQL integration + rollback/restore gates |
-| Integrate Clerk identity → Wayfound Actor mapping | ADR-0003 / ADR-0007 / WF-017 | Implementation | In progress | Approved M2 requirements | Stable-Actor integration + non-production Clerk validation |
+| Scaffold production Next.js/TypeScript application | ADR-0007 / WF-017 through WF-022 | Implementation | Implemented; automated gate passing | Approved M2 requirements | CI build/type/test gate |
+| Define initial Neon relational schema/migrations | ADR-0002 / ADR-0007 / WF-018 through WF-020 | Implementation | Validated for M2 preview scope | Approved M2 requirements | PostgreSQL integration + managed Neon + rollback/restore gates |
+| Integrate Clerk identity → Wayfound Actor mapping | ADR-0003 / ADR-0007 / WF-017 | Implementation | Implemented; hosted validation pending | Clerk development resource + M2 Vercel Preview | Stable-Actor integration + real Clerk sign-in validation |
+| Validate hosted M2 browser path | WF-017 through WF-022 | Implementation | Blocked | Separate `wayfound-m2-preview` Vercel project + Clerk Marketplace resource + secure preview env | Sign in → create → reopen → save → propose → conflict browser flow |
 
 ## 5. Work item standard
 
@@ -248,24 +249,10 @@ Do not use `blocked` for ordinary uncertainty that can be handled by a reversibl
 
 ## 7. Future work
 
-Near-term work after M2 requirements are approved:
+Near-term work after M2 hosted validation:
 
-- production Next.js / TypeScript scaffold
-- application/domain module boundaries
-- Neon PostgreSQL schema, migrations, revision and traceability invariants
-- Clerk authentication and internal Actor mapping
-- project authorization/capabilities
-- production browser/integration tests
-- environment separation, preview-data isolation, migration and rollback evidence
-
-Later work, not committed to M2 by default:
-
-- richer semantic question routing if the deterministic classifier proves too limited
-- external AI assistance with explicit trust and data-processing boundaries
-- public/shared projects after privacy and authorization requirements are approved
-- code-generation/development-agent execution
-- additional integrations
-
-## 8. Change rule
-
-Update this plan when approved scope, requirement priority, dependency order, or delivery status changes. Do not use the plan as a substitute for requirements or architecture records.
+- migrate the validated Interview experience onto the durable project model incrementally
+- select the production accessibility target
+- define retention, deletion, consent, and age-related product requirements before real hosted user-content release
+- define the separate formal Artifact approval requirement and authorized project-owner workflow
+- evaluate external AI adapters only after privacy/consent boundaries are approved
