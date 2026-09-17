@@ -8,6 +8,12 @@ The M2 application, domain, PostgreSQL, migration, backup/restore, and rollback 
 
 Do not use production project data for this gate.
 
+## Current Vercel observation
+
+The connected Vercel project `wayfound-preview` currently serves the earlier Borrow Desk / overview prototype with fixture data. Its current project metadata does not record a Git repository link, and its latest deployment is not the M2 application.
+
+Do not treat `wayfound-preview.vercel.app` as M2 validation evidence and do not overwrite it casually. Before M2 deployment, explicitly confirm whether this project should be repurposed or whether M2 should use a separate preview project, and configure the application root for `web/`.
+
 ## Remaining validation sequence
 
 1. **Neon preview database**
@@ -25,7 +31,8 @@ Do not use production project data for this gate.
    - Confirm unauthenticated project commands are rejected.
 
 3. **Vercel preview**
-   - Use the existing `wayfound-preview` project only after its root/build configuration is confirmed for `web/`.
+   - Confirm whether to repurpose `wayfound-preview` or use a separate M2 preview project.
+   - Confirm the deployment root/build configuration targets `web/`.
    - Configure preview-only values for `DATABASE_URL`, `WAYFOUND_DATA_ENV=preview`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, and `CLERK_SECRET_KEY`.
    - Confirm preview configuration cannot access production project data.
    - Deploy the M2 branch as a preview; deployment success is not release approval.
@@ -73,6 +80,7 @@ The current PR #9 CI proves:
 | Managed PostgreSQL adapter not exercised on Neon | Non-production Neon connection | Project owner / implementation | Connect Neon and provision/select a preview database branch |
 | Real Clerk authentication not exercised | Clerk development application and secure keys | Project owner | Configure Clerk development credentials in the preview deployment environment |
 | Hosted end-to-end browser path not exercised | Neon + Clerk + Vercel preview configuration | Implementation | Deploy and run the hosted validation sequence after both dependencies are available |
+| Existing Vercel preview is the older fixture prototype | Preview project/root decision | Project owner / implementation | Decide whether to preserve it and create a new M2 preview project or explicitly repurpose it |
 
 ## Authority rule
 
