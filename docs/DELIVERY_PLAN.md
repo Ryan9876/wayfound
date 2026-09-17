@@ -190,7 +190,7 @@ Prove one durable project path that preserves the validated prototype's human-co
 - Documentation matches implementation.
 - Release decision is explicit.
 
-**Status:** Proposed — requirements and implementation slice still need to be defined before coding starts.
+**Status:** In progress — WF-017 through WF-022 are approved and implementation is active in PR #9. Automated build, PostgreSQL, backup/restore, and migration rollback gates run in CI; live Clerk/preview browser validation remains pending.
 
 ## 4. Active work
 
@@ -209,10 +209,10 @@ Prove one durable project path that preserves the validated prototype's human-co
 | Review actionable draft artifacts | WF-016 | Implementation | Validated | Validated Draft artifacts | 7 model tests + Chromium interaction/responsive gate |
 | Accept production architecture boundaries | ADR-0001 through ADR-0006 via ADR-0007 | Project owner | Accepted | M0.9 | Architecture review |
 | Select production stack | ADR-0007 | Project owner | Accepted | M1 boundary decisions | Stack comparison + project-owner approval |
-| Define M2 production requirements | Future WF requirements | Project owner | Next | Accepted M1 | Requirements review |
-| Scaffold production Next.js/TypeScript application | ADR-0007 | Implementation | Blocked | M2 requirements approved | Build/test gate |
-| Define initial Neon relational schema/migrations | ADR-0002 / ADR-0007 | Implementation | Blocked | M2 requirements approved | Schema/integration tests |
-| Integrate Clerk identity → Wayfound Actor mapping | ADR-0003 / ADR-0007 | Implementation | Blocked | M2 requirements approved | Auth/authorization tests |
+| Define M2 production requirements | WF-017 through WF-022 | Project owner | Approved | Accepted M1 | Requirements review |
+| Scaffold production Next.js/TypeScript application | ADR-0007 / WF-017 through WF-022 | Implementation | In progress | Approved M2 requirements | CI build/type/test gate |
+| Define initial Neon relational schema/migrations | ADR-0002 / ADR-0007 / WF-018 through WF-020 | Implementation | In progress | Approved M2 requirements | PostgreSQL integration + rollback/restore gates |
+| Integrate Clerk identity → Wayfound Actor mapping | ADR-0003 / ADR-0007 / WF-017 | Implementation | In progress | Approved M2 requirements | Stable-Actor integration + non-production Clerk validation |
 
 ## 5. Work item standard
 
