@@ -16,10 +16,10 @@
       <nav class="nav">
         <a href="#"><span aria-hidden="true">◫</span><span>Overview</span></a>
         <a href="#"><span aria-hidden="true">⌁</span><span>Journey</span></a>
-        <a href="#" class="active" aria-current="page"><span aria-hidden="true">◇</span><span>Interview</span></a>
+        <a href="#interview" class="active" aria-current="page" data-page="interview"><span aria-hidden="true">◇</span><span>Interview</span></a>
         <a href="#"><span aria-hidden="true">□</span><span>Work</span></a>
         <a href="#"><span aria-hidden="true">↔</span><span>Handoffs</span></a>
-        <a href="#"><span aria-hidden="true">≡</span><span>Records</span></a>
+        <a href="#records" data-page="records"><span aria-hidden="true">≡</span><span>Records</span></a>
         <a href="#"><span aria-hidden="true">✓</span><span>Release &amp; Care</span></a>
       </nav>
       <div class="sidebar-footer"><span class="status-dot" aria-hidden="true"></span><span>Evidence synced</span></div>
@@ -27,11 +27,16 @@
 
     <main class="main-content">
       <div class="topbar">
-        <div class="breadcrumb">Wayfound / <strong>Interview</strong></div>
-        <div class="stage-pill">Stage 1 · Understand</div>
+        <div class="breadcrumb">Wayfound / <strong id="pageName">Interview</strong></div>
+        <div class="stage-pill" id="stagePill">Stage 1 · Understand</div>
       </div>
 
-      <div class="page-grid">
+      <nav class="mobile-nav" aria-label="Wayfound mobile navigation">
+        <a href="#interview" class="active" aria-current="page" data-page="interview">Interview</a>
+        <a href="#records" data-page="records">Records</a>
+      </nav>
+
+      <div class="page-grid" id="interviewPage">
         <header class="page-header">
           <div class="eyebrow">GUIDED IDEA BUILDER</div>
           <h1>Turn an idea into something you can actually build.</h1>
@@ -67,6 +72,26 @@
 
           <div id="decisionLog"></div>
         </aside>
+      </div>
+
+      <div class="records-page" id="recordsPage" hidden>
+        <header class="page-header">
+          <div class="eyebrow">TRACEABLE PROJECT MEMORY</div>
+          <h1>The choices Wayfound can point back to.</h1>
+          <p>Records turn Interview answers into something future work can reference. Decisions, guesses, blockers, and open questions stay separate — because calling everything “notes” is how mysteries begin.</p>
+        </header>
+
+        <section class="panel records-panel">
+          <div class="records-head">
+            <div>
+              <div class="side-title">Current session</div>
+              <h2>Interview records</h2>
+            </div>
+            <button class="button" id="returnInterviewBtn" type="button">Back to Interview</button>
+          </div>
+          <div class="record-counts" id="recordCounts"></div>
+          <div class="records-body" id="recordsBody"></div>
+        </section>
       </div>
     </main>
   </div>

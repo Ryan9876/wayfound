@@ -351,6 +351,64 @@ A useful Interview should spend the user’s attention on decisions that can cha
 - Automated history test.
 - Browser keyboard and back-navigation review.
 
+
+### WF-012 — Project Interview state into structured records
+
+**Status:** Validated
+
+**Priority:** P0
+
+**User or system:** Wayfound
+
+**Requirement:**
+
+> When the current Interview contains accepted choices or derived uncertainty, Wayfound MUST project the applicable state into structured records so that later work can reference the origin and type of each item.
+
+**Acceptance criteria:**
+
+- An accepted applicable choice produces a decision record with a deterministic identifier, status, source, question identifier, selected choice, and tradeoff text when available.
+- A `not sure` answer produces an open-question record instead of an accepted decision record for that question.
+- Derived assumptions and blockers produce separate assumption and blocker records.
+- Answers that are no longer applicable to the current idea do not produce current records.
+- Recomputing records from the same Interview state produces the same identifiers and content.
+
+**Constraints:**
+
+- The initial record projection MUST remain derived from the in-memory Interview state.
+- The record projection MUST NOT become a second authoritative data source.
+- The initial slice MUST NOT persist records outside the current browser session.
+
+**Evidence / validation:**
+
+- Automated record-projection tests.
+- Browser review of decision, assumption, blocker, and open-question records.
+
+### WF-013 — Show current Interview records in Wayfound Records
+
+**Status:** Validated
+
+**Priority:** P1
+
+**User or system:** User
+
+**Requirement:**
+
+> When a user opens Records, Wayfound MUST show the structured records derived from the current Interview session so that the user can see what was decided, what is assumed, what is blocked, and what remains open.
+
+**Acceptance criteria:**
+
+- Records shows a clear empty state before the Interview produces records.
+- Records shows record type, identifier, title, statement, source, and supporting detail when available.
+- Records shows counts for decisions, assumptions, blockers, and open questions.
+- A user can switch between Interview and Records without losing the current in-memory Interview state.
+- Records is reachable on desktop and mobile layouts.
+- The Records view uses friendly labels while preserving stable record identifiers for traceability.
+
+**Evidence / validation:**
+
+- Browser interaction review at desktop and mobile widths.
+- Automated model tests for the record projection consumed by the page.
+
 ## 5. Non-functional requirements
 
 Do not invent numeric targets. Establish targets only when the product context supports them.
@@ -412,6 +470,8 @@ The Interview decision model SHOULD remain separate from rendering logic so ques
 | WF-009 | Let answers change what must be asked next | P0 | Validated | Applicability + browser tests |
 | WF-010 | Calculate progress from useful required questions | P1 | Validated | Completion + browser tests |
 | WF-011 | Preserve choices during adaptive review | P1 | Validated | History + browser tests |
+| WF-012 | Project Interview state into structured records | P0 | Validated | Record-model + browser tests |
+| WF-013 | Show current Interview records in Wayfound Records | P1 | Validated | Browser + record-model tests |
 
 ## 7. Validation record
 
@@ -438,6 +498,18 @@ The current slice is validated for its defined prototype scope. It is not releas
 - Full adaptive completion reached 100% using only the required questions applicable to the idea and accepted answers.
 - Keyboard selection, back-navigation, original-idea traceability, and responsive layouts down to 320 px were reviewed.
 - No external AI, persistence, account, or network dependency was introduced.
+
+
+**2026-09-17 — Interview Records slice**
+
+- `node --test tests/*.test.mjs`: 17 tests passed.
+- JavaScript syntax checks passed for `app/interview.js` and `app/interview-model.js`.
+- Automated tests verified deterministic decision identifiers, open-question handling, derived assumption/blocker records, and exclusion of non-applicable answers.
+- Browser validation confirmed the Records empty state, Interview-to-Records navigation, preserved session state, and record rendering after a completed adaptive Interview.
+- The validated technical scenario produced seven decision records, two assumption records, one blocker record, and zero open-question records.
+- Desktop and 390 px mobile layouts were reviewed with no horizontal overflow.
+- Mobile navigation was added so Interview and Records remain reachable after the desktop sidebar collapses.
+- Records remain session-only and derived from Interview state; no persistence or second data authority was introduced.
 
 ## 8. Change rule
 

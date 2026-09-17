@@ -404,6 +404,88 @@ export function isInterviewComplete(state) {
     .every((question) => Boolean(state.answers[question.id]));
 }
 
+function stableRecordSuffix(value = '') {
+  let hash = 2166136261;
+  for (const character of String(value)) {
+    hash ^= character.charCodeAt(0);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(36).toUpperCase().padStart(6, '0').slice(0, 6);
+}
+
+export function getInterviewRecords(state) {
+  const applicable = getApplicableQuestions(state);
+  const records = [];
+
+  applicable.forEach((question) => {
+    const option = getSelectedOption(state, question.id);
+    if (!option) return;
+
+    if (option.id === 'not-sure') {
+      records.push({
+        id: `OQ-${question.id.toUpperCase()}`,
+        type: 'open-question',
+        status: 'open',
+        title: question.stateLabel ?? question.stage,
+        statement: question.prompt,
+        detail: 'This answer is intentionally unresolved.',
+        source: 'Interview',
+        questionId: question.id
+      });
+      return;
+    }
+
+    const resolved = getResolvedQuestion(state, question.id);
+    records.push({
+      id: `DEC-${question.id.toUpperCase()}`,
+      type: 'decision',
+      status: 'accepted',
+      title: question.stateLabel ?? question.stage,
+      statement: option.label,
+      detail: option.tradeoff ?? '',
+      recommended: option.id === resolved?.recommendation?.optionId,
+      source: 'Interview',
+      questionId: question.id
+    });
+  });
+
+  const derived = deriveProjectState(state);
+  derived.assumptions.forEach((statement) => records.push({
+    id: `ASM-${stableRecordSuffix(statement)}`,
+    type: 'assumption',
+    status: 'open',
+    title: 'Guess to verify',
+    statement,
+    detail: 'Wayfound is keeping this visible until it is checked.',
+    source: 'Interview'
+  }));
+  derived.blockers.forEach((statement) => records.push({
+    id: `BLK-${stableRecordSuffix(statement)}`,
+    type: 'blocker',
+    status: 'open',
+    title: 'Something is stopping dependent work',
+    statement,
+    detail: 'Resolve this before dependent work is treated as ready.',
+    source: 'Interview'
+  }));
+  derived.openQuestions.forEach((statement) => {
+    const duplicate = records.some((record) => record.type === 'open-question' && record.statement === statement);
+    if (!duplicate) {
+      records.push({
+        id: `OQ-${stableRecordSuffix(statement)}`,
+        type: 'open-question',
+        status: 'open',
+        title: 'Something to figure out',
+        statement,
+        detail: 'This can stay open until it materially affects the next step.',
+        source: 'Interview'
+      });
+    }
+  });
+
+  return records;
+}
+
 export function getSummary(state) {
   const decisions = getApplicableQuestions(state)
     .filter((question) => state.answers[question.id])

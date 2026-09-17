@@ -8,6 +8,7 @@ import {
   getApplicableQuestions,
   getNextQuestion,
   getProgress,
+  getInterviewRecords,
   getSummary,
   goBackInterview,
   isInterviewComplete,
@@ -123,6 +124,7 @@ test('summary contains only applicable answered decisions', () => {
   assert.ok(!summary.decisions.some((d) => d.id === 'game-loop'));
 });
 
+
 test('privacy becomes applicable when collaboration becomes shared', () => {
   let state = { ...createInitialState(), idea: 'A puzzle game for my friends' };
   let ids = getApplicableQuestions(state).map((question) => question.id);
@@ -132,4 +134,48 @@ test('privacy becomes applicable when collaboration becomes shared', () => {
   state = selectAnswer(state, 'collaboration', 'small-shared');
   ids = getApplicableQuestions(state).map((question) => question.id);
   assert.ok(ids.includes('privacy'));
+});
+
+
+test('accepted answers create stable decision records', () => {
+  let state = withIdea('A tiny gardening helper');
+  state = selectAnswer(state, 'outcome', 'easier');
+  const records = getInterviewRecords(state);
+  const decision = records.find((record) => record.id === 'DEC-OUTCOME');
+  assert.equal(decision.type, 'decision');
+  assert.equal(decision.status, 'accepted');
+  assert.equal(decision.statement, 'It makes something easier to do or manage');
+  assert.equal(decision.questionId, 'outcome');
+});
+
+test('not-sure answers become open-question records instead of decisions', () => {
+  let state = withIdea('A puzzle game');
+  state = selectAnswer(state, 'game-loop', 'not-sure');
+  const records = getInterviewRecords(state);
+  assert.ok(records.some((record) => record.id === 'OQ-GAME-LOOP' && record.type === 'open-question'));
+  assert.ok(!records.some((record) => record.id === 'DEC-GAME-LOOP'));
+});
+
+test('derived guesses and blockers become separate records', () => {
+  let state = withIdea('A tool that connects to an API');
+  state = selectAnswer(state, 'dependencies', 'assume-normal');
+  const records = getInterviewRecords(state);
+  assert.ok(records.some((record) => record.type === 'assumption'));
+  assert.ok(records.some((record) => record.type === 'blocker'));
+  assert.ok(records.some((record) => record.id === 'DEC-DEPENDENCIES'));
+});
+
+test('records exclude answers that are not applicable to the current idea', () => {
+  let state = withIdea('A puzzle game');
+  state = selectAnswer(state, 'control', 'risk-based');
+  const records = getInterviewRecords(state);
+  assert.ok(!records.some((record) => record.id === 'DEC-CONTROL'));
+});
+
+test('record identifiers are deterministic for the same interview state', () => {
+  let state = withIdea('A tool that connects to an API');
+  state = selectAnswer(state, 'dependencies', 'assume-normal');
+  const first = getInterviewRecords(state).map((record) => record.id);
+  const second = getInterviewRecords(state).map((record) => record.id);
+  assert.deepEqual(first, second);
 });
