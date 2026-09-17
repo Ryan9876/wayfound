@@ -1,6 +1,6 @@
 # Wayfound Architecture
 
-**Status:** Approved local-first production baseline; M2 implementation in progress
+**Status:** Approved local-first production baseline; M2 validated
 
 ## Purpose
 
@@ -262,13 +262,13 @@ Create an ADR when a change:
 
 | Item | Type | Impact | Mitigation | Owner | Status |
 | --- | --- | --- | --- | --- | --- |
-| Local-first durable runtime still being implemented | Delivery gap | Validated prototype and durable local application are not yet fully unified | Complete M2 against ADR-0009 and validate local persistence/restart flow | Project owner | In progress |
+| Durable M2 checkpoint is not yet the full validated Interview experience | Delivery gap | The local durable runtime proves authority and persistence, while the full adaptive Interview still lives in the validated prototype | Migrate WF-001 through WF-016 onto the local durable project model incrementally with regression/browser gates | Project owner | Open |
 | Local database backup/upgrade UX not yet productized | Reliability/UX | Users could lose local project history if the file is damaged or deleted | Add documented backup/export and tested migration/recovery before broad reliance | Project owner | Open |
 | Desktop packaging not selected | UX/operations | Users currently need a local Node/Next process rather than a one-click desktop app | Evaluate native wrapper/installer after M2 local runtime is stable | Project owner | Open |
 | Privacy / retention / age policy details not yet finalized for hosted mode | Product/governance decision | Real hosted user content cannot safely be opened broadly until policy requirements are defined | Define hosted retention, deletion, consent, guardian/age eligibility rules before relevant hosted use | Project owner | Open |
 | Local intent classification uses bounded keyword/rule signals | Known limitation | An idea can be under-tagged or over-tagged | Keep routing hints visible and non-authoritative; consider richer semantic classification through approved local/optional AI adapters | Project owner | Open |
 | Draft artifacts are suggestions, not approved state | Governance boundary | Users could mistake generated candidates for project truth | Preserve explicit Draft/Proposed/Approved lifecycle and exact revision binding | Project owner | Open |
-| Browser validation is not yet committed as repeatable CI | Validation gap | Unit/integration gates do not automatically protect every future UI change | Add browser-level local interaction/accessibility testing | Project owner | Open |
+| Browser CI currently covers the M2 checkpoint, not the full Interview/accessibility surface | Validation gap | Future Interview migration could regress broader UX outside the current M2 checkpoint | Expand Playwright coverage as WF-001 through WF-016 move onto durable state and select a formal accessibility target | Project owner | Open |
 | Local and hosted adapters can drift | Architecture risk | Same domain command could behave differently by storage/identity mode | Keep shared domain rules and contract/integration tests for every supported adapter | Project owner | Open |
 
 ## 14. Change rule
