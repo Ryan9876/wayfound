@@ -34,6 +34,18 @@ export type InterviewState = {
   answers: Record<string, string>;
 };
 
+export type InterviewRecord = {
+  id: string;
+  type: 'decision' | 'assumption' | 'blocker' | 'open-question';
+  status: 'accepted' | 'open';
+  title: string;
+  statement: string;
+  detail: string;
+  source: string;
+  recommended?: boolean;
+  questionId?: string;
+};
+
 export const QUESTION_BANK: InterviewQuestion[];
 export function classifyIdea(idea?: string): string[];
 export function createInitialState(): InterviewState;
@@ -47,8 +59,14 @@ export function startInterview(state: InterviewState): InterviewState;
 export function advanceInterview(state: InterviewState): InterviewState;
 export function goBackInterview(state: InterviewState): InterviewState;
 export function reviewInterview(state: InterviewState): InterviewState;
+export function deriveProjectState(state: InterviewState): {
+  assumptions: string[];
+  blockers: string[];
+  openQuestions: string[];
+};
 export function getProgress(state: InterviewState): { answered: number; total: number; percent: number };
 export function isInterviewComplete(state: InterviewState): boolean;
+export function getInterviewRecords(state: InterviewState): InterviewRecord[];
 export function getSummary(state: InterviewState): {
   idea: string;
   tags: string[];
